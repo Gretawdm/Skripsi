@@ -1,0 +1,580 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Fossil Track{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="hero" class="hero section">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
+                <div class="hero-content">
+                    <h1>Prediksi, Analisis, dan Aksi untuk Masa Depan Energi Indonesia</h1>
+                    <p>Menggunakan Metode ARIMA dengan Variabel Eksternal Pertumbuhan PDB/Produk Domestik Bruto</p>
+                    <div class="hero-buttons">
+                        <a href="#" class="btn btn-outline-light">Lihat Data Historis</a>
+                        <a href="#" class="btn btn-success">Mulai Prediksi</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-wave">
+        <svg class="wave" viewBox="0 0 1440 300" preserveAspectRatio="none">
+            <path fill="#9bd3a7" d="M0,140
+                     C180,200 360,80 540,110
+                     C720,140 900,220 1080,180
+                     C1260,140 1350,110 1440,130
+                     L1440,300 L0,300 Z" />
+
+            <path fill="#6fbf8e" d="M0,170
+                     C200,230 380,110 560,140
+                     C740,170 920,260 1100,210
+                     C1280,170 1360,150 1440,160
+                     L1440,300 L0,300 Z" />
+
+            <path fill="#0f3f54" d="M0,210
+                     C220,270 400,150 580,180
+                     C760,210 940,300 1120,250
+                     C1300,210 1380,200 1440,210
+                     L1440,300 L0,300 Z" />
+        </svg>
+    </div>
+</section>
+<section class="overview-section">
+    <div class="overview-container">
+        <div class="overview-left">
+            <div class="about-card">
+                <h3>Tentang</h3>
+                <p>
+                    Aplikasi ini dikembangkan untuk menganalisis dan memprediksi konsumsi
+                    energi fosil di Indonesia berdasarkan data tahunan menggunakan metode
+                    time series ARIMAX. Data diperoleh dari
+                    <strong>Our World in Data</strong> dan <strong>World Bank</strong>.
+                </p>
+
+
+           
+              
+
+             
+
+               
+                <section class="system-role">
+                    <div class="container">
+                        <h2>Peran Sistem dalam Analisis dan Prediksi Energi</h2>
+                        <p class="subtitle">
+                            Sistem ini dirancang sebagai alat bantu analisis berbasis data
+                            untuk mendukung pemahaman tren konsumsi energi fosil
+                            dan pengambilan keputusan berbasis prediksi.
+                        </p>
+
+                        <div class="role-grid">
+                            <div class="role-card">
+                                <h3>Menyediakan Analisis Berbasis Data</h3>
+                                <p>
+                                    Sistem mengolah data historis konsumsi energi fosil Indonesia
+                                    dari sumber resmi untuk menghasilkan analisis yang objektif
+                                    dan terukur.
+                                </p>
+                            </div>
+
+                            <div class="role-card">
+                                <h3>Menghasilkan Prediksi Konsumsi Energi</h3>
+                                <p>
+                                    Dengan metode time series ARIMA dan ARIMAX,
+                                    sistem memprediksi konsumsi energi pada periode mendatang
+                                    berdasarkan pola historis dan variabel ekonomi.
+                                </p>
+                            </div>
+
+                            <div class="role-card">
+                                <h3>Mendukung Evaluasi dan Pengambilan Keputusan</h3>
+                                <p>
+                                    Hasil prediksi dan visualisasi grafik digunakan sebagai
+                                    bahan evaluasi untuk memahami dampak pertumbuhan ekonomi
+                                    terhadap konsumsi energi fosil.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <div class="overview-right">
+            <h3 class="why-title text-center">Mengapa prediksi ini penting?</h3>
+            <div class="section-grafik">
+                <h4 class="chart-title text-center">
+                    Grafik Tren Konsumsi Energi Fosil di Indonesia
+                </h4>
+                <div class="chart-wrapper">
+                    <canvas id="energyChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+
+<style>
+    .system-role {
+        padding: 80px 20px;
+        background-color: #f9fbfc;
+    }
+
+    .system-role .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .system-role h2 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #0b3c49;
+        margin-bottom: 16px;
+    }
+
+    .system-role .subtitle {
+        font-size: 16px;
+        color: #5f6f73;
+        max-width: 700px;
+        margin: 0 auto 48px;
+        line-height: 1.6;
+    }
+
+    .role-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+
+    .role-card {
+        background: #ffffff;
+        padding: 32px 24px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+        text-align: left;
+    }
+
+    .role-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0b3c49;
+        margin-bottom: 12px;
+    }
+
+    .role-card p {
+        font-size: 15px;
+        color: #5f6f73;
+        line-height: 1.6;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .role-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .system-role {
+            padding: 60px 16px;
+        }
+    }
+
+
+    .overview-section {
+        padding: 80px 20px;
+        background: transparent;
+        margin-top: -60px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .overview-left .about-card {
+        transform: translateY(-80px);
+        position: relative;
+        z-index: 3;
+        overflow: hidden;
+    }
+
+    .overview-left,
+    .overview-right {
+        flex: 1;
+    }
+
+    .overview-container {
+        max-width: 1200px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: 2fr 1.5fr;
+        gap: 20px;
+        align-items: start;
+    }
+
+    @media (max-width: 768px) {
+        .overview-left .about-card {
+            transform: translateY(0);
+        }
+
+        .overview-left{
+            order:2;
+        }
+
+        .overview-right{
+            order:1;
+        }
+
+        .overview-section {
+            margin-top: 0;
+        }
+    }
+
+    .about-card {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    .about-card h3,
+    .section-header h3 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .about-card p {
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: #374151;
+    }
+
+    .chart-title {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .why-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .why-card {
+        display: flex;
+        gap: 15px;
+        background: #ffffff;
+        padding: 16px;
+        border-radius: 14px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+        margin-bottom: 16px;
+    }
+
+    .why-icon {
+        min-width: 45px;
+        height: 44px;
+        border-radius: 10px;
+        background: #53B863;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+
+    .why-card h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .why-card p {
+        font-size: 0.85rem;
+        color: #4b5563;
+        line-height: 1.5;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 350px;
+        overflow: hidden;
+    }
+
+    .chart-wrapper canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .features-section {
+        padding: 80px 20px;
+        background: #ffffff;
+    }
+
+    .features-section .container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .features-title {
+        text-align: center;
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: #1f2d3d;
+        margin-bottom: 50px;
+    }
+
+    /* Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
+    }
+
+    /* Item */
+    .feature-item {
+        text-align: center;
+    }
+
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        background: #f3f6fb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px auto;
+        transition: all 0.3s ease;
+    }
+
+    .feature-icon i {
+        font-size: 28px;
+        color: #2e7d32;
+    }
+
+    .feature-item h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #1f2d3d;
+    }
+
+    .feature-item p {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    /* Hover */
+    .feature-item:hover .feature-icon {
+        background: #2e7d32;
+        transform: translateY(-5px);
+    }
+
+    .feature-item:hover .feature-icon i {
+        color: #ffffff;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+
+    /* RESPONSIVE */
+    @media (max-width: 992px) {
+        .overview-container {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-wrapper {
+            height: 280px;
+        }
+    }
+
+    /* Workflow Section */
+    .workflow-section {
+        padding: 90px 20px;
+        background: #f9fafb;
+    }
+
+    .workflow-section .container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    /* Header */
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: #0f3f54;
+        margin-bottom: 10px;
+    }
+
+    .section-header p {
+        font-size: 0.95rem;
+        color: #555;
+        max-width: 650px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .workflow-steps {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+
+    .workflow-step {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 30px 25px;
+        width: 200px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+    }
+
+    .workflow-step:hover {
+        transform: translateY(-6px);
+    }
+
+    /* Icon */
+    .step-icon {
+        width: 65px;
+        height: 65px;
+        background: #e8f5ee;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px auto;
+    }
+
+    .step-icon i {
+        font-size: 28px;
+        color: #2e7d32;
+    }
+
+    /* Text */
+    .workflow-step h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2d3d;
+        margin-bottom: 8px;
+    }
+
+    .workflow-step p {
+        font-size: 0.85rem;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+
+    /* Line Between Steps */
+    .step-line {
+        width: 40px;
+        height: 2px;
+        background: #cbd5e1;
+        margin: 0 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .workflow-steps {
+            flex-direction: column;
+        }
+
+        .step-line {
+            width: 2px;
+            height: 40px;
+            margin: 15px 0;
+        }
+
+        .workflow-step {
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .about-card {
+            margin-bottom: 1.5rem;
+        }
+
+        .overview-left .about-card {
+            transform: none !important;
+        }
+
+
+    }
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('energyChart');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['1970', '1980', '1990', '2000', '2010', '2020'],
+            datasets: [
+                {
+                    label: 'Data Historis',
+                    data: [50, 120, 260, 520, 780, 850],
+                    borderColor: '#1e88e5',
+                    backgroundColor: 'rgba(30,136,229,0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Prediksi ARIMAX',
+                    data: [null, null, null, null, 780, 920],
+                    borderColor: '#8bc34a',
+                    borderDash: [6, 6],
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Konsumsi Energi (Joule)'
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

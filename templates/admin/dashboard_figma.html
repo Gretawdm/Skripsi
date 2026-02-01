@@ -1,0 +1,226 @@
+{% extends 'admin/layouts/template.html' %}
+
+{% block title %}Dashboard - Admin{% endblock %}
+
+{% block content %}
+<div class="section-dashboard container-fluid">
+    <!-- Feature Cards -->
+    <div class="row g-4 mb-5">
+        <!-- Data Historis Card -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-table text-success fs-2 me-2"></i>
+                        <h5 class="card-title mb-0 fw-bold">Data Historis</h5>
+                    </div>
+                    <p class="card-text text-muted small">Unggah dan kelola data konsumsi energi fosil 1990 - 2023</p>
+                    <a href="" class="btn btn-success btn-sm">Kelola data historis</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Card -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-chart-line text-primary fs-2 me-2"></i>
+                        <h5 class="card-title mb-0 fw-bold">Model</h5>
+                    </div>
+                    <p class="card-text fw-bold">ARIMAX 1.16</p>
+                    <p class="card-text text-muted small">Retrain model ARIMAX dengan data terbaru</p>
+                    <a href="" class="btn btn-info btn-sm text-white">Latih ulang model</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediksi Card -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-cog text-info fs-2 me-2"></i>
+                        <h5 class="card-title mb-0 fw-bold">Prediksi</h5>
+                    </div>
+                    <p class="card-text fw-bold">2023 - 2030</p>
+                    <p class="card-text text-muted small">Atur batas tahun dan skenario prediksi</p>
+                    <a href="" class="btn btn-info btn-sm">Atur skenario prediksi</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Konten Card -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-file-alt text-teal fs-2 me-2"></i>
+                        <h5 class="card-title mb-0 fw-bold">Konten</h5>
+                    </div>
+                    <p class="card-text fw-bold">MAPE 4.23%</p>
+                    <p class="card-text text-muted small">Evaluasi akurasi model prediksi</p>
+                    <a href="" class="btn btn-teal btn-sm">Tinjau performa</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kelola Data Historis Section -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h4 class="fw-bold">Kelola Data Historis</h4>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#tambahDataModal">
+                <i class="fas fa-plus me-2"></i>Tambah Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label class="form-label small">Jenis Data:</label>
+            <select class="form-select" id="jenisDataFilter">
+                <option selected>Konsumsi Energi</option>
+                <option>PDB</option>
+                <option>Populasi</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label small">Rentang Tahun:</label>
+            <select class="form-select" id="rentangTahunFilter">
+                <option selected>1990 - Semua tahun</option>
+                <option>2000 - 2023</option>
+                <option>2010 - 2023</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tahun</th>
+                                    <th>Konsumsi Energi (Exajoule)</th>
+                                    <th>PDB</th>
+                                    <th>Indeks (2015 = 100)</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2019</td>
+                                    <td>125.4</td>
+                                    <td>127.9</td>
+                                    <td>124.3</td>
+                                    <td>
+                                        <i class="fas fa-check-circle text-success"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2020</td>
+                                    <td>124.0</td>
+                                    <td>120.7</td>
+                                    <td>120.7</td>
+                                    <td>
+                                        <i class="fas fa-check-circle text-success"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2021</td>
+                                    <td>125.5</td>
+                                    <td>125.5</td>
+                                    <td>125.5</td>
+                                    <td>
+                                        <i class="fas fa-check-circle text-success"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2022</td>
+                                    <td>129.5</td>
+                                    <td>129.6</td>
+                                    <td>129.6</td>
+                                    <td>
+                                        <i class="fas fa-check-circle text-success"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Kelola Data Historis</h5>
+                    <div class="mb-3">
+                        <label class="form-label small">Jenis Data:</label>
+                        <select class="form-select mb-2" style="max-width: 200px;">
+                            <option selected>Konsumsi Energi</option>
+                        </select>
+                        <label class="form-label small">Rentang Tahun:</label>
+                        <select class="form-select" style="max-width: 200px;">
+                            <option selected>1990 - Semua tahun</option>
+                        </select>
+                    </div>
+
+                    <div class="border rounded p-4 text-center bg-light mb-3">
+                        <i class="fas fa-file-csv fa-3x text-muted mb-3"></i>
+                        <p class="mb-2"><strong>Unggah File CSV/Excel untuk memperbarui data historis.</strong></p>
+                        <p class="text-muted small mb-3">Pastikan format sesuai historis Tahun, Konsumsi Energi, PDB</p>
+                        <button class="btn btn-success">
+                            <i class="fas fa-upload me-2"></i>Unggah Data
+                        </button>
+                        <div class="mt-2">
+                            <a href="#" class="text-muted small">Panduan Input Data CSV</a>
+                        </div>
+                    </div>
+
+                    <!-- Anomaly Detection -->
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <i class="fas fa-exclamation-triangle me-3 fs-4"></i>
+                        <div class="flex-grow-1">
+                            <strong>2 data anomali terdeteksi</strong>
+                            <p class="mb-0 small">Ditemukan 2 data anomali (nilai outlier) pada Konsumsi Energi. Mohon
+                                cek data historis dan perbarui data yang anomali.</p>
+                        </div>
+                        <button class="btn btn-success ms-3">Validasi Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .section-dashboard {
+        padding: 2rem;
+        margin-top: 1rem;
+    }
+
+    .text-teal {
+        color: #20c997;
+    }
+
+    .btn-teal {
+        background-color: #20c997;
+        color: white;
+        border: none;
+    }
+
+    .btn-teal:hover {
+        background-color: #1ba87e;
+        color: white;
+    }
+</style>
+{% endblock %}

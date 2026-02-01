@@ -1,0 +1,581 @@
+{% extends 'admin/layouts/template.html' %}
+
+{% block title %}Riwayat Aktivitas - Admin{% endblock %}
+
+{% block content %}
+<div class="section-history container-fluid mt-3 mb-5">
+    <div class="mt-1 row g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-primary border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Total Training</p>
+                            <h4 class="fw-bold mb-0" id="totalTraining">0</h4>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-brain text-primary fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Model retraining</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-success border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Update Data</p>
+                            <h4 class="fw-bold mb-0" id="totalDataUpdate">0</h4>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-database text-success fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Data fetch & upload</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-info border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Prediksi</p>
+                            <h4 class="fw-bold mb-0" id="totalPrediction">0</h4>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-chart-line text-info fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Forecast dibuat</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-warning border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Hari Ini</p>
+                            <h4 class="fw-bold mb-0" id="todayActivities">0</h4>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-calendar-day text-warning fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Aktivitas hari ini</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Tabs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <ul class="nav nav-tabs card-header-tabs" id="historyTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="training-tab" data-bs-toggle="tab"
+                                data-bs-target="#training" type="button" role="tab">
+                                <i class="fas fa-brain me-2"></i>Riwayat Training Model
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data"
+                                type="button" role="tab">
+                                <i class="fas fa-database me-2"></i>Riwayat Update Data
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="prediction-tab" data-bs-toggle="tab"
+                                data-bs-target="#prediction" type="button" role="tab">
+                                <i class="fas fa-chart-line me-2"></i>Riwayat Prediksi
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <!-- Filter Section -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small">Filter Tanggal</label>
+                            <select class="form-select form-select-sm" id="dateFilter">
+                                <option value="all">Semua Waktu</option>
+                                <option value="today">Hari Ini</option>
+                                <option value="week">7 Hari Terakhir</option>
+                                <option value="month" selected>30 Hari Terakhir</option>
+                                <option value="year">1 Tahun Terakhir</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small">Status</label>
+                            <select class="form-select form-select-sm" id="statusFilter">
+                                <option value="all">Semua Status</option>
+                                <option value="success">Berhasil</option>
+                                <option value="failed">Gagal</option>
+                                <option value="running">Sedang Berjalan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small">Cari</label>
+                            <input type="text" class="form-control form-control-sm" id="searchInput"
+                                placeholder="Cari berdasarkan keterangan...">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-sm btn-primary w-100" id="btnApplyFilter">
+                                <i class="fas fa-filter me-1"></i>Terapkan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="historyTabContent">
+                        <!-- Training History Tab -->
+                        <div class="tab-pane fade show active" id="training" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 5%;">No</th>
+                                            <th style="width: 15%;">Tanggal & Waktu</th>
+                                            <th style="width: 12%;">Model Version</th>
+                                            <th style="width: 15%;">Parameters (p,d,q)</th>
+                                            <th style="width: 12%;">Akurasi (MAPE)</th>
+                                            <th style="width: 10%;">Status</th>
+                                            <th style="width: 20%;">Keterangan</th>
+                                            <th style="width: 11%;">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="trainingTableBody">
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4">
+                                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                                <p>Belum ada riwayat training model</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination -->
+                            <nav id="trainingPagination" style="display: none;">
+                                <ul class="pagination justify-content-center">
+                                    <!-- Pagination items will be inserted here -->
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <!-- Data Update History Tab -->
+                        <div class="tab-pane fade" id="data" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 5%;">No</th>
+                                            <th style="width: 15%;">Tanggal & Waktu</th>
+                                            <th style="width: 12%;">Metode</th>
+                                            <th style="width: 15%;">Jenis Data</th>
+                                            <th style="width: 12%;">Records Ditambah</th>
+                                            <th style="width: 10%;">Status</th>
+                                            <th style="width: 20%;">Keterangan</th>
+                                            <th style="width: 11%;">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dataTableBody">
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4">
+                                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                                <p>Belum ada riwayat update data</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination -->
+                            <nav id="dataPagination" style="display: none;">
+                                <ul class="pagination justify-content-center">
+                                    <!-- Pagination items will be inserted here -->
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <!-- Prediction History Tab -->
+                        <div class="tab-pane fade" id="prediction" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 5%;">No</th>
+                                            <th style="width: 15%;">Tanggal & Waktu</th>
+                                            <th style="width: 12%;">Model Used</th>
+                                            <th style="width: 15%;">Forecast Period</th>
+                                            <th style="width: 12%;">Skenario</th>
+                                            <th style="width: 10%;">Status</th>
+                                            <th style="width: 20%;">User/Admin</th>
+                                            <th style="width: 11%;">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="predictionTableBody">
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4">
+                                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                                <p>Belum ada riwayat prediksi</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination -->
+                            <nav id="predictionPagination" style="display: none;">
+                                <ul class="pagination justify-content-center">
+                                    <!-- Pagination items will be inserted here -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalTitle">Detail Aktivitas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailModalBody">
+                <!-- Detail content will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus riwayat ini?</p>
+                <p class="text-danger"><strong>Perhatian:</strong> Tindakan ini tidak dapat dibatalkan.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmDelete">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="notificationToast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-bell me-2"></i>
+            <strong class="me-auto">Notifikasi</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Pesan notifikasi
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        loadSummary();
+        loadTrainingHistory();
+
+        // Tab change listeners
+        document.getElementById('training-tab').addEventListener('click', loadTrainingHistory);
+        document.getElementById('data-tab').addEventListener('click', loadDataHistory);
+        document.getElementById('prediction-tab').addEventListener('click', loadPredictionHistory);
+
+        // Clear history button
+        document.getElementById('btnClearHistory').addEventListener('click', confirmClearAll);
+    });
+
+    // Load summary statistics
+    function loadSummary() {
+        fetch('/api/history/summary')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const stats = data.data;
+                    document.getElementById('totalTraining').textContent = stats.total_training || 0;
+                    document.getElementById('totalDataUpdate').textContent = stats.total_data_update || 0;
+                    document.getElementById('totalPrediction').textContent = stats.total_prediction || 0;
+                    document.getElementById('todayActivities').textContent = stats.today_activities || 0;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading summary:', error);
+            });
+    }
+
+    // Load training history
+    function loadTrainingHistory() {
+        fetch('/api/history/training')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data && data.data.length > 0) {
+                    renderTrainingTable(data.data);
+                } else {
+                    document.getElementById('trainingTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                <p>Belum ada riwayat training model</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading training history:', error);
+            });
+    }
+
+    // Render training table
+    function renderTrainingTable(items) {
+        const tbody = document.getElementById('trainingTableBody');
+        tbody.innerHTML = items.map((item, index) => `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${item.training_date || '-'}</td>
+                <td><span class="badge bg-primary">${item.model_version || 'v1.0'}</span></td>
+                <td><code>ARIMAX(${item.p || 0}, ${item.d || 0}, ${item.q || 0})</code></td>
+                <td><strong class="${item.mape < 10 ? 'text-success' : item.mape < 20 ? 'text-warning' : 'text-danger'}">${item.mape ? item.mape.toFixed(2) + '%' : '-'}</strong></td>
+                <td><span class="badge bg-success">Success</span></td>
+                <td><small>${item.year_range || '-'} (${item.total_data || 0} data)</small></td>
+                <td>
+                    <button class="btn btn-sm btn-info" onclick="viewTrainingDetail(${item.id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Load data update history
+    function loadDataHistory() {
+        fetch('/api/history/data-update')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data && data.data.length > 0) {
+                    renderDataTable(data.data);
+                } else {
+                    document.getElementById('dataTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                <p>Belum ada riwayat update data</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading data history:', error);
+            });
+    }
+
+    // Render data update table
+    function renderDataTable(items) {
+        const tbody = document.getElementById('dataTableBody');
+        tbody.innerHTML = items.map((item, index) => `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${item.update_date || '-'}</td>
+                <td>
+                    <span class="badge ${item.update_type === 'fetch_api' ? 'bg-primary' : 'bg-success'}">
+                        <i class="fas fa-${item.update_type === 'fetch_api' ? 'cloud' : 'upload'} me-1"></i>
+                        ${item.update_type === 'fetch_api' ? 'API Fetch' : 'Manual Upload'}
+                    </span>
+                </td>
+                <td>${item.source || 'All'}</td>
+                <td><strong>${item.records_added || 0}</strong> records</td>
+                <td><span class="badge bg-${item.status === 'success' ? 'success' : 'danger'}">${item.status || 'success'}</span></td>
+                <td><small>${item.message || '-'}</small></td>
+                <td>
+                    <button class="btn btn-sm btn-info" onclick="viewDataDetail(${item.id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Load prediction history
+    function loadPredictionHistory() {
+        fetch('/api/history/prediction')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data && data.data.length > 0) {
+                    renderPredictionTable(data.data);
+                } else {
+                    document.getElementById('predictionTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                <p>Belum ada riwayat prediksi</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading prediction history:', error);
+            });
+    }
+
+    // Render prediction table
+    function renderPredictionTable(items) {
+        const tbody = document.getElementById('predictionTableBody');
+        tbody.innerHTML = items.map((item, index) => `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${item.prediction_date || '-'}</td>
+                <td><span class="badge bg-primary">${item.model_version || 'ARIMAX v1.0'}</span></td>
+                <td><strong>${item.years || 0} tahun</strong></td>
+                <td>
+                    <span class="badge bg-${item.scenario === 'optimis' ? 'success' : item.scenario === 'moderat' ? 'warning' : 'danger'}">
+                        ${item.scenario || 'moderat'}
+                    </span>
+                </td>
+                <td><span class="badge bg-success">Success</span></td>
+                <td>User/Admin</td>
+                <td>
+                    <button class="btn btn-sm btn-info" onclick="viewPredictionDetail(${item.id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // View detail functions (modal)
+    function viewTrainingDetail(id) {
+        // TODO: Implement detail modal
+        alert('Detail untuk Training ID: ' + id);
+    }
+
+    function viewDataDetail(id) {
+        // TODO: Implement detail modal
+        alert('Detail untuk Data Update ID: ' + id);
+    }
+
+    function viewPredictionDetail(id) {
+        // TODO: Implement detail modal
+        alert('Detail untuk Prediction ID: ' + id);
+    }
+
+    // Confirm clear all
+    function confirmClearAll() {
+        if (confirm('Apakah Anda yakin ingin menghapus SEMUA riwayat?\n\nPerhatian: Tindakan ini tidak dapat dibatalkan!')) {
+            fetch('/api/history/clear', {
+                method: 'DELETE'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('✓ Semua riwayat berhasil dihapus');
+                        loadSummary();
+                        loadTrainingHistory();
+                        loadDataHistory();
+                        loadPredictionHistory();
+                    } else {
+                        alert('✗ Gagal menghapus riwayat: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error clearing history:', error);
+                    alert('Error: ' + error.message);
+                });
+        }
+    }
+</script>
+
+<style>
+    .section-history .card {
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .section-history .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .border-4 {
+        border-width: 4px !important;
+    }
+
+    .table-responsive {
+        max-height: 600px;
+    }
+
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        border: none;
+        border-bottom: 3px solid transparent;
+    }
+
+    .nav-tabs .nav-link:hover {
+        border-bottom-color: #dee2e6;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        border-bottom-color: #0d6efd;
+        background-color: transparent;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .table td {
+        vertical-align: middle;
+        font-size: 0.875rem;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .pagination {
+        margin-top: 1rem;
+    }
+
+    .toast {
+        min-width: 300px;
+    }
+
+    code {
+        background-color: #f8f9fa;
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.25rem;
+        font-size: 0.85em;
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,731 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Fossil Track{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="hero" class="hero section">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
+                <div class="hero-content">
+                    <h1>Prediksi, Analisis, dan Aksi untuk Masa Depan Energi Indonesia</h1>
+                    <p>Menggunakan Metode ARIMA dengan Variabel Eksternal Pertumbuhan PDB/Produk Domestik Bruto</p>
+                    <div class="hero-buttons">
+                        <a href="#" class="btn btn-outline-light">Lihat Data Historis</a>
+                        <a href="#" class="btn btn-success">Mulai Prediksi</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-wave">
+        <svg class="wave" viewBox="0 0 1440 300" preserveAspectRatio="none">
+            <path fill="#9bd3a7" d="M0,140
+                     C180,200 360,80 540,110
+                     C720,140 900,220 1080,180
+                     C1260,140 1350,110 1440,130
+                     L1440,300 L0,300 Z" />
+
+            <path fill="#6fbf8e" d="M0,170
+                     C200,230 380,110 560,140
+                     C740,170 920,260 1100,210
+                     C1280,170 1360,150 1440,160
+                     L1440,300 L0,300 Z" />
+
+            <path fill="#0f3f54" d="M0,210
+                     C220,270 400,150 580,180
+                     C760,210 940,300 1120,250
+                     C1300,210 1380,200 1440,210
+                     L1440,300 L0,300 Z" />
+        </svg>
+    </div>
+</section>
+<section class="overview-section">
+    <div class="overview-container">
+        <div class="overview-left">
+            <div class="about-card">
+                <div class="about" style="margin-bottom: 2rem;">
+                    <h3>Tentang</h3>
+                    <p>
+                        Aplikasi ini dikembangkan untuk menganalisis dan memprediksi konsumsi
+                        energi fosil di Indonesia berdasarkan data tahunan menggunakan metode
+                        time series ARIMAX. Data diperoleh dari
+                        <strong>Our World in Data</strong> dan <strong>World Bank</strong>.
+                    </p>
+                </div>
+
+                <div class="reason" style="margin-bottom: 2rem;">
+                    <h3>Mengapa Prediksi Ini Penting Dilakukan?</h3>
+                    <p class="text-muted" style="margin-bottom: 1.5rem;">
+                        Prediksi konsumsi energi fosil memberikan dasar pengambilan keputusan
+                        dalam perencanaan energi, kebijakan lingkungan, dan analisis ekonomi.
+                    </p>
+
+                    <div class="why-grid">
+                        <div class="why-image">
+                            <img src="{{ url_for('static', filename='assets/img/left.png') }}"
+                                alt="Tren Konsumsi Energi" class="img-fluid">
+                        </div>
+                        <div class="why-list">
+                            <div class="why-card">
+                                <div class="why-icon">
+                                    <i class="fa-solid fa-file-circle-check"></i>
+                                </div>
+                                <div class="why-text">
+                                    <h4>Berbasis Data Resmi</h4>
+                                    <p>
+                                        Data historis berasal dari Our World in Data dan World Bank.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="why-card">
+                                <div class="why-icon">
+                                    <i class="fa-solid fa-solar-panel"></i>
+                                </div>
+                                <div class="why-text">
+                                    <h4>Kebijakan Energi Berkelanjutan</h4>
+                                    <p>
+                                        Mendukung perencanaan transisi energi dan target Net Zero Emission.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="why-card">
+                                <div class="why-icon">
+                                    <i class="fa-solid fa-chart-line"></i>
+                                </div>
+                                <div class="why-text">
+                                    <h4>Analisis Dampak Ekonomi</h4>
+                                    <p>
+                                        Membantu melihat hubungan pertumbuhan ekonomi dan konsumsi energi.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-clean" style="margin-bottom: 2rem;">
+                    <h3>Bagaimana Cara Kerja Sistem?</h3>
+                    <p class="workflow-desc">
+                        Alur kerja sistem disusun secara bertahap untuk menjelaskan proses analisis
+                        dan prediksi konsumsi energi fosil menggunakan metode ARIMA dan ARIMAX.
+                    </p>
+
+                    <div class="workflow-item">
+                        <div class="step-number-card">01</div>
+
+                        <div class="step-divider"></div>
+                        <div class="step-content-card">
+                            <h4>Pilih Data & Periode</h4>
+                            <p>
+                                Pengguna memilih data konsumsi energi fosil serta rentang tahun
+                                yang akan dianalisis sebagai dasar pemodelan.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-item">
+                        <div class="step-number-card">02</div>
+
+                        <div class="step-divider"></div>
+                        <div class="step-content-card">
+                            <h4>Proses ARIMA / ARIMAX</h4>
+                            <p>
+                                Sistem melakukan pemodelan time series menggunakan ARIMA atau
+                                ARIMAX dengan variabel eksternal berupa PDB.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-item">
+                        <div class="step-number-card">03</div>
+                        <div class="step-divider"></div>
+                        <div class="step-content-card">
+                            <h4>Hasil Prediksi & Insight</h4>
+                            <p>
+                                Hasil prediksi disajikan dalam bentuk grafik dan analisis untuk
+                                mendukung evaluasi dan pengambilan keputusan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-features" style="margin-bottom: 2rem;">
+                    <h3>Komponen Sistem</h3>
+                    <div class=" features-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-database"></i>
+                            </div>
+                            <h4>Data Historis</h4>
+                            <p>Konsumsi Energi Fosil Indonesia</p>
+                        </div>
+
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <h4>Model Prediksi</h4>
+                            <p>ARIMA & ARIMAX</p>
+                        </div>
+
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
+                            <h4>Simulasi PDB</h4>
+                            <p>Skenario Pertumbuhan Ekonomi</p>
+                        </div>
+
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-lightbulb"></i>
+                            </div>
+                            <h4>Analisis & Insight</h4>
+                            <p>Hasil dan Rekomendasi</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div class="overview-right">
+            <h3 class="why-title text-center">Grafik Tren Konsumsi Energi Fosil di Indonesia</h3>
+            <div class="section-grafik">
+                <div class="chart-wrapper">
+                    <canvas id="energyChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<style>
+    .overview-left,
+    .overview-right {
+        flex: 1;
+    }
+
+    .step-number-card {
+        background: #e8f5ee;
+        color: #2e7d32;
+        font-weight: 700;
+        font-size: 1.3rem;
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .step-divider {
+        display: none;
+        /* desktop ga perlu */
+    }
+
+    .step-content-card {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        flex: 1;
+    }
+
+    .overview-section {
+        padding: 80px 20px;
+        background: transparent;
+        margin-top: -60px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .overview-left .about-card {
+        transform: translateY(-80px);
+        position: relative;
+        z-index: 3;
+        overflow: hidden;
+    }
+
+    .overview-container {
+        max-width: 1200px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: 2fr 1.5fr;
+        gap: 20px;
+        align-items: start;
+    }
+
+    .workflow-clean {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    .workflow-desc {
+        color: #6b7280;
+        margin-bottom: 2rem;
+    }
+
+    .workflow-item {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 1.8rem;
+    }
+
+    .workflow-step {
+        font-weight: 700;
+        color: #2e7d32;
+        min-width: 32px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .workflow-item h4 {
+        font-size: 1rem;
+        margin-bottom: 6px;
+        color: #1f2d3d;
+    }
+
+    .workflow-item p {
+        font-size: 0.9rem;
+        color: #4b5563;
+        line-height: 1.6;
+    }
+
+
+    @media (max-width: 768px) {
+        .overview-left .about-card {
+            transform: translateY(0);
+        }
+
+        .overview-section {
+            margin-top: 0;
+        }
+
+        .overview-left {
+            order: 2;
+        }
+
+        .overview-right {
+            order: 1;
+        }
+    }
+
+    .about-card {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    .about-card h3,
+    .section-header h3 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .about-card p {
+        line-height: 1.7;
+        color: #374151;
+    }
+
+    .chart-title {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .why-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .why-image img {
+        width: 100%;
+        max-width: 250px;
+        margin: auto;
+        justify-content: center;
+        align-items: center;
+        display: block;
+        opacity: 0.85;
+    }
+
+    .workflow-step {
+        position: relative;
+    }
+
+    .workflow-step::before {
+        content: "";
+        position: absolute;
+        left: 30px;
+        top: 70px;
+        width: 2px;
+        height: calc(100% - 70px);
+        background: #e5e7eb;
+    }
+
+    .why-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .why-icon {
+        border-radius: 20px;
+        color: #53B863;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #E8F5EE;
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+
+    .why-card {
+        display: flex;
+        gap: 14px;
+        background: #ffffff;
+        padding: 16px;
+        border-radius: 14px;
+        border: 1px solid #eef2f6;
+        box-shadow: none;
+        margin-bottom: 16px;
+    }
+
+    .why-card h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .why-card p {
+        font-size: 0.85rem !important;
+        color: #4b5563;
+        line-height: 1.5;
+    }
+
+    .why-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    .chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 350px;
+        overflow: hidden;
+    }
+
+    .chart-wrapper canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .features-section {
+        padding: 80px 20px;
+        background: #ffffff;
+    }
+
+    .features-section .container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .features-title {
+        text-align: center;
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: #1f2d3d;
+        margin-bottom: 50px;
+    }
+
+    /* Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
+    }
+
+    /* Item */
+    .feature-item {
+        text-align: center;
+    }
+
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        background: #f3f6fb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px auto;
+        transition: all 0.3s ease;
+    }
+
+    .feature-icon i {
+        font-size: 28px;
+        color: #2e7d32;
+    }
+
+    .feature-item h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #1f2d3d;
+    }
+
+    .feature-item p {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    /* Hover */
+    .feature-item:hover .feature-icon {
+        background: #2e7d32;
+        transform: translateY(-5px);
+    }
+
+    .feature-item:hover .feature-icon i {
+        color: #ffffff;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .workflow-step {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .step-number-card {
+            margin-bottom: 6px;
+        }
+
+        .step-divider {
+            display: block;
+            width: 2px;
+            height: 30px;
+            background: #cbd5e1;
+            margin: 8px 0;
+        }
+
+        .step-content-card {
+            width: 100%;
+            text-align: left;
+        }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 992px) {
+        .overview-container {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-wrapper {
+            height: 280px;
+        }
+    }
+
+
+    /* Header */
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: #0f3f54;
+        margin-bottom: 10px;
+    }
+
+    .section-header p {
+        font-size: 0.85rem;
+        color: #555;
+        max-width: 650px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .workflow-steps {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+
+    .workflow-step {
+        background: #ffffff;
+        border-radius: 14px;
+        font-size: 14px !important;
+        width: 150px;
+        min-height: auto;
+        padding: 24px 18px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+    }
+
+    .workflow-step p {
+        font-size: 0.5rem;
+    }
+
+    .workflow-step:hover {
+        transform: translateY(-6px);
+    }
+
+    .step-icon {
+        width: 45px;
+        height: 45px;
+        background: #e8f5ee;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px auto;
+    }
+
+    .step-icon i {
+        font-size: 20px;
+        color: #2e7d32;
+    }
+
+    /* Text */
+    .workflow-step h4 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1f2d3d;
+        margin-bottom: 8px;
+    }
+
+    .workflow-step p {
+        font-size: 0.75rem;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+
+    /* Line Between Steps */
+    .step-line {
+        width: 30px;
+        height: 2px;
+        background: #cbd5e1;
+        margin: 0 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .workflow-steps {
+            flex-direction: column;
+        }
+
+        .step-line {
+            width: 2px;
+            height: 40px;
+            margin: 15px 0;
+        }
+
+        .workflow-step {
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .about-card {
+            margin-bottom: 1.5rem;
+        }
+
+        .overview-left .about-card {
+            transform: none !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .why-grid {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .why-card {
+            align-items: center;
+            text-align: left;
+        }
+    }
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('energyChart');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['1970', '1980', '1990', '2000', '2010', '2020'],
+            datasets: [
+                {
+                    label: 'Data Historis',
+                    data: [50, 120, 260, 520, 780, 850],
+                    borderColor: '#1e88e5',
+                    backgroundColor: 'rgba(30,136,229,0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Prediksi ARIMAX',
+                    data: [null, null, null, null, 780, 920],
+                    borderColor: '#8bc34a',
+                    borderDash: [6, 6],
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Konsumsi Energi (Joule)'
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

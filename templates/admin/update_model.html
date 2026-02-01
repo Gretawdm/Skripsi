@@ -1,0 +1,1435 @@
+{% extends 'admin/layouts/template.html' %}
+
+{% block page_title %}Update Model - Admin{% endblock %}
+
+{% block page_header %}Update Model{% endblock %}
+
+{% block content %}
+<div class="section-update-model container-fluid mt-3">
+    <!-- Model Info Cards -->
+    <div class="row mt-1 g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-info border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Model Saat Ini</p>
+                            <h5 class="fw-bold mb-0" id="currentModelVersion">ARIMAX v1.0</h5>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-brain text-info fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Versi aktif</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-success border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Akurasi (MAPE)</p>
+                            <h5 class="fw-bold mb-0" id="currentAccuracy">-</h5>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-chart-line text-success fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Model accuracy</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-primary border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Last Trained</p>
+                            <h6 class="fw-bold mb-0" id="lastTrained">-</h6>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-clock text-primary fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Tanggal training</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-warning border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Data Records</p>
+                            <h5 class="fw-bold mb-0" id="dataRecords">-</h5>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-database text-warning fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Total data training</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Staging System -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-rocket text-success me-2"></i>
+                        Model Management (Staging System)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Active Model Info -->
+                    <div class="alert alert-success border-success" id="activeModelInfo">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1">
+                                    <i class="fas fa-check-circle me-2"></i>Model Aktif (Digunakan untuk Prediksi)
+                                </h6>
+                                <p class="mb-1" id="activeModelDetails">Loading...</p>
+                                <small class="text-muted" id="activeModelDate">-</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success fs-6">ACTIVE</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model Comparison Table -->
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-table me-2"></i>Model Comparison & Selection
+                    </h6>
+                    <p class="text-muted small mb-3">
+                        Pilih model terbaik berdasarkan metrics. Model yang diaktifkan akan digunakan untuk semua
+                        prediksi.
+                    </p>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="modelComparisonTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Order (p,d,q)</th>
+                                    <th>MAPE (%)</th>
+                                    <th>RMSE</th>
+                                    <th>MAE</th>
+                                    <th>R²</th>
+                                    <th>Data</th>
+                                    <th>Training Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modelComparisonBody">
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted py-4">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>Loading models...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Configuration -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-cogs text-primary me-2"></i>
+                        Konfigurasi Training
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Model ARIMAX akan dilatih dengan data terbaru. Proses ini memakan waktu beberapa menit.
+                        Hasil training akan ditampilkan dalam bentuk metrics (MAPE, R², MAE, RMSE).
+                    </div>
+
+                    <!-- ARIMA Order Configuration -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-sliders-h me-2"></i>ARIMA Order Configuration
+                        </h6>
+                        <div class="d-flex align-items-center mb-3 p-3 bg-light rounded border">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-magic text-primary me-2 fs-5"></i>
+                                    <div>
+                                        <strong id="orderModeLabel">Manual ARIMAX (3,2,6)</strong>
+                                        <small class="d-block text-muted" id="orderModeDesc">Set parameter (p,d,q)
+                                            secara manual - Default: (3,2,6)</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch ms-3">
+                                <input class="form-check-input" type="checkbox" id="orderModeToggle"
+                                    style="width: 3em; height: 1.5em; cursor: pointer;">
+                                <label class="form-check-label ms-2" for="orderModeToggle" style="cursor: pointer;">
+                                    <span class="badge bg-secondary" id="toggleBadge">Manual</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Manual Order Inputs (shown by default since toggle starts unchecked) -->
+                        <div id="manualOrderInputs" style="display: block;">
+                            <div class="row bg-light p-3 rounded border">
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label fw-bold">p (AR order)</label>
+                                    <input type="number" class="form-control" id="orderP" value="3" min="0" max="5">
+                                    <small class="text-muted">Autoregressive order</small>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label fw-bold">d (Differencing)</label>
+                                    <input type="number" class="form-control" id="orderD" value="2" min="0" max="2">
+                                    <small class="text-muted">Degree of differencing</small>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label fw-bold">q (MA order)</label>
+                                    <input type="number" class="form-control" id="orderQ" value="6" min="0" max="10">
+                                    <small class="text-muted">Moving average order</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Train/Test Split (%)</label>
+                            <input type="number" class="form-control" id="trainSplit" value="80" min="60" max="90">
+                            <small class="text-muted">Persentase data untuk training</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Forecast Horizon</label>
+                            <input type="number" class="form-control" id="forecastHorizon" value="7" min="1" max="20">
+                            <small class="text-muted">Jumlah tahun prediksi (untuk visualisasi)</small>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success btn-lg px-5" id="btnStartTraining" type="button">
+                        <i class="fas fa-play me-2"></i>Mulai Training Model
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Progress & Steps -->
+    <div class="row mb-4" id="trainingSection" style="display: none;">
+        <div class="col-12">
+            <div class="card shadow-sm border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-spinner fa-spin me-2"></i>
+                        Proses Training Model
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Overall Progress -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold">Progress Keseluruhan</span>
+                            <span id="overallProgress" class="fw-bold text-primary">0%</span>
+                        </div>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                                role="progressbar" id="overallProgressBar" style="width: 0%">
+                                <span class="fw-bold">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Training Log (Simplified) -->
+                    <div class="border rounded p-3 bg-light mb-3"
+                        style="max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;"
+                        id="trainingLog">
+                        <p class="text-muted mb-0"><i class="fas fa-circle-notch fa-spin me-2"></i>Menunggu proses...
+                        </p>
+                    </div>
+
+                    <!-- Training Result (appears below after completion) -->
+                    <div id="trainingResultInline" style="display: none;">
+                        <hr class="my-4">
+                        <div class="alert alert-success">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Training Berhasil!
+                            </h5>
+                        </div>
+
+                        <!-- Metrics Inline -->
+                        <h6 class="fw-bold mb-3">Model Performance Metrics:</h6>
+                        <div class="row mb-3">
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="p-3 bg-light rounded border text-center">
+                                    <p class="text-muted mb-1 small fw-bold">MAPE</p>
+                                    <h4 class="fw-bold text-primary mb-0" id="resultMAPEInline">-</h4>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="p-3 bg-light rounded border text-center">
+                                    <p class="text-muted mb-1 small fw-bold">RMSE</p>
+                                    <h4 class="fw-bold text-success mb-0" id="resultRMSEInline">-</h4>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="p-3 bg-light rounded border text-center">
+                                    <p class="text-muted mb-1 small fw-bold">MAE</p>
+                                    <h4 class="fw-bold text-info mb-0" id="resultMAEInline">-</h4>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-3">
+                                <div class="p-3 bg-light rounded border text-center">
+                                    <p class="text-muted mb-1 small fw-bold">R²</p>
+                                    <h4 class="fw-bold text-warning mb-0" id="resultR2Inline">-</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Model Parameters Inline -->
+                        <h6 class="fw-bold mb-2">Model Parameters:</h6>
+                        <div id="resultParamsInline" class="bg-light p-3 rounded border mb-3">
+                            <p class="mb-0 text-muted">Loading...</p>
+                        </div>
+
+                        <!-- Action Info -->
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Model sudah aktif!</strong> Prediksi sekarang menggunakan model baru ini.
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <button class="btn btn-primary btn-lg px-4" onclick="window.location.reload()">
+                                <i class="fas fa-redo me-2"></i>Train Ulang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Steps (Hidden - not used in simplified version) -->
+    <div style="display: none;">
+        <!-- Training Steps -->
+        <div class="accordion" id="trainingSteps">
+            <!-- Step 1: Data Loading -->
+            <div class="accordion-item" id="step1Container">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#step1" disabled id="step1Btn">
+                        <i class="fas fa-circle-notch me-2 step-icon"></i>
+                        <strong>Step 1:</strong>&nbsp;Data Loading & Preprocessing
+                    </button>
+                </h2>
+                <div id="step1" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="step-content">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold mb-3">Data Statistics</h6>
+                                    <div id="step1Stats" class="mb-3">
+                                        <p class="text-muted">Menunggu proses...</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold mb-3">Preview Grafik Data</h6>
+                                    <div id="step1Chart" class="chart-container">
+                                        <canvas id="chart1"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Stationarity Test -->
+            <div class="accordion-item" id="step2Container">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#step2" disabled id="step2Btn">
+                        <i class="fas fa-circle-notch me-2 step-icon"></i>
+                        <strong>Step 2:</strong>&nbsp;Stationarity Check (ADF Test)
+                    </button>
+                </h2>
+                <div id="step2" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3">ADF Test Results</h6>
+                                <div id="step2Stats" class="mb-3">
+                                    <p class="text-muted">Menunggu proses...</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3">Time Series Plot</h6>
+                                <div id="step2Chart" class="chart-container">
+                                    <canvas id="chart2"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: ACF/PACF Analysis -->
+            <div class="accordion-item" id="step3Container">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#step3" disabled id="step3Btn">
+                        <i class="fas fa-circle-notch me-2 step-icon"></i>
+                        <strong>Step 3:</strong>&nbsp;ACF/PACF Analysis
+                    </button>
+                </h2>
+                <div id="step3" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3">ACF Plot</h6>
+                                <div id="step3ChartACF" class="chart-container">
+                                    <canvas id="chart3ACF"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3">PACF Plot</h6>
+                                <div id="step3ChartPACF" class="chart-container">
+                                    <canvas id="chart3PACF"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div id="step3Stats">
+                                <p class="text-muted">Menunggu proses...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Model Fitting -->
+            <div class="accordion-item" id="step4Container">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#step4" disabled id="step4Btn">
+                        <i class="fas fa-circle-notch me-2 step-icon"></i>
+                        <strong>Step 4:</strong>&nbsp;Model Fitting & Optimization
+                    </button>
+                </h2>
+                <div id="step4" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 class="fw-bold mb-3">Model Parameters</h6>
+                                <div id="step4Stats" class="mb-3">
+                                    <p class="text-muted">Menunggu proses...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Residual Diagnostics -->
+            <div class="accordion-item" id="step5Container">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#step5" disabled id="step5Btn">
+                        <i class="fas fa-circle-notch me-2 step-icon"></i>
+                        <strong>Step 5:</strong>&nbsp;Residual Diagnostics
+                    </button>
+                </h2>
+                <div id="step5" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3">Residual Plot</h6>
+                                <div id="step5Chart" class="chart-container">
+                                    <canvas id="chart5"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-3">Residual Statistics</h6>
+                                <div id="step5Stats" class="mb-3">
+                                    <p class="text-muted">Menunggu proses...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Model Evaluation -->
+            <div class="accordion-item" id="step6Container">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#step6" disabled id="step6Btn">
+                        <i class="fas fa-circle-notch me-2 step-icon"></i>
+                        <strong>Step 6:</strong>&nbsp;Model Evaluation & Forecast
+                    </button>
+                </h2>
+                <div id="step6" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <h6 class="fw-bold mb-3">Prediction vs Actual</h6>
+                                <div id="step6Chart" class="chart-container">
+                                    <canvas id="chart6"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 class="fw-bold mb-3">Evaluation Metrics</h6>
+                                <div id="step6Stats">
+                                    <p class="text-muted">Menunggu proses...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 7: Save Model -->
+            <div class="accordion-item" id="step7Container">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#step7" disabled id="step7Btn">
+                        <i class="fas fa-circle-notch me-2 step-icon"></i>
+                        <strong>Step 7:</strong>&nbsp;Save Model
+                    </button>
+                </h2>
+                <div id="step7" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div id="step7Stats">
+                            <p class="text-muted">Menunggu proses...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Training Result Summary (OLD - HIDDEN, replaced by inline result) -->
+<div class="row mb-4" id="resultSection" style="display: none;">
+    <!-- This section is no longer used, replaced by trainingResultInline -->
+</div>
+</div>
+
+<!-- Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="notificationToast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-bell me-2"></i>
+            <strong class="me-auto">Notifikasi</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Pesan notifikasi
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+    let charts = {};
+    let trainingTaskId = null;
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOM loaded, initializing...');
+
+        loadModelInfo();
+        loadModelsComparison();  // NEW: Load model comparison table
+
+        // Event listeners
+        const btnTraining = document.getElementById('btnStartTraining');
+        if (btnTraining) {
+            btnTraining.addEventListener('click', startTraining);
+            console.log('Training button event listener attached');
+        } else {
+            console.error('Training button not found!');
+        }
+
+        // Toggle switch for Auto/Manual mode
+        const toggle = document.getElementById('orderModeToggle');
+        const manualInputs = document.getElementById('manualOrderInputs');
+        const modeLabel = document.getElementById('orderModeLabel');
+        const modeDesc = document.getElementById('orderModeDesc');
+        const toggleBadge = document.getElementById('toggleBadge');
+
+        if (toggle) {
+            toggle.addEventListener('change', function () {
+                if (this.checked) {
+                    // Auto mode
+                    manualInputs.style.display = 'none';
+                    modeLabel.innerHTML = '<i class="fas fa-magic text-success me-2"></i>Auto ARIMAX';
+                    modeDesc.textContent = 'Sistem akan mencari parameter (p,d,q) terbaik secara otomatis';
+                    toggleBadge.textContent = 'Auto';
+                    toggleBadge.className = 'badge bg-success';
+                } else {
+                    // Manual mode
+                    manualInputs.style.display = 'block';
+                    modeLabel.innerHTML = '<i class="fas fa-cog text-primary me-2"></i>Manual ARIMAX (3,2,6)';
+                    modeDesc.textContent = 'Set parameter (p,d,q) secara manual - Default: (3,2,6)';
+                    toggleBadge.textContent = 'Manual';
+                    toggleBadge.className = 'badge bg-secondary';
+                }
+            });
+        }
+    });
+
+    // Load current model info
+    function loadModelInfo() {
+        fetch('/api/model/info')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('currentModelVersion').textContent = data.version || 'ARIMAX v1.0';
+                    document.getElementById('currentAccuracy').textContent = data.mape ? data.mape.toFixed(2) + '%' : '-';
+                    document.getElementById('lastTrained').textContent = data.lastTrained || '-';
+                    document.getElementById('dataRecords').textContent = data.dataCount || '-';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading model info:', error);
+            });
+    }
+
+    // NEW: Load models comparison
+    function loadModelsComparison() {
+        fetch('/api/model/comparison')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.models) {
+                    displayModelsComparison(data.models);
+                    updateActiveModelInfo(data.models);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading models:', error);
+            });
+    }
+
+    // NEW: Display models in comparison table
+    function displayModelsComparison(models) {
+        const tbody = document.getElementById('modelComparisonBody');
+
+        if (models.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center text-muted py-4">
+                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                        Belum ada model. Mulai training untuk membuat model baru.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = models.map(model => {
+            const isActive = model.model_status === 'active';
+            const statusBadge = isActive
+                ? '<span class="badge bg-success">ACTIVE</span>'
+                : '<span class="badge bg-secondary">Candidate</span>';
+
+            const actionBtn = isActive
+                ? `<button class="btn btn-sm btn-outline-secondary" disabled>
+                     <i class="fas fa-check me-1"></i>Active
+                   </button>`
+                : `<div class="btn-group btn-group-sm">
+                     <button class="btn btn-success" onclick="activateModel(${model.id})">
+                       <i class="fas fa-rocket me-1"></i>Activate
+                     </button>
+                     <button class="btn btn-danger" onclick="deleteModel(${model.id})">
+                       <i class="fas fa-trash"></i>
+                     </button>
+                   </div>`;
+
+            const trainingDate = new Date(model.training_date).toLocaleString('id-ID');
+
+            return `
+                <tr class="${isActive ? 'table-success' : ''}">
+                    <td>${statusBadge}</td>
+                    <td><strong>(${model.p}, ${model.d}, ${model.q})</strong></td>
+                    <td>${model.mape ? model.mape.toFixed(2) + '%' : '-'}</td>
+                    <td>${model.rmse ? model.rmse.toFixed(2) : '-'}</td>
+                    <td>${model.mae ? model.mae.toFixed(2) : '-'}</td>
+                    <td>${model.r2 ? model.r2.toFixed(4) : '-'}</td>
+                    <td>${model.total_data || '-'}</td>
+                    <td>${trainingDate}</td>
+                    <td>${actionBtn}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // NEW: Update active model info panel
+    function updateActiveModelInfo(models) {
+        const activeModel = models.find(m => m.model_status === 'active');
+        const activeModelInfo = document.getElementById('activeModelInfo');
+
+        if (activeModel) {
+            // Show active model info
+            activeModelInfo.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold mb-1">
+                            <i class="fas fa-check-circle me-2"></i>Model Aktif (Digunakan untuk Prediksi)
+                        </h6>
+                        <p class="mb-1">ARIMAX (${activeModel.p}, ${activeModel.d}, ${activeModel.q}) - 
+                           MAPE: ${activeModel.mape.toFixed(2)}% | 
+                           RMSE: ${activeModel.rmse.toFixed(2)} | 
+                           R²: ${activeModel.r2.toFixed(4)}</p>
+                        <small class="text-muted">Trained: ${new Date(activeModel.training_date).toLocaleString('id-ID')} | 
+                         Activated: ${activeModel.activated_at ? new Date(activeModel.activated_at).toLocaleString('id-ID') : 'N/A'}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success fs-6">ACTIVE</span>
+                    </div>
+                </div>
+            `;
+            activeModelInfo.className = 'alert alert-success border-success';
+        } else {
+            // No active model
+            activeModelInfo.innerHTML = `
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>
+                    <p class="mb-0">Tidak ada model aktif. Silakan training dan aktivasi model.</p>
+                </div>
+            `;
+            activeModelInfo.className = 'alert alert-warning border-warning';
+        }
+    }
+
+    // NEW: Activate model
+    function activateModel(modelId) {
+        if (!confirm('Aktifkan model ini untuk digunakan dalam prediksi?')) {
+            return;
+        }
+
+        fetch(`/api/model/activate/${modelId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ activated_by: 'admin' })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Model berhasil diaktifkan!', 'success');
+                    loadModelsComparison(); // Reload table
+                    loadModelInfo(); // Reload stats
+                } else {
+                    showToast('Gagal mengaktifkan model: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Error: ' + error.message, 'error');
+            });
+    }
+
+    // NEW: Delete model
+    function deleteModel(modelId) {
+        if (!confirm('Hapus model candidate ini? Tindakan ini tidak dapat dibatalkan.')) {
+            return;
+        }
+
+        fetch(`/api/model/delete/${modelId}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Model berhasil dihapus!', 'success');
+                    loadModelsComparison(); // Reload table
+                } else {
+                    showToast('Gagal menghapus model: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Error: ' + error.message, 'error');
+            });
+    }
+
+    // Helper: Add training log
+    function addTrainingLog(message) {
+        const logContainer = document.getElementById('trainingLog');
+        const timestamp = new Date().toLocaleTimeString('id-ID');
+        const logEntry = document.createElement('p');
+        logEntry.className = 'mb-1';
+        logEntry.innerHTML = `<small class="text-muted">[${timestamp}]</small> ${message}`;
+        logContainer.appendChild(logEntry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    // Load model parameters
+    function loadModelParameters() {
+        fetch('/api/model/parameters')
+            .then(response => response.json())
+            .then(data => {
+                const paramsDiv = document.getElementById('resultParams');
+                if (data.success && data.parameters) {
+                    paramsDiv.innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>ARIMAX Order:</strong> ${data.parameters.order}</p>
+                                <p class="mb-1"><strong>p (AR):</strong> ${data.parameters.p}</p>
+                                <p class="mb-1"><strong>d (I):</strong> ${data.parameters.d}</p>
+                                <p class="mb-1"><strong>q (MA):</strong> ${data.parameters.q}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Train Size:</strong> ${data.training.train_size} records</p>
+                                <p class="mb-1"><strong>Test Size:</strong> ${data.training.test_size} records</p>
+                                <p class="mb-1"><strong>Total:</strong> ${data.training.train_size + data.training.test_size} records</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    paramsDiv.innerHTML = '<p class="mb-0 text-muted">Model parameters tidak tersedia</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading parameters:', error);
+                document.getElementById('resultParams').innerHTML = '<p class="mb-0 text-danger">Error loading parameters</p>';
+            });
+    }
+
+    // Load model parameters INLINE (for training result)
+    function loadModelParametersInline() {
+        fetch('/api/model/parameters')
+            .then(response => response.json())
+            .then(data => {
+                const paramsDiv = document.getElementById('resultParamsInline');
+                if (data.success && data.parameters) {
+                    paramsDiv.innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>ARIMAX Order:</strong> ${data.parameters.order}</p>
+                                <p class="mb-1"><strong>p (AR):</strong> ${data.parameters.p}</p>
+                                <p class="mb-1"><strong>d (I):</strong> ${data.parameters.d}</p>
+                                <p class="mb-1"><strong>q (MA):</strong> ${data.parameters.q}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Train Size:</strong> ${data.training.train_size} records</p>
+                                <p class="mb-1"><strong>Test Size:</strong> ${data.training.test_size} records</p>
+                                <p class="mb-1"><strong>Total:</strong> ${data.training.train_size + data.training.test_size} records</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    paramsDiv.innerHTML = '<p class="mb-0 text-muted">Model parameters tidak tersedia</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading parameters:', error);
+                document.getElementById('resultParamsInline').innerHTML = '<p class="mb-0 text-danger">Error loading parameters</p>';
+            });
+    }
+
+    // Start training process
+    function startTraining() {
+        console.log('startTraining called');
+
+        const trainSplit = document.getElementById('trainSplit').value;
+        const forecastHorizon = document.getElementById('forecastHorizon').value;
+        const toggleSwitch = document.getElementById('orderModeToggle');
+        const orderMode = toggleSwitch.checked ? 'auto' : 'manual';
+
+        console.log('Order mode:', orderMode);
+
+        // Prepare request body
+        const requestBody = {
+            trainTestSplit: parseInt(trainSplit),
+            forecastHorizon: parseInt(forecastHorizon),
+            orderMode: orderMode
+        };
+
+        // Add manual order if selected
+        if (orderMode === 'manual') {
+            requestBody.order = {
+                p: parseInt(document.getElementById('orderP').value),
+                d: parseInt(document.getElementById('orderD').value),
+                q: parseInt(document.getElementById('orderQ').value)
+            };
+            console.log('Manual order:', requestBody.order);
+        }
+
+        // Show training section
+        document.getElementById('trainingSection').style.display = 'block';
+        document.getElementById('btnStartTraining').disabled = true;
+
+        // Clear and show loading in log
+        document.getElementById('trainingLog').innerHTML = '';
+        if (orderMode === 'auto') {
+            addTrainingLog('🚀 Memulai proses training model ARIMAX (Auto Mode - Finding Best Parameters)...');
+            addTrainingLog('🔍 Auto ARIMA akan mencari parameter (p,d,q) terbaik...');
+        } else {
+            addTrainingLog(`🚀 Memulai proses training model ARIMAX (Manual Mode - Order: ${requestBody.order.p},${requestBody.order.d},${requestBody.order.q})...`);
+        }
+        addTrainingLog('📂 Membaca data energi dan GDP dari database...');
+        updateOverallProgress(20);
+
+        // Hide result section
+        document.getElementById('resultSection').style.display = 'none';
+
+        // Reset all steps
+        resetAllSteps();
+
+        showToast('Memulai training model...', 'info');
+
+        // Call backend API
+        fetch('/api/model/train', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(response => response.json())
+            .then(data => {
+                addTrainingLog('📊 Validasi data...');
+                updateOverallProgress(50);
+
+                if (data.success) {
+                    // Training berhasil
+                    addTrainingLog('✅ Alignment data berhasil!');
+                    addTrainingLog(`📈 Training dengan ${data.details.rows_used} data points (${data.details.year_range})`);
+                    updateOverallProgress(80);
+
+                    addTrainingLog('🧠 Training model ARIMAX...');
+                    updateOverallProgress(90);
+
+                    addTrainingLog('💾 Menyimpan model...');
+                    updateOverallProgress(100);
+
+                    if (data.metrics) {
+                        addTrainingLog(`📊 Metrics - MAPE: ${data.metrics.mape.toFixed(2)}%, RMSE: ${data.metrics.rmse.toFixed(2)}, MAE: ${data.metrics.mae.toFixed(2)}, R²: ${data.metrics.r2.toFixed(3)}`);
+                    }
+
+                    addTrainingLog('✅ Training selesai! ' + data.message);
+
+                    showToast('Model berhasil di-training!', 'success');
+
+                    // Show result inline (below progress bar)
+                    setTimeout(() => {
+                        // Change header to success state
+                        const trainingSection = document.getElementById('trainingSection');
+                        const cardHeader = trainingSection.querySelector('.card-header');
+                        const headerTitle = trainingSection.querySelector('.card-header h5');
+
+                        cardHeader.classList.remove('bg-primary');
+                        cardHeader.classList.add('bg-success');
+                        headerTitle.innerHTML = '<i class="fas fa-check-circle me-2"></i>Training Selesai!';
+
+                        // Stop progress bar animation
+                        const progressBar = document.getElementById('overallProgressBar');
+                        progressBar.classList.remove('progress-bar-animated', 'progress-bar-striped');
+                        progressBar.classList.add('bg-success');
+
+                        // Show inline result
+                        document.getElementById('trainingResultInline').style.display = 'block';
+
+                        // Update result metrics inline
+                        if (data.metrics) {
+                            document.getElementById('resultMAPEInline').textContent = data.metrics.mape.toFixed(2) + '%';
+                            document.getElementById('resultRMSEInline').textContent = data.metrics.rmse.toFixed(2);
+                            document.getElementById('resultMAEInline').textContent = data.metrics.mae.toFixed(2);
+                            document.getElementById('resultR2Inline').textContent = data.metrics.r2.toFixed(3);
+                        }
+
+                        // Load model parameters inline
+                        loadModelParametersInline();
+
+                        // Refresh model info
+                        loadModelInfo();
+                        loadModelsComparison();  // NEW: Reload comparison table
+                        document.getElementById('btnStartTraining').disabled = false;
+
+                        // Scroll to result
+                        document.getElementById('trainingResultInline').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 1000);
+                } else {
+                    addTrainingLog('❌ Training gagal: ' + data.message);
+                    updateOverallProgress(0);
+                    showToast('Gagal training: ' + (data.message || 'Unknown error'), 'error');
+                    document.getElementById('btnStartTraining').disabled = false;
+
+                    // Show error details
+                    if (data.details) {
+                        for (let key in data.details) {
+                            addTrainingLog(`   ⚠️ ${key}: ${data.details[key]}`);
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addTrainingLog('❌ Error: ' + error.message);
+                updateOverallProgress(0);
+                showToast('Error: ' + error.message, 'error');
+                document.getElementById('btnStartTraining').disabled = false;
+            });
+    }
+
+    // Update training step
+    function updateTrainingStep(stepNumber, stepData) {
+        const stepBtn = document.getElementById(`step${stepNumber}Btn`);
+        const stepIcon = stepBtn.querySelector('.step-icon');
+
+        // Enable button
+        stepBtn.disabled = false;
+
+        // Update icon to processing
+        stepIcon.className = 'fas fa-spinner fa-spin me-2 step-icon text-primary';
+
+        // Open accordion
+        const stepCollapse = new bootstrap.Collapse(document.getElementById(`step${stepNumber}`), {
+            show: true
+        });
+
+        // Update step content based on step number
+        switch (stepNumber) {
+            case 1:
+                updateStep1(stepData);
+                break;
+            case 2:
+                updateStep2(stepData);
+                break;
+            case 3:
+                updateStep3(stepData);
+                break;
+            case 4:
+                updateStep4(stepData);
+                break;
+            case 5:
+                updateStep5(stepData);
+                break;
+            case 6:
+                updateStep6(stepData);
+                break;
+            case 7:
+                updateStep7(stepData);
+                break;
+        }
+
+        // Mark as completed after data is loaded
+        setTimeout(() => {
+            stepIcon.className = 'fas fa-check-circle me-2 step-icon text-success';
+        }, 1000);
+    }
+
+    // Update Step 1: Data Loading
+    function updateStep1(data) {
+        const statsDiv = document.getElementById('step1Stats');
+        statsDiv.innerHTML = `
+            <table class="table table-sm">
+                <tr><td><strong>Total Records:</strong></td><td>${data.totalRecords || 0}</td></tr>
+                <tr><td><strong>Training Set:</strong></td><td>${data.trainSize || 0} records</td></tr>
+                <tr><td><strong>Test Set:</strong></td><td>${data.testSize || 0} records</td></tr>
+                <tr><td><strong>Date Range:</strong></td><td>${data.dateRange || '-'}</td></tr>
+            </table>
+        `;
+
+        // Create chart
+        if (data.chartData) {
+            createLineChart('chart1', 'Data Time Series', data.chartData.labels,
+                [{
+                    label: 'Konsumsi Energi Fosil',
+                    data: data.chartData.values,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                }]
+            );
+        }
+    }
+
+    // Update Step 2: Stationarity Test
+    function updateStep2(data) {
+        const statsDiv = document.getElementById('step2Stats');
+        const isStationary = data.isStationary || false;
+        const statusClass = isStationary ? 'text-success' : 'text-warning';
+        const statusText = isStationary ? 'Stationary ✓' : 'Non-Stationary';
+
+        statsDiv.innerHTML = `
+            <div class="alert alert-${isStationary ? 'success' : 'warning'}">
+                <h6 class="fw-bold">${statusText}</h6>
+                <p class="mb-1"><strong>ADF Statistic:</strong> ${data.adfStatistic ? data.adfStatistic.toFixed(4) : '-'}</p>
+                <p class="mb-1"><strong>P-value:</strong> ${data.pValue ? data.pValue.toFixed(4) : '-'}</p>
+                <p class="mb-0"><strong>Critical Value (5%):</strong> ${data.criticalValue || '-'}</p>
+            </div>
+            ${!isStationary ? '<p class="text-muted"><small>Differencing akan diterapkan untuk mencapai stationarity.</small></p>' : ''}
+        `;
+
+        // Create chart
+        if (data.chartData) {
+            createLineChart('chart2', 'Time Series - Stationarity Check', data.chartData.labels,
+                [{
+                    label: 'Original Data',
+                    data: data.chartData.original,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                }]
+            );
+        }
+    }
+
+    // Update Step 3: ACF/PACF
+    function updateStep3(data) {
+        const statsDiv = document.getElementById('step3Stats');
+        statsDiv.innerHTML = `
+            <div class="alert alert-info">
+                <p class="mb-1"><strong>Suggested p (AR order):</strong> ${data.suggestedP || 'Auto'}</p>
+                <p class="mb-1"><strong>Suggested q (MA order):</strong> ${data.suggestedQ || 'Auto'}</p>
+                <p class="mb-0"><small>Berdasarkan analisis ACF dan PACF plots</small></p>
+            </div>
+        `;
+
+        // Create ACF chart
+        if (data.acfData) {
+            createBarChart('chart3ACF', 'ACF (Autocorrelation Function)', data.acfData.lags,
+                [{
+                    label: 'ACF',
+                    data: data.acfData.values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 1
+                }]
+            );
+        }
+
+        // Create PACF chart
+        if (data.pacfData) {
+            createBarChart('chart3PACF', 'PACF (Partial Autocorrelation Function)', data.pacfData.lags,
+                [{
+                    label: 'PACF',
+                    data: data.pacfData.values,
+                    backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                    borderColor: 'rgb(255, 159, 64)',
+                    borderWidth: 1
+                }]
+            );
+        }
+    }
+
+    // Update Step 4: Model Fitting
+    function updateStep4(data) {
+        const statsDiv = document.getElementById('step4Stats');
+        statsDiv.innerHTML = `
+            <div class="alert alert-success">
+                <h6 class="fw-bold">Model ARIMAX Parameters</h6>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p class="mb-1"><strong>p (AR):</strong> ${data.p || 0}</p>
+                        <p class="mb-1"><strong>d (I):</strong> ${data.d || 0}</p>
+                        <p class="mb-0"><strong>q (MA):</strong> ${data.q || 0}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-1"><strong>AIC:</strong> ${data.aic ? data.aic.toFixed(2) : '-'}</p>
+                        <p class="mb-1"><strong>BIC:</strong> ${data.bic ? data.bic.toFixed(2) : '-'}</p>
+                        <p class="mb-0"><strong>Log-Likelihood:</strong> ${data.logLikelihood ? data.logLikelihood.toFixed(2) : '-'}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-1"><strong>Exogenous Var:</strong> ${data.exogVar || 'GDP'}</p>
+                        <p class="mb-0"><strong>Training Time:</strong> ${data.trainingTime || '-'}s</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Update Step 5: Residual Diagnostics
+    function updateStep5(data) {
+        const statsDiv = document.getElementById('step5Stats');
+        statsDiv.innerHTML = `
+            <table class="table table-sm">
+                <tr><td><strong>Mean Residual:</strong></td><td>${data.meanResidual ? data.meanResidual.toFixed(6) : '-'}</td></tr>
+                <tr><td><strong>Std Residual:</strong></td><td>${data.stdResidual ? data.stdResidual.toFixed(4) : '-'}</td></tr>
+                <tr><td><strong>Ljung-Box p-value:</strong></td><td>${data.ljungBoxP ? data.ljungBoxP.toFixed(4) : '-'}</td></tr>
+                <tr><td><strong>Residuals Normal?</strong></td><td>${data.normalResiduals ? '✓ Yes' : '✗ No'}</td></tr>
+            </table>
+            <small class="text-muted">Residual harus random (white noise) untuk model yang baik</small>
+        `;
+
+        // Create residual chart
+        if (data.chartData) {
+            createLineChart('chart5', 'Residual Plot', data.chartData.labels,
+                [{
+                    label: 'Residuals',
+                    data: data.chartData.residuals,
+                    borderColor: 'rgb(153, 102, 255)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    pointRadius: 2
+                }]
+            );
+        }
+    }
+
+    // Update Step 6: Model Evaluation
+    function updateStep6(data) {
+        const statsDiv = document.getElementById('step6Stats');
+        statsDiv.innerHTML = `
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded text-center">
+                        <h6 class="text-muted mb-2">MAPE</h6>
+                        <h4 class="fw-bold text-primary">${data.mape ? data.mape.toFixed(2) + '%' : '-'}</h4>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded text-center">
+                        <h6 class="text-muted mb-2">RMSE</h6>
+                        <h4 class="fw-bold text-success">${data.rmse ? data.rmse.toFixed(4) : '-'}</h4>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded text-center">
+                        <h6 class="text-muted mb-2">MAE</h6>
+                        <h4 class="fw-bold text-info">${data.mae ? data.mae.toFixed(4) : '-'}</h4>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded text-center">
+                        <h6 class="text-muted mb-2">R²</h6>
+                        <h4 class="fw-bold text-warning">${data.r2 ? data.r2.toFixed(4) : '-'}</h4>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Create prediction vs actual chart
+        if (data.chartData) {
+            createLineChart('chart6', 'Prediction vs Actual', data.chartData.labels,
+                [
+                    {
+                        label: 'Actual',
+                        data: data.chartData.actual,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    },
+                    {
+                        label: 'Predicted',
+                        data: data.chartData.predicted,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderDash: [5, 5]
+                    }
+                ]
+            );
+        }
+    }
+
+    // Update Step 7: Save Model
+    function updateStep7(data) {
+        const statsDiv = document.getElementById('step7Stats');
+        statsDiv.innerHTML = `
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>Model berhasil disimpan!</strong>
+                <p class="mb-1 mt-2"><strong>Model Path:</strong> ${data.modelPath || '-'}</p>
+                <p class="mb-0"><strong>Version:</strong> ${data.version || '-'}</p>
+            </div>
+        `;
+    }
+
+    // Update overall progress
+    function updateOverallProgress(percentage) {
+        const progressBar = document.getElementById('overallProgressBar');
+        const progressText = document.getElementById('overallProgress');
+
+        percentage = Math.min(100, Math.max(0, percentage));
+        progressBar.style.width = percentage + '%';
+        progressBar.querySelector('span').textContent = percentage + '%';
+        progressText.textContent = percentage + '%';
+    }
+
+    // Show training result
+    function showTrainingResult(result) {
+        document.getElementById('resultSection').style.display = 'block';
+        document.getElementById('resultMAPE').textContent = result.mape ? result.mape.toFixed(2) + '%' : '-';
+        document.getElementById('resultRMSE').textContent = result.rmse ? result.rmse.toFixed(4) : '-';
+        document.getElementById('resultMAE').textContent = result.mae ? result.mae.toFixed(4) : '-';
+        document.getElementById('resultR2').textContent = result.r2 ? result.r2.toFixed(4) : '-';
+
+        document.getElementById('resultParams').innerHTML = `
+            <strong>ARIMAX(${result.p || 0}, ${result.d || 0}, ${result.q || 0})</strong><br>
+            <small>AIC: ${result.aic ? result.aic.toFixed(2) : '-'} | BIC: ${result.bic ? result.bic.toFixed(2) : '-'}</small>
+        `;
+
+        // Scroll to result
+        document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Reset all steps
+    function resetAllSteps() {
+        for (let i = 1; i <= 7; i++) {
+            const stepBtn = document.getElementById(`step${i}Btn`);
+            const stepIcon = stepBtn.querySelector('.step-icon');
+            stepBtn.disabled = true;
+            stepIcon.className = 'fas fa-circle-notch me-2 step-icon';
+        }
+        updateOverallProgress(0);
+
+        // Destroy existing charts
+        Object.values(charts).forEach(chart => {
+            if (chart) chart.destroy();
+        });
+        charts = {};
+    }
+
+    // Create line chart
+    function createLineChart(canvasId, title, labels, datasets) {
+        const ctx = document.getElementById(canvasId);
+        if (!ctx) return;
+
+        // Destroy existing chart
+        if (charts[canvasId]) {
+            charts[canvasId].destroy();
+        }
+
+        charts[canvasId] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: title
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Create bar chart
+    function createBarChart(canvasId, title, labels, datasets) {
+        const ctx = document.getElementById(canvasId);
+        if (!ctx) return;
+
+        // Destroy existing chart
+        if (charts[canvasId]) {
+            charts[canvasId].destroy();
+        }
+
+        charts[canvasId] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: title
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Show toast notification
+    function showToast(message, type) {
+        const toastEl = document.getElementById('notificationToast');
+        const toast = new bootstrap.Toast(toastEl);
+        const toastMessage = document.getElementById('toastMessage');
+
+        const icons = {
+            'success': '<i class="fas fa-check-circle text-success me-2"></i>',
+            'error': '<i class="fas fa-exclamation-circle text-danger me-2"></i>',
+            'info': '<i class="fas fa-info-circle text-info me-2"></i>'
+        };
+        toastMessage.innerHTML = (icons[type] || '') + message;
+
+        toast.show();
+    }
+</script>
+
+<style>
+    .section-update-model .card {
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .section-update-model .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .border-4 {
+        border-width: 4px !important;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background-color: #e7f3ff;
+        color: #0d6efd;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 1rem;
+    }
+
+    .step-icon {
+        font-size: 1rem;
+    }
+
+    .accordion-item {
+        margin-bottom: 0.5rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem !important;
+    }
+
+    .toast {
+        min-width: 300px;
+    }
+
+    .table-sm td {
+        padding: 0.5rem;
+    }
+</style>
+
+{% endblock %}

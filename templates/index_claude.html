@@ -1,0 +1,810 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Fossil Track{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="hero" class="hero section">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
+                <div class="hero-content">
+                    <h1>Prediksi Konsumsi Energi Fosil Indonesia</h1>
+                    <p class="lead">Menggunakan model ARIMAX untuk memprediksi tren konsumsi energi fosil berdasarkan
+                        faktor ekonomi</p>
+                    <p class="text-light">Analisis berbasis data historis dengan 3 skenario ekonomi: Optimis, Moderat,
+                        dan Pesimis</p>
+                    <div class="hero-buttons mt-4">
+                        <a href="#prediksi" class="btn btn-success btn-lg smooth-scroll">
+                            <i class="fas fa-chart-line me-2"></i>Mulai Prediksi
+                        </a>
+                        <a href="#data-historis" class="btn btn-outline-light btn-lg smooth-scroll">
+                            <i class="fas fa-history me-2"></i>Lihat Data Historis
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-wave">
+        <svg class="wave" viewBox="0 0 1440 300" preserveAspectRatio="none">
+            <path fill="#9bd3a7" d="M0,140
+                     C180,200 360,80 540,110
+                     C720,140 900,220 1080,180
+                     C1260,140 1350,110 1440,130
+                     L1440,300 L0,300 Z" />
+
+            <path fill="#6fbf8e" d="M0,170
+                     C200,230 380,110 560,140
+                     C740,170 920,260 1100,210
+                     C1280,170 1360,150 1440,160
+                     L1440,300 L0,300 Z" />
+
+            <path fill="#0f3f54" d="M0,210
+                     C220,270 400,150 580,180
+                     C760,210 940,300 1120,250
+                     C1300,210 1380,200 1440,210
+                     L1440,300 L0,300 Z" />
+        </svg>
+    </div>
+</section>
+
+<!-- Cara Kerja Section -->
+<section id="cara-kerja" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Cara Menggunakan</h2>
+            <p class="text-muted">3 langkah mudah untuk mendapatkan prediksi konsumsi energi fosil</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="card-body">
+                        <div class="step-icon mb-3">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                                style="width: 80px; height: 80px;">
+                                <i class="fas fa-sliders-h fa-2x text-primary"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title">1. Pilih Skenario Ekonomi</h5>
+                        <p class="text-muted">Tentukan asumsi pertumbuhan ekonomi: Optimis, Moderat, atau Pesimis</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="card-body">
+                        <div class="step-icon mb-3">
+                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                                style="width: 80px; height: 80px;">
+                                <i class="fas fa-calendar-alt fa-2x text-success"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title">2. Tentukan Periode</h5>
+                        <p class="text-muted">Pilih tahun prediksi yang diinginkan (hingga 10 tahun ke depan)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="card-body">
+                        <div class="step-icon mb-3">
+                            <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                                style="width: 80px; height: 80px;">
+                                <i class="fas fa-chart-area fa-2x text-info"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title">3. Lihat Hasil Prediksi</h5>
+                        <p class="text-muted">Analisis grafik prediksi dengan confidence interval yang detail</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Form Prediksi Section -->
+<section id="prediksi" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Buat Prediksi Anda</h2>
+            <p class="text-muted">Masukkan parameter prediksi dan lihat hasilnya secara real-time</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Form Card -->
+                <div class="card shadow-sm border-0 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-body p-4">
+                        <form id="predictionForm">
+                            <div class="row g-4">
+                                <!-- Skenario Ekonomi -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-chart-line text-primary me-2"></i>Skenario Pertumbuhan Ekonomi
+                                        (GDP)
+                                    </label>
+                                    <div class="scenario-cards">
+                                        <div class="form-check scenario-card">
+                                            <input class="form-check-input" type="radio" name="scenario" id="optimis"
+                                                value="optimistic" checked>
+                                            <label class="form-check-label w-100" for="optimis">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-arrow-up text-success fa-2x me-3"></i>
+                                                    <div>
+                                                        <strong>Optimis</strong>
+                                                        <p class="mb-0 small text-muted">Pertumbuhan GDP tinggi (~6-7%)
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check scenario-card mt-2">
+                                            <input class="form-check-input" type="radio" name="scenario" id="moderat"
+                                                value="moderate">
+                                            <label class="form-check-label w-100" for="moderat">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-minus text-warning fa-2x me-3"></i>
+                                                    <div>
+                                                        <strong>Moderat</strong>
+                                                        <p class="mb-0 small text-muted">Pertumbuhan GDP stabil (~4-5%)
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check scenario-card mt-2">
+                                            <input class="form-check-input" type="radio" name="scenario" id="pesimis"
+                                                value="pessimistic">
+                                            <label class="form-check-label w-100" for="pesimis">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-arrow-down text-danger fa-2x me-3"></i>
+                                                    <div>
+                                                        <strong>Pesimis</strong>
+                                                        <p class="mb-0 small text-muted">Pertumbuhan GDP rendah (~2-3%)
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Periode Prediksi -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-calendar-alt text-success me-2"></i>Periode Prediksi
+                                    </label>
+
+                                    <div class="mb-3">
+                                        <label for="startYear" class="form-label small">Tahun Mulai</label>
+                                        <select class="form-select" id="startYear" required>
+                                            <option value="2024">2024</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2026" selected>2026</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="forecastYears" class="form-label small">Proyeksi (Tahun ke
+                                            Depan)</label>
+                                        <select class="form-select" id="forecastYears" required>
+                                            <option value="3">3 Tahun</option>
+                                            <option value="5" selected>5 Tahun</option>
+                                            <option value="7">7 Tahun</option>
+                                            <option value="10">10 Tahun</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="alert alert-info mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <small>Data training: 1990-2023 (34 tahun)</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    <i class="fas fa-magic me-2"></i>Generate Prediksi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Hasil Prediksi -->
+                <div id="resultSection" class="card shadow-sm border-0" style="display: none;" data-aos="fade-up">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-line me-2"></i>Hasil Prediksi Konsumsi Energi Fosil
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Summary Cards -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-check text-primary fa-2x mb-2"></i>
+                                        <p class="mb-1 small text-muted">Tahun Terakhir</p>
+                                        <h4 id="lastYear" class="mb-0">-</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-bolt text-warning fa-2x mb-2"></i>
+                                        <p class="mb-1 small text-muted">Prediksi Konsumsi</p>
+                                        <h4 id="lastValue" class="mb-0">-</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-chart-line text-success fa-2x mb-2"></i>
+                                        <p class="mb-1 small text-muted">Tren Rata-rata</p>
+                                        <h4 id="avgTrend" class="mb-0">-</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart -->
+                        <div style="height: 400px;">
+                            <canvas id="predictionChart"></canvas>
+                        </div>
+
+                        <!-- Tabel Detail -->
+                        <div class="mt-4">
+                            <h6 class="mb-3">Detail Prediksi per Tahun</h6>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Tahun</th>
+                                            <th>Prediksi (%)</th>
+                                            <th>Batas Bawah (95% CI)</th>
+                                            <th>Batas Atas (95% CI)</th>
+                                            <th>Perubahan</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="predictionTableBody">
+                                        <!-- Filled by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Data Historis Section -->
+<section id="data-historis" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Data Historis</h2>
+            <p class="text-muted">Tren konsumsi energi fosil Indonesia periode 1990-2023</p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12" data-aos="fade-up" data-aos-delay="100">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <div style="height: 400px;">
+                            <canvas id="historicalChart"></canvas>
+                        </div>
+
+                        <div class="row mt-4 g-3">
+                            <div class="col-md-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <p class="mb-1 small text-muted">Periode Data</p>
+                                    <h5 class="mb-0">1990 - 2023</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <p class="mb-1 small text-muted">Total Data Point</p>
+                                    <h5 class="mb-0">34 Tahun</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <p class="mb-1 small text-muted">Konsumsi 2023</p>
+                                    <h5 class="mb-0">51.2%</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center p-3 bg-light rounded">
+                                    <p class="mb-1 small text-muted">Tren Historis</p>
+                                    <h5 class="mb-0 text-danger">
+                                        <i class="fas fa-arrow-up"></i> +0.8%/tahun
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Metode Section -->
+<section id="metode" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Tentang Metode ARIMAX</h2>
+            <p class="text-muted">Memahami model prediksi yang kami gunakan</p>
+        </div>
+
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">Apa itu ARIMAX?</h4>
+                        <p><strong>ARIMAX</strong> (AutoRegressive Integrated Moving Average with eXogenous variables)
+                            adalah metode statistik untuk prediksi time series yang mempertimbangkan faktor eksternal.
+                        </p>
+
+                        <div class="mt-4">
+                            <div class="d-flex mb-3">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-check-circle text-success fa-lg me-3"></i>
+                                </div>
+                                <div>
+                                    <strong>AR (AutoRegressive)</strong>
+                                    <p class="text-muted mb-0">Menggunakan nilai masa lalu untuk prediksi</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex mb-3">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-check-circle text-success fa-lg me-3"></i>
+                                </div>
+                                <div>
+                                    <strong>I (Integrated)</strong>
+                                    <p class="text-muted mb-0">Diferensiasi data untuk stasioneritas</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex mb-3">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-check-circle text-success fa-lg me-3"></i>
+                                </div>
+                                <div>
+                                    <strong>MA (Moving Average)</strong>
+                                    <p class="text-muted mb-0">Menggunakan error masa lalu</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-check-circle text-success fa-lg me-3"></i>
+                                </div>
+                                <div>
+                                    <strong>X (eXogenous)</strong>
+                                    <p class="text-muted mb-0">Memasukkan variabel eksternal (GDP)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">Performa Model</h4>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>MAPE (Mean Absolute Percentage Error)</span>
+                                <strong class="text-success">3.45%</strong>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success" style="width: 96.55%"></div>
+                            </div>
+                            <small class="text-muted">Semakin rendah semakin baik (Excellent < 10%)</small>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>R² (Coefficient of Determination)</span>
+                                <strong class="text-primary">0.9512</strong>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-primary" style="width: 95.12%"></div>
+                            </div>
+                            <small class="text-muted">Model menjelaskan 95.12% variasi data</small>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Variabel Eksternal:</strong> Pertumbuhan PDB (Produk Domestik Bruto) Indonesia
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Catatan:</strong> Hasil prediksi adalah estimasi berdasarkan model statistik dan
+                            asumsi skenario ekonomi yang dipilih.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Smooth scrolling for navbar links
+        document.querySelectorAll('.smooth-scroll').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Load historical chart
+        loadHistoricalChart();
+
+        // Form submission
+        document.getElementById('predictionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            generatePrediction();
+        });
+    });
+
+    // Data historis dummy (1990-2023)
+    const historicalData = [
+        { year: 1990, value: 44.2 }, { year: 1991, value: 44.5 }, { year: 1992, value: 44.8 },
+        { year: 1993, value: 45.1 }, { year: 1994, value: 45.6 }, { year: 1995, value: 46.0 },
+        { year: 1996, value: 46.3 }, { year: 1997, value: 46.8 }, { year: 1998, value: 45.9 },
+        { year: 1999, value: 46.2 }, { year: 2000, value: 46.7 }, { year: 2001, value: 47.1 },
+        { year: 2002, value: 47.5 }, { year: 2003, value: 47.8 }, { year: 2004, value: 48.2 },
+        { year: 2005, value: 48.5 }, { year: 2006, value: 48.9 }, { year: 2007, value: 49.2 },
+        { year: 2008, value: 49.6 }, { year: 2009, value: 48.8 }, { year: 2010, value: 49.3 },
+        { year: 2011, value: 49.7 }, { year: 2012, value: 50.0 }, { year: 2013, value: 50.3 },
+        { year: 2014, value: 50.5 }, { year: 2015, value: 50.7 }, { year: 2016, value: 50.9 },
+        { year: 2017, value: 51.1 }, { year: 2018, value: 51.3 }, { year: 2019, value: 51.5 },
+        { year: 2020, value: 50.8 }, { year: 2021, value: 51.0 }, { year: 2022, value: 51.4 },
+        { year: 2023, value: 51.2 }
+    ];
+
+    // Load historical chart
+    function loadHistoricalChart() {
+        const ctx = document.getElementById('historicalChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: historicalData.map(d => d.year),
+                datasets: [{
+                    label: 'Konsumsi Energi Fosil (%)',
+                    data: historicalData.map(d => d.value),
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 2,
+                    pointHoverRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return 'Konsumsi: ' + context.parsed.y.toFixed(2) + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Konsumsi Energi Fosil (%)'
+                        },
+                        ticks: {
+                            callback: function (value) {
+                                return value.toFixed(1) + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tahun'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Generate prediction
+    let predictionChartInstance = null;
+
+    function generatePrediction() {
+        const scenario = document.querySelector('input[name="scenario"]:checked').value;
+        const startYear = parseInt(document.getElementById('startYear').value);
+        const forecastYears = parseInt(document.getElementById('forecastYears').value);
+
+        // Show loading
+        const btn = document.querySelector('#predictionForm button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
+        btn.disabled = true;
+
+        // Simulate API call
+        setTimeout(() => {
+            const predictions = generateDummyPrediction(scenario, startYear, forecastYears);
+            displayPrediction(predictions, startYear);
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            // Scroll to result
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 1500);
+    }
+
+    // Generate dummy prediction based on scenario
+    function generateDummyPrediction(scenario, startYear, years) {
+        const predictions = [];
+        let baseValue = 51.2; // Last historical value (2023)
+
+        // Growth rate based on scenario
+        const growthRates = {
+            'optimistic': 0.015,   // 1.5% annual increase
+            'moderate': 0.010,     // 1.0% annual increase
+            'pessimistic': 0.005   // 0.5% annual increase
+        };
+
+        const growthRate = growthRates[scenario];
+
+        for (let i = 1; i <= years; i++) {
+            const year = startYear + i - 1;
+            const value = baseValue + (baseValue * growthRate * i);
+            const margin = value * 0.05; // 5% confidence interval
+
+            predictions.push({
+                year: year,
+                value: value,
+                lower: value - margin,
+                upper: value + margin
+            });
+        }
+
+        return predictions;
+    }
+
+    // Display prediction
+    function displayPrediction(predictions, startYear) {
+        // Update summary cards
+        const lastPred = predictions[predictions.length - 1];
+        const firstPred = predictions[0];
+        const avgTrend = ((lastPred.value - firstPred.value) / predictions.length).toFixed(2);
+
+        document.getElementById('lastYear').textContent = lastPred.year;
+        document.getElementById('lastValue').textContent = lastPred.value.toFixed(2) + '%';
+        document.getElementById('avgTrend').innerHTML = `
+        <i class="fas fa-arrow-up text-danger"></i> ${avgTrend}%/tahun
+    `;
+
+        // Create chart
+        createPredictionChart(predictions, startYear);
+
+        // Populate table
+        populatePredictionTable(predictions);
+    }
+
+    // Create prediction chart
+    function createPredictionChart(predictions, startYear) {
+        const ctx = document.getElementById('predictionChart').getContext('2d');
+
+        // Destroy existing chart
+        if (predictionChartInstance) {
+            predictionChartInstance.destroy();
+        }
+
+        // Get last 5 years of historical data for context
+        const historicalContext = historicalData.slice(-5);
+        const allYears = [...historicalContext.map(d => d.year), ...predictions.map(d => d.year)];
+        const historicalValues = [...historicalContext.map(d => d.value), ...Array(predictions.length).fill(null)];
+        const predictionValues = [...Array(historicalContext.length).fill(null), ...predictions.map(d => d.value)];
+        const upperBound = [...Array(historicalContext.length).fill(null), ...predictions.map(d => d.upper)];
+        const lowerBound = [...Array(historicalContext.length).fill(null), ...predictions.map(d => d.lower)];
+
+        predictionChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: allYears,
+                datasets: [
+                    {
+                        label: 'Data Historis',
+                        data: historicalValues,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: false
+                    },
+                    {
+                        label: 'Prediksi',
+                        data: predictionValues,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: false
+                    },
+                    {
+                        label: 'Upper Bound (95% CI)',
+                        data: upperBound,
+                        borderColor: 'rgba(201, 203, 207, 0.5)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 1,
+                        borderDash: [2, 2],
+                        tension: 0.4,
+                        fill: '+1',
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Lower Bound (95% CI)',
+                        data: lowerBound,
+                        borderColor: 'rgba(201, 203, 207, 0.5)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 1,
+                        borderDash: [2, 2],
+                        tension: 0.4,
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            filter: function (item) {
+                                return !item.text.includes('Bound');
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                if (context.dataset.label.includes('Bound')) return null;
+                                return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Konsumsi Energi Fosil (%)'
+                        },
+                        ticks: {
+                            callback: function (value) {
+                                return value.toFixed(1) + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tahun'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Populate prediction table
+    function populatePredictionTable(predictions) {
+        const tbody = document.getElementById('predictionTableBody');
+        tbody.innerHTML = '';
+
+        predictions.forEach((pred, index) => {
+            const change = index > 0 ?
+                ((pred.value - predictions[index - 1].value) / predictions[index - 1].value * 100).toFixed(2) :
+                '0.00';
+
+            const changeClass = parseFloat(change) > 0 ? 'text-danger' : 'text-success';
+            const changeIcon = parseFloat(change) > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+
+            const statusClass = pred.value > 55 ? 'danger' : pred.value > 50 ? 'warning' : 'success';
+            const statusText = pred.value > 55 ? 'Tinggi' : pred.value > 50 ? 'Sedang' : 'Normal';
+
+            const row = `
+            <tr>
+                <td><strong>${pred.year}</strong></td>
+                <td><strong>${pred.value.toFixed(2)}%</strong></td>
+                <td>${pred.lower.toFixed(2)}%</td>
+                <td>${pred.upper.toFixed(2)}%</td>
+                <td class="${changeClass}">
+                    <i class="fas ${changeIcon}"></i> ${Math.abs(change)}%
+                </td>
+                <td><span class="badge bg-${statusClass}">${statusText}</span></td>
+            </tr>
+        `;
+            tbody.innerHTML += row;
+        });
+    }
+</script>
+
+<style>
+    .section-title {
+        font-weight: 700;
+        color: #0f3f54;
+        margin-bottom: 1rem;
+    }
+
+    .scenario-card {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .scenario-card:hover {
+        border-color: #0d6efd;
+        background-color: #f8f9fa;
+    }
+
+    .scenario-card input[type="radio"]:checked+label {
+        border-color: #0d6efd;
+        background-color: #e7f1ff;
+    }
+
+    .scenario-card label {
+        cursor: pointer;
+        margin-bottom: 0;
+        padding: 8px;
+    }
+</style>
+
+{% endblock %}

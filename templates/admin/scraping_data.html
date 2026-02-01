@@ -1,0 +1,940 @@
+{% extends 'admin/layouts/template.html' %}
+
+{% block content %}
+<div class="section-scraping container-fluid mt-3 mb-5">
+
+    <!-- Status Cards -->
+    <div class=" mt-1 row g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-primary border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Data Energi</p>
+                            <h4 class="fw-bold mb-0" id="energyDataCount">-</h4>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-bolt text-primary fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Total records</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-success border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Data GDP</p>
+                            <h4 class="fw-bold mb-0" id="gdpDataCount">-</h4>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-chart-line text-success fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Total records</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-info border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Update Terakhir</p>
+                            <h6 class="fw-bold mb-0" id="lastUpdate">-</h6>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-clock text-info fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Waktu update</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-warning border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Status</p>
+                            <h6 class="fw-bold mb-0" id="scrapingStatus">
+                                <span class="badge bg-secondary">Ready</span>
+                            </h6>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-info-circle text-warning fs-4"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">System status</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Method Selection -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-file-import text-primary me-2"></i>
+                        Pilih Metode Update Data
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="method-option p-4 border rounded h-100" id="apiMethod" style="cursor: pointer;">
+                                <div class="text-center">
+                                    <i class="fas fa-cloud-download-alt text-primary" style="font-size: 3rem;"></i>
+                                    <h5 class="mt-3 fw-bold">Fetch dari API</h5>
+                                    <p class="text-muted">Ambil data terbaru dari sumber eksternal (World Bank API)</p>
+                                    <span class="badge bg-primary">Otomatis</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="method-option p-4 border rounded h-100" id="uploadMethod"
+                                style="cursor: pointer;">
+                                <div class="text-center">
+                                    <i class="fas fa-file-upload text-success" style="font-size: 3rem;"></i>
+                                    <h5 class="mt-3 fw-bold">Upload File</h5>
+                                    <p class="text-muted">Upload file CSV/Excel dengan data energi dan GDP</p>
+                                    <span class="badge bg-success">Manual</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fetch from API Section -->
+    <div class="row mb-4" id="apiSection" style="display: none;">
+        <div class="col-12">
+            <div class="card shadow-sm border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-cloud-download-alt me-2"></i>
+                        Fetch Data dari API
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Data akan diambil dari World Bank API. Proses ini memerlukan koneksi internet dan mungkin
+                        memakan waktu beberapa menit.
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Jenis Data</label>
+                            <select class="form-select" id="apiDataType">
+                                <option value="all">Semua Data (Energi + GDP)</option>
+                                <option value="energy">Data Energi Saja</option>
+                                <option value="gdp">Data GDP Saja</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Tahun Mulai</label>
+                            <input type="number" class="form-control" id="apiStartYear" value="1990" min="1965"
+                                max="2025">
+                            <small class="text-muted">✓ Data tersedia mulai 1965 (Energy) & 1960 (GDP constant 2015
+                                US$)</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Tahun Akhir</label>
+                            <input type="number" class="form-control" id="apiEndYear" value="2023" min="1965"
+                                max="2025">
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary px-4" id="btnFetchData">
+                            <i class="fas fa-download me-2"></i>Fetch Data Sekarang
+                        </button>
+                        <button class="btn btn-outline-secondary px-4" id="btnCancelApi">
+                            <i class="fas fa-times me-2"></i>Batal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload File Section -->
+    <div class="row mb-4" id="uploadSection" style="display: none;">
+        <div class="col-12">
+            <div class="card shadow-sm border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-file-upload me-2"></i>
+                        Upload File Data
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Format File:</strong> Gunakan file CSV atau Excel (.xlsx) dengan kolom:
+                        <code>year, country, value</code>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-bolt text-primary me-1"></i>File Data Energi
+                            </label>
+                            <input type="file" class="form-control" id="energyFile" accept=".csv,.xlsx">
+                            <small class="text-muted">Format: CSV atau Excel</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-chart-line text-success me-1"></i>File Data GDP
+                            </label>
+                            <input type="file" class="form-control" id="gdpFile" accept=".csv,.xlsx">
+                            <small class="text-muted">Format: CSV atau Excel</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success px-4" id="btnUploadFiles">
+                            <i class="fas fa-upload me-2"></i>Upload Files
+                        </button>
+                        <button class="btn btn-outline-secondary px-4" id="btnCancelUpload">
+                            <i class="fas fa-times me-2"></i>Batal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="row mb-4" id="progressSection" style="display: none;">
+        <div class="col-12">
+            <div class="card shadow-sm border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-spinner fa-spin me-2"></i>
+                        Proses Sedang Berjalan
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold" id="progressTitle">Mengambil data...</span>
+                            <span id="progressPercentage" class="fw-bold text-info">0%</span>
+                        </div>
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info"
+                                role="progressbar" id="progressBar" style="width: 0%">
+                                <span class="fw-bold">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="progressLog" class="border rounded p-3 bg-light"
+                        style="max-height: 250px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;">
+                        <p class="text-muted mb-0"><i class="fas fa-circle-notch fa-spin me-2"></i>Memulai proses...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Preview -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-table text-warning me-2"></i>
+                        Preview Data Terbaru
+                    </h5>
+                    <button class="btn btn-sm btn-outline-primary" id="btnRefreshPreview">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh Preview
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs mb-3" id="dataTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="energy-tab" data-bs-toggle="tab"
+                                data-bs-target="#energy" type="button" role="tab">
+                                <i class="fas fa-bolt me-1"></i>Data Energi
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="gdp-tab" data-bs-toggle="tab" data-bs-target="#gdp"
+                                type="button" role="tab">
+                                <i class="fas fa-chart-line me-1"></i>Data GDP
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="dataTabContent">
+                        <!-- Energy Data Tab -->
+                        <div class="tab-pane fade show active" id="energy" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Tahun</th>
+                                            <th>Negara</th>
+                                            <th>Konsumsi Energi Fosil (TWh)</th>
+                                            <th>Terakhir Diupdate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="energyTableBody">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">
+                                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                                <p>Belum ada data. Klik "Mulai Scraping" untuk mengambil data.</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- GDP Data Tab -->
+                        <div class="tab-pane fade" id="gdp" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Tahun</th>
+                                            <th>Negara</th>
+                                            <th>GDP (USD)</th>
+                                            <th>Terakhir Diupdate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gdpTableBody">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">
+                                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                                <p>Belum ada data. Klik "Mulai Scraping" untuk mengambil data.</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Section - DISABLED -->
+    <!-- 
+    Fitur scheduler otomatis dinonaktifkan karena tidak reliable di environment lokal.
+    Untuk production deployment, gunakan cron job atau cloud scheduler service.
+    -->
+    <!-- 
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-calendar-alt text-primary me-2"></i>
+                        Jadwal Scraping Otomatis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Fitur scheduler otomatis saat ini tidak tersedia.
+                        Gunakan tombol "Mulai Scraping" untuk manual fetch.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+</div>
+
+<!-- Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="notificationToast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-bell me-2"></i>
+            <strong class="me-auto">Notifikasi</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Pesan notifikasi
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        // Load initial data
+        loadDataStats();
+        loadEnergyData();
+        loadGDPData();
+        // loadScheduleStatus();  // DISABLED - Scheduler feature removed
+
+        // Method selection listeners
+        document.getElementById('apiMethod').addEventListener('click', showApiSection);
+        document.getElementById('uploadMethod').addEventListener('click', showUploadSection);
+
+        // API section listeners
+        document.getElementById('btnFetchData').addEventListener('click', fetchDataFromAPI);
+        document.getElementById('btnCancelApi').addEventListener('click', hideAllSections);
+
+        // Upload section listeners
+        document.getElementById('btnUploadFiles').addEventListener('click', uploadFiles);
+        document.getElementById('btnCancelUpload').addEventListener('click', hideAllSections);
+
+        // Other listeners
+        document.getElementById('btnRefreshPreview').addEventListener('click', refreshPreview);
+        // Scheduler listeners removed - feature disabled
+        // document.getElementById('enableSchedule').addEventListener('change', toggleSchedule);
+        // document.getElementById('btnSaveSchedule').addEventListener('click', saveSchedule);
+    });
+
+    // Show API section
+    function showApiSection() {
+        hideAllSections();
+        document.getElementById('apiSection').style.display = 'block';
+        document.getElementById('apiMethod').classList.add('border-primary', 'bg-primary', 'bg-opacity-10');
+    }
+
+    // Show Upload section
+    function showUploadSection() {
+        hideAllSections();
+        document.getElementById('uploadSection').style.display = 'block';
+        document.getElementById('uploadMethod').classList.add('border-success', 'bg-success', 'bg-opacity-10');
+    }
+
+    // Hide all sections
+    function hideAllSections() {
+        document.getElementById('apiSection').style.display = 'none';
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('progressSection').style.display = 'none';
+        document.getElementById('apiMethod').classList.remove('border-primary', 'bg-primary', 'bg-opacity-10');
+        document.getElementById('uploadMethod').classList.remove('border-success', 'bg-success', 'bg-opacity-10');
+    }
+
+
+    // Load data statistics
+    function loadDataStats() {
+        fetch('/api/data/stats')
+            .then(response => response.json())
+            .then(result => {
+                if (result.success && result.stats) {
+                    const stats = result.stats;
+                    document.getElementById('energyDataCount').textContent = stats.energy_count || '0';
+                    document.getElementById('gdpDataCount').textContent = stats.gdp_count || '0';
+                    document.getElementById('lastUpdate').textContent = stats.last_update || '-';
+                } else {
+                    throw new Error(result.message || 'Failed to load stats');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading stats:', error);
+                // Set default values
+                document.getElementById('energyDataCount').textContent = '0';
+                document.getElementById('gdpDataCount').textContent = '0';
+                document.getElementById('lastUpdate').textContent = '-';
+            });
+    }
+
+    // Fetch data from API
+    function fetchDataFromAPI() {
+        const dataType = document.getElementById('apiDataType').value;
+        const startYear = document.getElementById('apiStartYear').value;
+        const endYear = document.getElementById('apiEndYear').value;
+
+        // Show progress section
+        document.getElementById('progressSection').style.display = 'block';
+        document.getElementById('progressTitle').textContent = 'Mengambil data dari API...';
+        document.getElementById('apiSection').style.display = 'none';
+
+        // Update status
+        updateStatus('running', 'Fetching...');
+
+        // Initialize progress log
+        const progressLog = document.getElementById('progressLog');
+        progressLog.innerHTML = '<p class="text-info mb-1"><i class="fas fa-spinner fa-spin me-2"></i>Menghubungi API eksternal...</p>';
+
+        // Call backend API
+        fetch('/api/data/fetch', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                dataType: dataType,
+                startYear: parseInt(startYear),
+                endYear: parseInt(endYear)
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateProgress(50);
+                    addProgressLog('✓ Koneksi berhasil!');
+
+                    // Tampilkan message detail dari backend
+                    if (data.message) {
+                        addProgressLog('📊 ' + data.message);
+                    }
+
+                    // Tampilkan info jumlah data
+                    addProgressLog(`✓ Data Energi: ${data.energyCount} records`);
+                    addProgressLog(`✓ Data GDP: ${data.gdpCount} records`);
+
+                    // Tampilkan warnings jika ada
+                    if (data.warnings && data.warnings.length > 0) {
+                        data.warnings.forEach(warning => {
+                            addProgressLog('⚠️ ' + warning);
+                        });
+                    }
+
+                    // Tampilkan alignment info jika ada
+                    if (data.alignment_info) {
+                        const info = data.alignment_info;
+                        addProgressLog(`📅 Rentang tahun tersimpan: ${info.year_range} (${info.total_matched} tahun)`);
+                        addProgressLog(`📈 Coverage: ${info.coverage_percentage.toFixed(1)}% dari rentang yang diminta`);
+
+                        if (info.energy_only_years && info.energy_only_years.length > 0) {
+                            const years = info.energy_only_years.slice(0, 5).join(', ');
+                            const more = info.energy_only_years.length > 5 ? '...' : '';
+                            addProgressLog(`⚠️ Tahun dengan data energi saja: ${years}${more}`);
+                        }
+
+                        if (info.gdp_only_years && info.gdp_only_years.length > 0) {
+                            const years = info.gdp_only_years.slice(0, 5).join(', ');
+                            const more = info.gdp_only_years.length > 5 ? '...' : '';
+                            addProgressLog(`⚠️ Tahun dengan data GDP saja: ${years}${more}`);
+                        }
+                    }
+
+                    // Langsung update progress dan refresh preview
+                    updateProgress(100);
+                    addProgressLog('✓ Proses selesai!');
+                    addProgressLog('✓ Data berhasil disimpan ke database');
+                    updateStatus('success', 'Selesai');
+                    showToast('Data berhasil diperbarui!', 'success');
+
+                    // Refresh preview untuk update stats dan tabel
+                    setTimeout(() => {
+                        refreshPreview();
+                        resetProcess();
+                    }, 2000);
+                } else {
+                    addProgressLog('✗ Gagal: ' + (data.message || 'Unknown error'));
+                    showToast('Gagal fetch data: ' + (data.message || 'Unknown error'), 'error');
+                    resetProcess();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addProgressLog('✗ Error: ' + error.message);
+                showToast('Error: ' + error.message, 'error');
+                resetProcess();
+            });
+    }
+
+    // Upload files
+    function uploadFiles() {
+        const energyFile = document.getElementById('energyFile').files[0];
+        const gdpFile = document.getElementById('gdpFile').files[0];
+
+        if (!energyFile && !gdpFile) {
+            showToast('Pilih minimal satu file untuk diupload!', 'error');
+            return;
+        }
+
+        // Show progress section
+        document.getElementById('progressSection').style.display = 'block';
+        document.getElementById('progressTitle').textContent = 'Mengupload file...';
+        document.getElementById('uploadSection').style.display = 'none';
+
+        // Update status
+        updateStatus('running', 'Uploading...');
+
+        // Initialize progress log
+        const progressLog = document.getElementById('progressLog');
+        progressLog.innerHTML = '<p class="text-info mb-1"><i class="fas fa-spinner fa-spin me-2"></i>Memulai upload...</p>';
+
+        const formData = new FormData();
+        if (energyFile) {
+            formData.append('energyFile', energyFile);
+            addProgressLog('📁 File energi: ' + energyFile.name);
+        }
+        if (gdpFile) {
+            formData.append('gdpFile', gdpFile);
+            addProgressLog('📁 File GDP: ' + gdpFile.name);
+        }
+
+        // Call backend API
+        fetch('/api/data/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateProgress(100);
+                    addProgressLog('✓ Upload berhasil!');
+
+                    // Tampilkan message detail dari backend
+                    if (data.message) {
+                        addProgressLog('📊 ' + data.message);
+                    }
+
+                    addProgressLog(`✓ Data energi: ${data.energyCount || 0} records`);
+                    addProgressLog(`✓ Data GDP: ${data.gdpCount || 0} records`);
+
+                    // Tampilkan warnings jika ada
+                    if (data.warnings && data.warnings.length > 0) {
+                        data.warnings.forEach(warning => {
+                            addProgressLog('⚠️ ' + warning);
+                        });
+                    }
+
+                    // Tampilkan alignment info jika ada
+                    if (data.alignment_info) {
+                        const info = data.alignment_info;
+                        addProgressLog(`📅 Rentang tahun tersimpan: ${info.year_range} (${info.total_matched} tahun)`);
+                        if (info.coverage_percentage) {
+                            addProgressLog(`📈 Coverage: ${info.coverage_percentage.toFixed(1)}%`);
+                        }
+                    }
+
+                    updateStatus('success', 'Selesai');
+                    showToast('File berhasil diupload!', 'success');
+
+                    // Refresh preview untuk update stats dan tabel
+                    setTimeout(() => {
+                        refreshPreview();
+                        resetProcess();
+                    }, 2000);
+                } else {
+                    addProgressLog('✗ Gagal: ' + (data.message || 'Unknown error'));
+                    showToast('Gagal upload file: ' + (data.message || 'Unknown error'), 'error');
+                    resetProcess();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addProgressLog('✗ Error: ' + error.message);
+                showToast('Error: ' + error.message, 'error');
+                resetProcess();
+            });
+    }
+
+    // Monitor progress
+    function monitorProgress(taskId) {
+        let progress = 50;
+        const interval = setInterval(() => {
+            fetch(`/api/data/progress/${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.progress) {
+                        updateProgress(data.progress);
+                    } else {
+                        // Simulate progress
+                        progress += 10;
+                        if (progress > 90) progress = 90;
+                        updateProgress(progress);
+                    }
+
+                    if (data.log) {
+                        addProgressLog(data.log);
+                    }
+
+                    if (data.status === 'completed') {
+                        clearInterval(interval);
+                        updateProgress(100);
+                        addProgressLog('✓ Proses selesai!');
+                        addProgressLog('✓ Data berhasil disimpan ke database');
+                        updateStatus('success', 'Selesai');
+                        showToast('Data berhasil diperbarui! Lihat detail di log.', 'success');
+
+                        setTimeout(() => {
+                            refreshPreview();
+                            resetProcess();
+                        }, 3000);
+                    } else if (data.status === 'failed') {
+                        clearInterval(interval);
+                        addProgressLog('✗ Gagal: ' + (data.error || 'Unknown error'));
+                        updateStatus('error', 'Gagal');
+                        showToast('Proses gagal: ' + (data.error || 'Unknown error'), 'error');
+                        resetProcess();
+                    }
+                })
+                .catch(error => {
+                    clearInterval(interval);
+                    console.error('Error monitoring progress:', error);
+                });
+        }, 2000);
+    }
+
+    // Update progress bar
+    function updateProgress(percentage) {
+        const progressBar = document.getElementById('progressBar');
+        const progressPercentage = document.getElementById('progressPercentage');
+
+        percentage = Math.min(100, Math.max(0, percentage));
+        progressBar.style.width = percentage + '%';
+        progressBar.querySelector('span').textContent = percentage + '%';
+        progressPercentage.textContent = percentage + '%';
+    }
+
+    // Add progress log
+    function addProgressLog(message) {
+        const progressLog = document.getElementById('progressLog');
+        const timestamp = new Date().toLocaleTimeString('id-ID');
+        const logEntry = document.createElement('p');
+        logEntry.className = 'mb-1';
+        logEntry.innerHTML = `<small class="text-muted">[${timestamp}]</small> ${message}`;
+        progressLog.appendChild(logEntry);
+        progressLog.scrollTop = progressLog.scrollHeight;
+    }
+
+    // Reset process
+    function resetProcess() {
+        setTimeout(() => {
+            hideAllSections();
+            updateStatus('ready', 'Ready');
+        }, 3000);
+    }
+
+    // Update status badge
+    function updateStatus(status, text) {
+        const statusBadge = document.getElementById('scrapingStatus');
+        const badgeClasses = {
+            'ready': 'bg-secondary',
+            'running': 'bg-primary',
+            'success': 'bg-success',
+            'error': 'bg-danger'
+        };
+
+        statusBadge.innerHTML = `<span class="badge ${badgeClasses[status]}">${text}</span>`;
+    }
+
+    // Refresh data preview
+    function refreshPreview() {
+        loadDataStats();
+        loadEnergyData();
+        loadGDPData();
+    }
+
+    // Load energy data
+    function loadEnergyData() {
+        fetch('/api/data/energy?limit=10')
+            .then(response => response.json())
+            .then(result => {
+                const tbody = document.getElementById('energyTableBody');
+                if (result.success && result.data && result.data.length > 0) {
+                    tbody.innerHTML = result.data.map((row, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${row.year || '-'}</td>
+                            <td>Indonesia</td>
+                            <td>${row.energy_value ? parseFloat(row.energy_value).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TWh' : '-'}</td>
+                            <td>${row.updated_at ? new Date(row.updated_at).toLocaleDateString('id-ID') : '-'}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                <p>Belum ada data. Silakan fetch atau upload data terlebih dahulu.</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading energy data:', error);
+            });
+    }
+
+    // Load GDP data
+    function loadGDPData() {
+        fetch('/api/data/gdp?limit=10')
+            .then(response => response.json())
+            .then(result => {
+                const tbody = document.getElementById('gdpTableBody');
+                if (result.success && result.data && result.data.length > 0) {
+                    tbody.innerHTML = result.data.map((row, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${row.year || '-'}</td>
+                            <td>Indonesia</td>
+                            <td>${row.gdp ? 'Rp ' + parseFloat(row.gdp).toLocaleString('id-ID') : '-'}</td>
+                            <td>${row.updated_at ? new Date(row.updated_at).toLocaleDateString('id-ID') : '-'}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                <p>Belum ada data. Silakan fetch atau upload data terlebih dahulu.</p>
+                            </td>
+                        </tr>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading GDP data:', error);
+            });
+    }
+
+    // Toggle schedule configuration
+    function toggleSchedule() {
+        const scheduleConfig = document.getElementById('scheduleConfig');
+        const isEnabled = document.getElementById('enableSchedule').checked;
+        scheduleConfig.style.display = isEnabled ? 'block' : 'none';
+
+        // Jika dinonaktifkan, langsung save
+        if (!isEnabled) {
+            // saveSchedule();  // DISABLED
+        }
+    }
+
+    // SCHEDULER FUNCTIONS DISABLED - Feature removed for reliability
+    /*
+    function loadScheduleStatus() {
+        fetch('/api/data/schedule')
+            .then(response => response.json())
+            .then(data => {
+                if (data.enabled) {
+                    document.getElementById('enableSchedule').checked = true;
+                    document.getElementById('scheduleConfig').style.display = 'block';
+
+                    if (data.frequency) {
+                        document.getElementById('scheduleFrequency').value = data.frequency;
+                    }
+                    if (data.time) {
+                        document.getElementById('scheduleTime').value = data.time;
+                    }
+                    if (data.timezone) {
+                        document.getElementById('timezone').value = data.timezone;
+                    }
+
+                    // Show next run time
+                    if (data.next_run) {
+                        document.getElementById('nextRunInfo').style.display = 'block';
+                        document.getElementById('nextRunTime').textContent = data.next_run;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading schedule status:', error);
+            });
+    }
+
+    function saveSchedule() {
+        const enabled = document.getElementById('enableSchedule').checked;
+        const frequency = document.getElementById('scheduleFrequency').value;
+        const time = document.getElementById('scheduleTime').value;
+        const timezone = document.getElementById('timezone').value;
+
+        fetch('/api/data/schedule', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                enabled: enabled,
+                frequency: frequency,
+                time: time,
+                timezone: timezone
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    // Reload schedule status to update next run time
+                    setTimeout(() => loadScheduleStatus(), 1000);
+                } else {
+                    showToast('Gagal menyimpan jadwal: ' + (data.message || 'Unknown error'), 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Error: ' + error.message, 'error');
+            });
+    }
+    */
+
+    // Show toast notification
+    function showToast(message, type) {
+        const toastEl = document.getElementById('notificationToast');
+        const toast = new bootstrap.Toast(toastEl);
+        const toastMessage = document.getElementById('toastMessage');
+
+        // Add icon based on type
+        const icons = {
+            'success': '<i class="fas fa-check-circle text-success me-2"></i>',
+            'error': '<i class="fas fa-exclamation-circle text-danger me-2"></i>',
+            'info': '<i class="fas fa-info-circle text-info me-2"></i>'
+        };
+        toastMessage.innerHTML = (icons[type] || '') + message;
+
+        toast.show();
+    }
+</script>
+
+<style>
+    .section-scraping .card {
+        border: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .section-scraping .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .method-option {
+        transition: all 0.3s ease;
+    }
+
+    .method-option:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    }
+
+    .table-responsive {
+        max-height: 400px;
+    }
+
+    #progressLog {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+
+    #progressLog p {
+        margin-bottom: 0.5rem;
+        padding: 0.25rem;
+    }
+
+    .toast {
+        min-width: 300px;
+    }
+
+    .border-4 {
+        border-width: 4px !important;
+    }
+</style>
+
+{% endblock %}

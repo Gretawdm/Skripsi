@@ -1,0 +1,62 @@
+<div class="header mb-3">
+    <nav class="navbar">
+        <div class="container-fluid">
+
+            <!-- Toggle Sidebar (Desktop) -->
+            <button class="btn sidebar-toggle d-none d-md-block" type="button" id="sidebarToggle"
+                title="Toggle Sidebar">
+                <i class="fa-solid fa-bars-staggered" style="color: #53B863;"></i>
+            </button>
+
+            <!-- Toggle Sidebar (Mobile) -->
+            <button class="btn mobile-menu-toggle d-md-none" type="button" id="mobileMenuToggle">
+                <i class="fa-solid fa-bars-staggered" style="color: #53B863;"></i>
+            </button>
+
+            <!-- Page Title -->
+            <span class="navbar-brand mb-0 h5" style="color: #01384F;">
+                {{ page_title | default('Dashboard') }}
+            </span>
+
+            <!-- User Dropdown -->
+            <div class="d-flex align-items-center ms-auto">
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle d-flex align-items-center user-dropdown-btn" type="button"
+                        id="userDropdown" data-bs-toggle="dropdown">
+
+                        <div class="avatar-circle">
+                            <i class="fas fa-user"></i>
+                        </div>
+
+                        <span class="ms-2 d-none d-md-inline header-username" style="color: #01384F;">
+                            Selamat datang ,Admin
+                        </span>
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end modern-dropdown" aria-labelledby="userDropdown">
+
+                        <li>
+                            <a class="dropdown-item modern-dropdown-item" href="">
+                                <div class="dropdown-icon">
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <span>Ubah Password</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item modern-dropdown-item logout-item" href="" id="logoutBtn">
+                                <div class="dropdown-icon">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+</div>

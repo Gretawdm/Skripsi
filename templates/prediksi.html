@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Metode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/metode.css') }}">
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <section class="method-section">
+        <div class="method-container">
+
+            <!-- LEFT CONTENT -->
+            <div class="method-left">
+
+                <h2>Metode</h2>
+                <p class="subtitle">
+                    Metode yang digunakan dalam sistem ini bertujuan untuk menganalisis
+                    dan memprediksi konsumsi energi fosil di Indonesia menggunakan
+                    pendekatan time series ARIMA dan ARIMAX.
+                </p>
+
+                <!-- STEP ICON -->
+                <div class="method-steps">
+                    <div class="step-item">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Data</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Pra-pemrosesan</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>ARIMA</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fa-solid fa-chart-area"></i>
+                        <span>ARIMAX</span>
+                    </div>
+                </div>
+
+                <!-- DATA SECTION -->
+                <h3>Data yang Digunakan</h3>
+                <div class="data-grid">
+                    <div class="data-card">
+                        <h4>Jenis Data</h4>
+                        <p>Konsumsi energi fosil (batubara, minyak, dan gas).</p>
+                    </div>
+                    <div class="data-card">
+                        <h4>Periode Data</h4>
+                        <p>Data tahunan, misalnya 1990–2022.</p>
+                    </div>
+                    <div class="data-card">
+                        <h4>Sumber Data</h4>
+                        <p>Our World in Data dan World Bank.</p>
+                    </div>
+                </div>
+
+                <!-- PREPROCESS -->
+                <h3>Pra-pemrosesan Data</h3>
+                <div class="process-grid">
+                    <div class="process-item">Pembersihan Data</div>
+                    <div class="process-item">Transformasi</div>
+                    <div class="process-item">Uji Stasioneritas</div>
+                    <div class="process-item">Normalisasi</div>
+                </div>
+
+                <!-- ARIMA -->
+                <h3>Metode ARIMA</h3>
+                <p>
+                    ARIMA digunakan untuk memodelkan pola historis data time series
+                    dengan mempertimbangkan komponen autoregressive (p),
+                    differencing (d), dan moving average (q).
+                </p>
+
+                <!-- ARIMAX -->
+                <h3>Metode ARIMAX</h3>
+                <p>
+                    ARIMAX merupakan pengembangan ARIMA dengan menambahkan
+                    variabel eksternal seperti Produk Domestik Bruto (PDB)
+                    untuk meningkatkan akurasi prediksi.
+                </p>
+
+            </div>
+
+            <!-- RIGHT CONTENT -->
+            <div class="method-right">
+
+                <!-- FLOW -->
+                <h3>Alur Sistem</h3>
+                <div class="flow">
+                    <div class="flow-item">
+                        <span class="flow-number">01</span>
+                        <div>
+                            <h4>Pilih Data & Periode</h4>
+                            <p>Pengguna memilih data energi fosil dan rentang tahun analisis.</p>
+                        </div>
+                    </div>
+
+                    <div class="flow-line"></div>
+
+                    <div class="flow-item">
+                        <span class="flow-number">02</span>
+                        <div>
+                            <h4>Pra-pemrosesan Data</h4>
+                            <p>Data dibersihkan dan diuji agar memenuhi syarat pemodelan.</p>
+                        </div>
+                    </div>
+
+                    <div class="flow-line"></div>
+
+                    <div class="flow-item">
+                        <span class="flow-number">03</span>
+                        <div>
+                            <h4>Pemodelan ARIMA / ARIMAX</h4>
+                            <p>Sistem membangun model prediksi time series.</p>
+                        </div>
+                    </div>
+
+                    <div class="flow-line"></div>
+
+                    <div class="flow-item">
+                        <span class="flow-number">04</span>
+                        <div>
+                            <h4>Visualisasi & Evaluasi</h4>
+                            <p>Hasil prediksi ditampilkan dalam bentuk grafik.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRAPH -->
+                <div class="chart-box">
+                    <h4>Grafik Prediksi</h4>
+                    <img src="{{ url_for('static', filename='img/chart.png') }}" alt="Grafik">
+                </div>
+
+                <!-- EVALUATION -->
+                <div class="evaluation">
+                    <div>
+                        <strong>MAPE</strong>
+                        <span>4.23%</span>
+                    </div>
+                    <div>
+                        <strong>MAE</strong>
+                        <span>0.85</span>
+                    </div>
+                    <div>
+                        <strong>RMSE</strong>
+                        <span>1.12</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+</body>
+<style>
+    * {
+        box-sizing: border-box;
+        font-family: 'Inter', sans-serif;
+    }
+
+    body {
+        margin: 0;
+        background: #f6f8fb;
+        color: #1f2937;
+    }
+
+    .method-section {
+        padding: 4rem 2rem;
+    }
+
+    .method-container {
+        max-width: 1200px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2.5rem;
+    }
+
+    /* LEFT */
+    .method-left h2 {
+        font-size: 2rem;
+        margin-bottom: .5rem;
+    }
+
+    .subtitle {
+        color: #6b7280;
+        margin-bottom: 2rem;
+    }
+
+    .method-steps {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .step-item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        background: #fff;
+        padding: .6rem 1rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+    }
+
+    .step-item i {
+        color: #22c55e;
+    }
+
+    .data-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .data-card {
+        background: #fff;
+        padding: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+    }
+
+    .process-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: .8rem;
+        margin-bottom: 2rem;
+    }
+
+    .process-item {
+        background: #e8f8ef;
+        padding: .8rem;
+        border-radius: 8px;
+        font-size: .9rem;
+        text-align: center;
+    }
+
+    /* RIGHT */
+    .method-right {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, .06);
+    }
+
+    .flow-item {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .flow-number {
+        background: #dcfce7;
+        color: #166534;
+        font-weight: 600;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .flow-line {
+        height: 24px;
+        border-left: 2px dashed #cbd5e1;
+        margin: .5rem 0 .5rem 18px;
+    }
+
+    .chart-box img {
+        width: 100%;
+        border-radius: 12px;
+        margin-top: 1rem;
+    }
+
+    .evaluation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+    }
+
+    .evaluation div {
+        text-align: center;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+        .method-container {
+            grid-template-columns: 1fr;
+        }
+
+        .method-right {
+            order: -1;
+        }
+    }
+</style>
+
+</html>

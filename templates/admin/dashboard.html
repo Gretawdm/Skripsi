@@ -1,0 +1,1185 @@
+{% extends 'admin/layouts/template.html' %}
+
+{% block page_title %}Dashboard - Admin{% endblock %}
+
+{% block content %}
+<div class="section-dashboard container-fluid mt-3">
+    <!-- Key Metrics Cards -->
+    <div class="row mt-1 g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-primary border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Model Aktif</p>
+                            <h5 class="fw-bold mb-0" id="modelVersion">ARIMAX v1.0</h5>
+                            <small class="text-success" id="modelAccuracy">MAPE: -</small>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-brain text-primary fs-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-success border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Total Data</p>
+                            <h3 class="fw-bold mb-0" id="totalRecords">0</h3>
+                            <small class="text-muted">records (1964-2024)</small>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-database text-success fs-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-info border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">R² Score</p>
+                            <h4 class="fw-bold mb-0" id="r2Score">-</h4>
+                            <small class="text-muted" id="r2Label">Model fit quality</small>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-chart-line text-info fs-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-start border-warning border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted small mb-1">Trend</p>
+                            <h5 class="fw-bold mb-0" id="trendIndicator">
+                                <i class="fas fa-arrow-up text-danger"></i>
+                                <span id="trendValue">-</span>
+                            </h5>
+                            <small class="text-muted">Perubahan per tahun</small>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="fas fa-chart-area text-warning fs-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Charts Row -->
+    <div class="row mb-4">
+        <!-- Prediction Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0 fw-bold">
+                                <i class="fas fa-chart-line text-primary me-2"></i>
+                                Prediksi Konsumsi Energi Fosil (2024-2030)
+                            </h5>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i>
+                                Skenario: Moderat (GDP Growth +5%/tahun)
+                            </small>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary active" id="btnChartLine"
+                                onclick="changeChartType('line')">
+                                <i class="fas fa-chart-line"></i>
+                            </button>
+                            <button class="btn btn-outline-primary" id="btnChartArea" onclick="changeChartType('area')">
+                                <i class="fas fa-chart-area"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="predictionChartContainer" style="height: 400px;">
+                        <canvas id="predictionChart"></canvas>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <span class="badge bg-primary me-2">
+                            <i class="fas fa-circle me-1" style="font-size: 0.6rem;"></i>Data Aktual
+                        </span>
+                        <span class="badge bg-danger me-2">
+                            <i class="fas fa-circle me-1" style="font-size: 0.6rem;"></i>Prediksi
+                        </span>
+                        <span class="badge bg-secondary">
+                            <i class="fas fa-square me-1" style="font-size: 0.6rem; opacity: 0.3;"></i>Confidence
+                            Interval (95%)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Performance & Quick Stats -->
+        <div class="col-lg-4">
+            <!-- Model Performance -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-tachometer-alt text-success me-2"></i>
+                        Performa Model
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="fw-bold">MAPE (Akurasi)</small>
+                            <small class="text-success" id="mapeValue">-</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" id="mapeBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="fw-bold">R² Score</small>
+                            <small class="text-info" id="r2Value">-</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info" id="r2Bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <small class="text-muted d-block">RMSE</small>
+                            <strong id="rmseValue">-</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">MAE</small>
+                            <strong id="maeValue">-</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last Training Info -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-history text-warning me-2"></i>
+                        Last Training
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <td class="text-muted"><i class="fas fa-calendar me-2"></i>Tanggal:</td>
+                            <td class="text-end"><strong id="lastTrainingDate">-</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted"><i class="fas fa-code me-2"></i>Parameters:</td>
+                            <td class="text-end"><code id="modelParams">-</code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted"><i class="fas fa-clock me-2"></i>Duration:</td>
+                            <td class="text-end"><strong id="trainingDuration">-</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historical Data vs Prediction Comparison -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-chart-bar text-primary me-2"></i>
+                        Actual vs Predicted (Test Set)
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div style="height: 350px;">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-table text-secondary me-2"></i>
+                        Preview Prediksi Mendatang (2025-2030)
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                        <table class="table table-hover table-bordered table-sm mb-0">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>Tahun</th>
+                                    <th>Prediksi (TWh)</th>
+                                    <th>Lower Bound</th>
+                                    <th>Upper Bound</th>
+                                    <th>Perubahan</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="predictionTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">
+                                        <i class="fas fa-spinner fa-spin me-2"></i>Memuat data prediksi...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities & Quick Actions -->
+    <div class="row">
+        <!-- Recent Activities -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="fas fa-list text-info me-2"></i>
+                            Aktivitas Terbaru
+                        </h6>
+                        <a href="/admin/riwayat" class="btn btn-sm btn-outline-primary">
+                            Lihat Semua
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="timeline" id="recentActivities">
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                            <p>Memuat aktivitas...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions & System Status -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-bolt text-warning me-2"></i>
+                        Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="/admin/scraping-data" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-download me-2"></i>Update Data
+                        </a>
+                        <a href="/admin/update-model" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-brain me-2"></i>Retrain Model
+                        </a>
+                        <button class="btn btn-outline-info btn-sm" onclick="generateReport()">
+                            <i class="fas fa-file-pdf me-2"></i>Generate Report
+                        </button>
+                        <a href="/admin/riwayat" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-history me-2"></i>Lihat Riwayat
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-server text-danger me-2"></i>
+                        System Status
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small">Database</span>
+                        <span class="badge bg-success" id="databaseStatus">
+                            <i class="fas fa-check-circle"></i> Online
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small">Model Server</span>
+                        <span class="badge bg-success" id="modelServerStatus">
+                            <i class="fas fa-check-circle"></i> Running
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small">API Status</span>
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle"></i> Active
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="notificationToast" class="toast" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-bell me-2"></i>
+            <strong class="me-auto">Notifikasi</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Pesan notifikasi
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+    let charts = {};
+    let currentChartType = 'line';
+
+    // Dummy data untuk testing
+    const dummyData = {
+        modelInfo: {
+            version: "ARIMAX v1.2",
+            mape: 3.45,
+            r2: 0.9512,
+            rmse: 0.0234,
+            mae: 0.0189,
+            totalRecords: 34,
+            lastTrained: "21 Jan 2026, 10:30",
+            params: "ARIMAX(2,1,1)",
+            duration: "2m 34s",
+            testData: {
+                years: ['2020', '2021', '2022', '2023'],
+                actual: [48.2, 49.1, 50.3, 51.2],
+                predicted: [48.5, 49.3, 50.1, 51.5]
+            },
+            errorData: {
+                bins: ['-2 to -1', '-1 to 0', '0 to 1', '1 to 2', '2 to 3'],
+                frequencies: [2, 5, 12, 8, 3]
+            }
+        },
+        prediction: {
+            historical: [
+                { year: 2015, value: 44.2 },
+                { year: 2016, value: 45.1 },
+                { year: 2017, value: 46.3 },
+                { year: 2018, value: 47.5 },
+                { year: 2019, value: 47.8 },
+                { year: 2020, value: 48.2 },
+                { year: 2021, value: 49.1 },
+                { year: 2022, value: 50.3 },
+                { year: 2023, value: 51.2 }
+            ],
+            predictions: [
+                { year: 2024, value: 52.1, lowerBound: 50.2, upperBound: 54.0 },
+                { year: 2025, value: 53.5, lowerBound: 51.0, upperBound: 56.0 },
+                { year: 2026, value: 54.8, lowerBound: 51.8, upperBound: 57.8 },
+                { year: 2027, value: 56.2, lowerBound: 52.5, upperBound: 59.9 },
+                { year: 2028, value: 57.4, lowerBound: 53.0, upperBound: 61.8 },
+                { year: 2029, value: 58.7, lowerBound: 53.5, upperBound: 63.9 },
+                { year: 2030, value: 60.1, lowerBound: 54.0, upperBound: 66.2 }
+            ],
+            trend: 1.25
+        },
+        activities: [
+            {
+                type: 'training',
+                title: 'Model Retrained Successfully',
+                description: 'Model ARIMAX v1.2 berhasil dilatih dengan akurasi MAPE 3.45%',
+                timestamp: new Date(Date.now() - 3600000).toISOString()
+            },
+            {
+                type: 'data',
+                title: 'Data Updated via API',
+                description: 'Berhasil fetch 15 records data energi dari World Bank API',
+                timestamp: new Date(Date.now() - 7200000).toISOString()
+            },
+            {
+                type: 'prediction',
+                title: 'New Prediction Generated',
+                description: 'Prediksi periode 2024-2030 berhasil dibuat',
+                timestamp: new Date(Date.now() - 10800000).toISOString()
+            },
+            {
+                type: 'data',
+                title: 'Data Uploaded',
+                description: 'Upload file GDP data berhasil, 20 records ditambahkan',
+                timestamp: new Date(Date.now() - 86400000).toISOString()
+            },
+            {
+                type: 'training',
+                title: 'Model Parameters Optimized',
+                description: 'Auto-optimization menemukan parameter optimal (2,1,1)',
+                timestamp: new Date(Date.now() - 172800000).toISOString()
+            }
+        ],
+        systemStatus: {
+            uptime: '5d 12h 34m',
+            modelServerRunning: true
+        }
+    };
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        loadDashboardData();
+        updateLastUpdateTime();
+
+        // Refresh data every 5 minutes (disabled untuk dummy data)
+        // setInterval(loadDashboardData, 300000);
+
+        // Update time every minute
+        setInterval(updateLastUpdateTime, 60000);
+    });
+
+    // Load all dashboard data
+    function loadDashboardData() {
+        // Use real API
+        loadModelInfo();
+        loadPredictionData();
+        loadRecentActivities();
+        loadSystemStatus();
+    }
+
+    // Update last update time
+    function updateLastUpdateTime() {
+        const now = new Date();
+        document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('id-ID');
+    }
+
+    // Load model info dengan dummy data
+    function loadModelInfoDummy() {
+        const data = dummyData.modelInfo;
+
+        document.getElementById('modelVersion').textContent = data.version;
+        document.getElementById('modelAccuracy').textContent = `MAPE: ${data.mape.toFixed(2)}%`;
+        document.getElementById('totalRecords').textContent = data.totalRecords;
+
+        // Performance metrics
+        document.getElementById('mapeValue').textContent = data.mape.toFixed(2) + '%';
+        document.getElementById('r2Value').textContent = data.r2.toFixed(4);
+        document.getElementById('rmseValue').textContent = data.rmse.toFixed(4);
+        document.getElementById('maeValue').textContent = data.mae.toFixed(4);
+
+        // Progress bars (invert for MAPE - lower is better)
+        const mapeScore = Math.max(0, 100 - data.mape);
+        document.getElementById('mapeBar').style.width = mapeScore + '%';
+        document.getElementById('r2Bar').style.width = (data.r2 * 100) + '%';
+
+        // Last training info
+        document.getElementById('lastTrainingDate').textContent = data.lastTrained;
+        document.getElementById('modelParams').textContent = data.params;
+        document.getElementById('trainingDuration').textContent = data.duration;
+
+        // Load comparison chart
+        createComparisonChart(data.testData);
+
+        // Load error distribution chart
+        createErrorChart(data.errorData);
+    }
+
+    // Load prediction data dengan dummy data
+    function loadPredictionDataDummy() {
+        const data = dummyData.prediction;
+
+        // Update prediction 2030
+        const pred2030 = data.predictions.find(p => p.year === 2030);
+        if (pred2030) {
+            document.getElementById('prediction2030').textContent = pred2030.value.toFixed(2) + '%';
+        }
+
+        // Update trend
+        const trendIcon = data.trend > 0 ?
+            '<i class="fas fa-arrow-up text-danger"></i>' :
+            '<i class="fas fa-arrow-down text-success"></i>';
+        document.getElementById('trendIndicator').innerHTML = trendIcon +
+            ' <span id="trendValue">' + Math.abs(data.trend).toFixed(2) + '%/tahun</span>';
+
+        // Create main prediction chart
+        createPredictionChart(data);
+
+        // Populate prediction table
+        populatePredictionTable(data.predictions);
+    }
+
+    // Load recent activities dengan dummy data
+    function loadRecentActivitiesDummy() {
+        const activities = dummyData.activities;
+        renderActivities(activities);
+    }
+
+    // Load system status dengan dummy data
+    function loadSystemStatusDummy() {
+        const data = dummyData.systemStatus;
+
+        document.getElementById('serverUptime').textContent = data.uptime;
+
+        const statusBadge = data.modelServerRunning ?
+            '<i class="fas fa-check-circle"></i> Running' :
+            '<i class="fas fa-times-circle"></i> Stopped';
+        const statusClass = data.modelServerRunning ? 'bg-success' : 'bg-danger';
+
+        document.getElementById('modelServerStatus').className = 'badge ' + statusClass;
+        document.getElementById('modelServerStatus').innerHTML = statusBadge;
+    }
+
+    // Load model info (API real - untuk nanti)
+    function loadModelInfo() {
+        fetch('/api/dashboard/model-info')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('modelVersion').textContent = data.model_version || 'ARIMAX (?,?,?)';
+                    document.getElementById('modelAccuracy').textContent = `MAPE: ${data.mape ? data.mape.toFixed(2) + '%' : '-'}`;
+
+                    // Update R² Score card
+                    if (data.r2 !== null && data.r2 !== undefined) {
+                        document.getElementById('r2Score').textContent = data.r2.toFixed(4);
+                        const r2Percent = (data.r2 * 100).toFixed(1);
+                        document.getElementById('r2Label').textContent = `${r2Percent}% variance explained`;
+                    }
+
+                    // Performance metrics
+                    document.getElementById('mapeValue').textContent = data.mape ? data.mape.toFixed(2) + '%' : '-';
+                    document.getElementById('r2Value').textContent = data.r2 ? data.r2.toFixed(4) : '-';
+                    document.getElementById('rmseValue').textContent = data.rmse ? data.rmse.toFixed(4) : '-';
+                    document.getElementById('maeValue').textContent = data.mae ? data.mae.toFixed(4) : '-';
+
+                    // Progress bars (invert for MAPE - lower is better)
+                    if (data.mape) {
+                        const mapeScore = Math.max(0, 100 - data.mape);
+                        document.getElementById('mapeBar').style.width = mapeScore + '%';
+                    }
+                    if (data.r2) {
+                        document.getElementById('r2Bar').style.width = (data.r2 * 100) + '%';
+                    }
+
+                    // Last training info
+                    document.getElementById('lastTrainingDate').textContent = data.lastTrained || '-';
+                    document.getElementById('modelParams').textContent = data.params || '-';
+                    document.getElementById('trainingDuration').textContent = data.duration || '-';
+
+                    // Load comparison chart
+                    if (data.testData) {
+                        createComparisonChart(data.testData);
+                    } else {
+                        // Show placeholder for comparison chart
+                        const comparisonCanvas = document.getElementById('comparisonChart');
+                        if (comparisonCanvas) {
+                            const container = comparisonCanvas.parentElement;
+                            container.innerHTML = `
+                                <div class="text-center py-5">
+                                    <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Data perbandingan belum tersedia</p>
+                                    <small class="text-muted">Lakukan retrain model untuk melihat chart ini</small>
+                                    <br>
+                                    <a href="/admin/update-model" class="btn btn-sm btn-primary mt-3">
+                                        <i class="fas fa-brain me-1"></i> Retrain Model
+                                    </a>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    // Load error distribution chart
+                    if (data.errorData) {
+                        createErrorChart(data.errorData);
+                    } else {
+                        // Show placeholder for error chart
+                        const errorCanvas = document.getElementById('errorChart');
+                        if (errorCanvas) {
+                            const container = errorCanvas.parentElement;
+                            container.innerHTML = `
+                                <div class="text-center py-5">
+                                    <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Data distribusi error belum tersedia</p>
+                                    <small class="text-muted">Lakukan retrain model untuk melihat chart ini</small>
+                                    <br>
+                                    <a href="/admin/update-model" class="btn btn-sm btn-primary mt-3">
+                                        <i class="fas fa-brain me-1"></i> Retrain Model
+                                    </a>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading model info:', error);
+            });
+    }
+
+    // Load prediction data
+    function loadPredictionData() {
+        fetch('/api/dashboard/prediction')
+            .then(response => response.json())
+            .then(data => {
+                // Update total records and data range even if prediction fails
+                if (data.total_records !== undefined) {
+                    const range = data.data_range ? `(${data.data_range.start}-${data.data_range.end})` : '';
+                    document.getElementById('totalRecords').textContent = data.total_records;
+                    document.querySelector('#totalRecords').parentElement.querySelector('small').textContent = `records ${range}`;
+                }
+
+                if (data.success) {
+                    // Update trend
+                    if (data.trend !== undefined) {
+                        const trendIcon = data.trend > 0 ?
+                            '<i class="fas fa-arrow-up text-danger"></i>' :
+                            '<i class="fas fa-arrow-down text-success"></i>';
+                        document.getElementById('trendIndicator').innerHTML = trendIcon +
+                            ' <span id="trendValue">' + Math.abs(data.trend).toFixed(2) + ' TWh/tahun</span>';
+                    }
+
+                    // Create main prediction chart
+                    createPredictionChart(data);
+
+                    // Populate prediction table with historical data for comparison
+                    populatePredictionTable(data.predictions, data.historical);
+                } else {
+                    console.warn('Prediction error:', data.error);
+                    // Show empty chart message with action button
+                    const chartContainer = document.getElementById('predictionChart');
+                    if (chartContainer) {
+                        const canvas = chartContainer.parentElement;
+                        canvas.innerHTML = `
+                            <div class="alert alert-warning text-center">
+                                <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                                <p class="mb-2">Prediksi belum tersedia. ${data.error || 'Model belum di-training.'}</p>
+                                <a href="/admin/scraping-data" class="btn btn-sm btn-success me-2">
+                                    <i class="fas fa-download me-1"></i> Update Data
+                                </a>
+                                <a href="/admin/update-model" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-brain me-1"></i> Training Model
+                                </a>
+                            </div>
+                        `;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading prediction data:', error);
+            });
+    }
+
+    // Create main prediction chart
+    function createPredictionChart(data) {
+        const ctx = document.getElementById('predictionChart');
+        if (!ctx) return;
+
+        // Destroy existing chart
+        if (charts.prediction) {
+            charts.prediction.destroy();
+        }
+
+        const datasets = [
+            {
+                label: 'Data Aktual',
+                data: data.historical.map(d => ({ x: d.year, y: d.value })),
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                fill: currentChartType === 'area'
+            },
+            {
+                label: 'Prediksi',
+                data: data.predictions.map(d => ({ x: d.year, y: d.value })),
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: currentChartType === 'area'
+            }
+        ];
+
+        // Add confidence interval
+        if (data.predictions[0]?.lowerBound) {
+            datasets.push({
+                label: 'Lower Bound (95%)',
+                data: data.predictions.map(d => ({ x: d.year, y: d.lowerBound })),
+                borderColor: 'rgba(200, 200, 200, 0.5)',
+                backgroundColor: 'rgba(200, 200, 200, 0.1)',
+                borderWidth: 1,
+                borderDash: [2, 2],
+                pointRadius: 0,
+                fill: false
+            });
+
+            datasets.push({
+                label: 'Upper Bound (95%)',
+                data: data.predictions.map(d => ({ x: d.year, y: d.upperBound })),
+                borderColor: 'rgba(200, 200, 200, 0.5)',
+                backgroundColor: 'rgba(200, 200, 200, 0.2)',
+                borderWidth: 1,
+                borderDash: [2, 2],
+                pointRadius: 0,
+                fill: '-1'
+            });
+        }
+
+        charts.prediction = new Chart(ctx, {
+            type: 'line',
+            data: { datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            title: function (context) {
+                                // Display year as integer without thousand separator
+                                return 'Tahun ' + Math.round(context[0].parsed.x);
+                            },
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(2) + ' TWh';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: 'Tahun'
+                        },
+                        ticks: {
+                            stepSize: 5,
+                            callback: function (value) {
+                                // Display year as integer without formatting
+                                return Math.round(value);
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Konsumsi Energi Fosil (%)'
+                        },
+                        ticks: {
+                            callback: function (value) {
+                                return value.toFixed(1) + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Create comparison chart (Actual vs Predicted)
+    function createComparisonChart(testData) {
+        const ctx = document.getElementById('comparisonChart');
+        if (!ctx) return;
+
+        if (charts.comparison) {
+            charts.comparison.destroy();
+        }
+
+        charts.comparison = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: testData.years,
+                datasets: [
+                    {
+                        label: 'Actual',
+                        data: testData.actual,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Predicted',
+                        data: testData.predicted,
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function (value) {
+                                return value.toFixed(1) + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Create error distribution chart
+    function createErrorChart(errorData) {
+        const ctx = document.getElementById('errorChart');
+        if (!ctx) return;
+
+        if (charts.error) {
+            charts.error.destroy();
+        }
+
+        charts.error = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: errorData.bins,
+                datasets: [{
+                    label: 'Frekuensi Error',
+                    data: errorData.frequencies,
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribusi Error Prediksi (%)'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Frekuensi'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Error Range (%)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Populate prediction table
+    function populatePredictionTable(predictions, historical) {
+        const tbody = document.getElementById('predictionTableBody');
+        if (!predictions || predictions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Tidak ada data prediksi</td></tr>';
+            return;
+        }
+
+        // Get last historical value (2024) for comparison with 2025
+        const lastHistorical = historical && historical.length > 0 ?
+            historical[historical.length - 1].value : null;
+
+        tbody.innerHTML = predictions.map((pred, index) => {
+            // For first prediction year (2025), compare with last historical year (2024)
+            // For subsequent years, compare with previous prediction
+            let change = 0;
+            let previousValue = null;
+
+            if (index === 0 && lastHistorical !== null) {
+                // Compare 2025 with 2024 (last historical)
+                previousValue = lastHistorical;
+                change = pred.value - lastHistorical;
+            } else if (index > 0) {
+                // Compare with previous prediction
+                previousValue = predictions[index - 1].value;
+                change = pred.value - previousValue;
+            }
+
+            const changePercent = previousValue ? ((change / previousValue) * 100) : 0;
+            const changeClass = change > 0 ? 'text-danger' : change < 0 ? 'text-success' : 'text-secondary';
+            const changeIcon = change > 0 ? 'fa-arrow-up' : change < 0 ? 'fa-arrow-down' : 'fa-minus';
+            // Status berdasarkan nilai TWh (threshold realistis untuk Indonesia)
+            const statusClass = pred.value > 4000 ? 'bg-danger' : pred.value > 3500 ? 'bg-warning' : 'bg-success';
+            const statusText = pred.value > 4000 ? 'Tinggi' : pred.value > 3500 ? 'Sedang' : 'Rendah';
+
+            return `
+                <tr>
+                    <td><strong>${pred.year}</strong></td>
+                    <td><strong>${pred.value.toFixed(2)} TWh</strong></td>
+                    <td>${pred.lowerBound ? pred.lowerBound.toFixed(2) + ' TWh' : '-'}</td>
+                    <td>${pred.upperBound ? pred.upperBound.toFixed(2) + ' TWh' : '-'}</td>
+                    <td class="${changeClass}">
+                        <i class="fas ${changeIcon} me-1"></i>
+                        ${Math.abs(change).toFixed(2)} TWh (${Math.abs(changePercent).toFixed(2)}%)
+                    </td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // Load recent activities
+    function loadRecentActivities() {
+        fetch('/api/dashboard/recent-activities')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.activities && data.activities.length > 0) {
+                    renderActivities(data.activities);
+                } else {
+                    document.getElementById('recentActivities').innerHTML = `
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <p>Belum ada aktivitas terbaru</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading activities:', error);
+            });
+    }
+
+    // Render activities timeline
+    function renderActivities(activities) {
+        const container = document.getElementById('recentActivities');
+        container.innerHTML = activities.slice(0, 5).map(activity => {
+            const iconMap = {
+                'training': { icon: 'fa-brain', color: 'primary' },
+                'data': { icon: 'fa-database', color: 'success' },
+                'prediction': { icon: 'fa-chart-line', color: 'info' }
+            };
+            const config = iconMap[activity.type] || iconMap['data'];
+
+            return `
+                <div class="d-flex mb-3">
+                    <div class="flex-shrink-0">
+                        <div class="bg-${config.color} bg-opacity-10 p-2 rounded-circle" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas ${config.icon} text-${config.color}"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">${activity.title}</h6>
+                            <small class="text-muted">${formatTimeAgo(activity.timestamp)}</small>
+                        </div>
+                        <p class="text-muted small mb-0">${activity.description}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Format time ago
+    function formatTimeAgo(timestamp) {
+        try {
+            const now = new Date();
+            const then = new Date(timestamp);
+
+            // Check if date is valid
+            if (isNaN(then.getTime())) {
+                return 'Baru saja';
+            }
+
+            const diff = Math.floor((now - then) / 1000); // seconds
+
+            if (diff < 0) return 'Baru saja'; // Handle future dates
+            if (diff < 60) return 'Baru saja';
+            if (diff < 3600) {
+                const mins = Math.floor(diff / 60);
+                return mins + ' menit lalu';
+            }
+            if (diff < 86400) {
+                const hours = Math.floor(diff / 3600);
+                return hours + ' jam lalu';
+            }
+            if (diff < 604800) { // Less than a week
+                const days = Math.floor(diff / 86400);
+                return days + ' hari lalu';
+            }
+
+            // For older dates, show the actual date
+            return then.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        } catch (e) {
+            console.error('Error formatting timestamp:', timestamp, e);
+            return 'Baru saja';
+        }
+    }
+
+    // Load system status
+    function loadSystemStatus() {
+        fetch('/api/dashboard/system-status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update Model Server status
+                    const modelBadge = data.modelServerRunning ?
+                        '<i class="fas fa-check-circle"></i> Running' :
+                        '<i class="fas fa-times-circle"></i> Stopped';
+                    const modelClass = data.modelServerRunning ? 'bg-success' : 'bg-danger';
+
+                    document.getElementById('modelServerStatus').className = 'badge ' + modelClass;
+                    document.getElementById('modelServerStatus').innerHTML = modelBadge;
+
+                    // Update Database status
+                    const dbBadge = data.databaseConnected ?
+                        '<i class="fas fa-check-circle"></i> Online' :
+                        '<i class="fas fa-times-circle"></i> Offline';
+                    const dbClass = data.databaseConnected ? 'bg-success' : 'bg-danger';
+
+                    document.getElementById('databaseStatus').className = 'badge ' + dbClass;
+                    document.getElementById('databaseStatus').innerHTML = dbBadge;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading system status:', error);
+                // On error, set offline status
+                document.getElementById('databaseStatus').className = 'badge bg-danger';
+                document.getElementById('databaseStatus').innerHTML = '<i class="fas fa-times-circle"></i> Offline';
+                document.getElementById('modelServerStatus').className = 'badge bg-danger';
+                document.getElementById('modelServerStatus').innerHTML = '<i class="fas fa-times-circle"></i> Stopped';
+            });
+    }
+
+    // Change chart type
+    function changeChartType(type) {
+        currentChartType = type;
+        document.getElementById('btnChartLine').classList.remove('active');
+        document.getElementById('btnChartArea').classList.remove('active');
+        document.getElementById('btnChart' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+
+        // Reload prediction chart
+        loadPredictionData();
+    }
+
+    // Generate report
+    function generateReport() {
+        showToast('Generating report...', 'info');
+
+        fetch('/api/dashboard/generate-report', {
+            method: 'POST'
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `FossilTrack_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                showToast('Report berhasil diunduh!', 'success');
+            })
+            .catch(error => {
+                console.error('Error generating report:', error);
+                showToast('Gagal generate report', 'error');
+            });
+    }
+
+    // Show toast notification
+    function showToast(message, type) {
+        const toastEl = document.getElementById('notificationToast');
+        const toast = new bootstrap.Toast(toastEl);
+        const toastMessage = document.getElementById('toastMessage');
+
+        const icons = {
+            'success': '<i class="fas fa-check-circle text-success me-2"></i>',
+            'error': '<i class="fas fa-exclamation-circle text-danger me-2"></i>',
+            'info': '<i class="fas fa-info-circle text-info me-2"></i>'
+        };
+        toastMessage.innerHTML = (icons[type] || '') + message;
+
+        toast.show();
+    }
+</script>
+
+<style>
+    .section-dashboard .card {
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .section-dashboard .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .border-4 {
+        border-width: 4px !important;
+    }
+
+    .timeline {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .table-responsive {
+        max-height: 400px;
+    }
+
+    code {
+        background-color: #f8f9fa;
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.25rem;
+        font-size: 0.85em;
+    }
+
+    .toast {
+        min-width: 300px;
+    }
+
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+    }
+
+    #predictionChartContainer canvas {
+        max-height: 400px;
+    }
+</style>
+
+{% endblock %}

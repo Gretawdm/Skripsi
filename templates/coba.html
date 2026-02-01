@@ -1,0 +1,243 @@
+<section class="method-section">
+    <div class="container">
+
+        <!-- Header -->
+        <div class="method-header">
+            <h2>Metodologi Sistem</h2>
+            <p>
+                Penjelasan alur kerja dan metode yang digunakan dalam sistem prediksi
+                konsumsi energi fosil di Indonesia menggunakan pendekatan time series
+                ARIMA dan ARIMAX.
+            </p>
+        </div>
+
+        <!-- Alur Kerja -->
+        <div class="method-card">
+            <h3>Alur Kerja Sistem</h3>
+
+            <div class="workflow">
+                <div class="workflow-item">
+                    <div class="step-number">01</div>
+                    <div class="step-content">
+                        <h4>Input Data</h4>
+                        <p>
+                            Sistem menerima data historis konsumsi energi fosil serta
+                            variabel eksternal berupa Produk Domestik Bruto (PDB).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="workflow-item">
+                    <div class="step-number">02</div>
+                    <div class="step-content">
+                        <h4>Preprocessing Data</h4>
+                        <p>
+                            Data dicek kelengkapan, konsistensi, dan disesuaikan
+                            agar memenuhi kebutuhan model time series.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="workflow-item">
+                    <div class="step-number">03</div>
+                    <div class="step-content">
+                        <h4>Pemodelan ARIMA / ARIMAX</h4>
+                        <p>
+                            Sistem membangun model prediksi menggunakan ARIMA
+                            atau ARIMAX dengan mempertimbangkan variabel eksternal.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="workflow-item">
+                    <div class="step-number">04</div>
+                    <div class="step-content">
+                        <h4>Evaluasi dan Prediksi</h4>
+                        <p>
+                            Model dievaluasi menggunakan metrik kesalahan,
+                            kemudian digunakan untuk menghasilkan prediksi konsumsi energi.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metode -->
+        <div class="method-grid">
+            <div class="method-box">
+                <h4>ARIMA</h4>
+                <p>
+                    Digunakan untuk memodelkan data time series berdasarkan
+                    pola historis konsumsi energi.
+                </p>
+            </div>
+
+            <div class="method-box">
+                <h4>ARIMAX</h4>
+                <p>
+                    Pengembangan ARIMA dengan menambahkan variabel eksternal
+                    seperti PDB untuk meningkatkan akurasi prediksi.
+                </p>
+            </div>
+        </div>
+
+        <!-- Variabel & Evaluasi -->
+        <div class="method-grid">
+            <div class="method-box">
+                <h4>Variabel Penelitian</h4>
+                <ul>
+                    <li>Konsumsi Energi Fosil (Batubara, Minyak, Gas)</li>
+                    <li>Produk Domestik Bruto (PDB)</li>
+                </ul>
+            </div>
+
+            <div class="method-box highlight">
+                <h4>Evaluasi Model</h4>
+                <div class="metric">
+                    <span>MAPE</span>
+                    <strong>4.23%</strong>
+                </div>
+                <div class="metric">
+                    <span>RMSE</span>
+                    <strong>1.12</strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<style>
+    .method-section {
+        padding: 80px 0;
+        background: #f9fafb;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: auto;
+        padding: 0 20px;
+    }
+
+    /* Header */
+    .method-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .method-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+
+    .method-header p {
+        color: #475569;
+        max-width: 700px;
+        margin: auto;
+    }
+
+    /* Card */
+    .method-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
+        margin-bottom: 40px;
+    }
+
+    .method-card h3 {
+        margin-bottom: 25px;
+    }
+
+    /* Workflow */
+    .workflow {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .workflow-item {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .step-number {
+        width: 50px;
+        height: 50px;
+        background: #e6f4ec;
+        color: #2e7d32;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        flex-shrink: 0;
+    }
+
+    .step-content h4 {
+        margin-bottom: 6px;
+        color: #0f172a;
+    }
+
+    .step-content p {
+        font-size: 0.95rem;
+        color: #475569;
+    }
+
+    /* Grid */
+    .method-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .method-box {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 25px;
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .method-box h4 {
+        margin-bottom: 10px;
+        color: #0f172a;
+    }
+
+    .method-box p,
+    .method-box li {
+        font-size: 0.95rem;
+        color: #475569;
+    }
+
+    .method-box ul {
+        padding-left: 18px;
+    }
+
+    .highlight {
+        background: linear-gradient(135deg, #e6f4ec, #ffffff);
+    }
+
+    .metric {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .method-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .workflow-item {
+            flex-direction: column;
+        }
+
+        .step-number {
+            margin-bottom: 10px;
+        }
+    }
+</style>
