@@ -8,7 +8,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from pmdarima import auto_arima
 from services.database_service import save_training_history
 
-def retrain_model(train_test_split=0.8, order_mode='auto', manual_order=None):
+def retrain_model(train_test_split=0.8, order_mode='auto', manual_order=None, forecast_years=3):
     """
     Retrain ARIMAX model dengan data terbaru
     
@@ -16,6 +16,7 @@ def retrain_model(train_test_split=0.8, order_mode='auto', manual_order=None):
         train_test_split (float): Ratio untuk train data (0.0-1.0). Default 0.8 (80% training, 20% testing)
         order_mode (str): 'auto' untuk auto_arima atau 'manual' untuk set manual. Default 'auto'
         manual_order (tuple): (p,d,q) jika order_mode='manual'. Default None
+        forecast_years (int): Number of years to forecast in dashboard. Default 3
     """
     try:
         # Start timer
@@ -229,7 +230,7 @@ def retrain_model(train_test_split=0.8, order_mode='auto', manual_order=None):
         # Save to database as CANDIDATE
         model_id = None
         try:
-            model_id = save_training_history(metrics, year_range, energy_stats, gdp_stats)
+            model_id = save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast_years)
         except Exception as db_error:
             print(f"Warning: Failed to save to database: {db_error}")
             # Continue even if database save fails

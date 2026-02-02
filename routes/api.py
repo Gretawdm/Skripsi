@@ -274,6 +274,7 @@ def train_model():
         # Get configuration from request
         data = request.json or {}
         train_test_split = data.get('trainTestSplit', 80) / 100  # Convert percentage to decimal
+        forecast_years = data.get('forecastYears', 3)  # Number of years to forecast
         order_mode = data.get('orderMode', 'auto')  # 'auto' or 'manual'
         manual_order = None
         
@@ -293,13 +294,14 @@ def train_model():
             manual_order = (p, d, q)
             print(f"API received manual order: p={p}, d={d}, q={q} -> {manual_order}")
         
-        print(f"Training with mode={order_mode}, manual_order={manual_order}")
+        print(f"Training with mode={order_mode}, manual_order={manual_order}, forecast_years={forecast_years}")
         
         # Call train_service untuk retrain model
         result = retrain_model(
             train_test_split=train_test_split,
             order_mode=order_mode,
-            manual_order=manual_order
+            manual_order=manual_order,
+            forecast_years=forecast_years
         )
         
         if result["status"] == "success":
@@ -327,7 +329,6 @@ def train_model():
             "success": False,
             "message": f"Error training model: {str(e)}"
         }), 500
-
 @api_bp.route("/model/training-progress/<task_id>", methods=["GET"])
 def training_progress(task_id):
     """Monitor progress training (simplified untuk saat ini)"""
@@ -362,7 +363,12 @@ def model_info():
                 "version": "ARIMAX v1.0",
                 "mape": float(active_model['mape']),
                 "lastTrained": last_trained,
-                "dataCount": active_model['total_data']
+                "dataCount": active_model['total_data'],
+                "trainSize": active_model.get('train_size'),
+                "testSize": active_model.get('test_size'),
+                "trainPercentage": active_model.get('train_percentage'),
+                "testPercentage": active_model.get('test_percentage'),
+                "forecastYears": active_model.get('forecast_years', 3)
             })
         
         # Fallback: Load from file if no active model in database
@@ -912,9 +918,15 @@ def dashboard_prediction():
                 "data_range": data_range
             }), 400
         
-        # Get predictions for next 6 years (2025-2030)
+        # Get forecast years from active model (default to 3 if not set)
+        active_model = get_active_model()
+        forecast_years = active_model.get('forecast_years', 3) if active_model else 3
+        
+        print(f"Dashboard: Using forecast_years = {forecast_years} from active model")
+        
+        # Get predictions using forecast_years from model
         try:
-            forecast_result = predict_energy_service(scenario='moderat', years=6)
+            forecast_result = predict_energy_service(scenario='moderat', years=forecast_years)
             
             # Convert forecast dict to predictions format with confidence intervals
             energy_df = pd.DataFrame(energy_data)

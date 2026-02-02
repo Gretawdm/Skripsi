@@ -297,6 +297,11 @@
 </div>
 
 <script>
+    // Global variables for filtering
+    let allTrainingData = [];
+    let allDataUpdateData = [];
+    let allPredictionData = [];
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function () {
         loadSummary();
@@ -307,9 +312,122 @@
         document.getElementById('data-tab').addEventListener('click', loadDataHistory);
         document.getElementById('prediction-tab').addEventListener('click', loadPredictionHistory);
 
-        // Clear history button
-        document.getElementById('btnClearHistory').addEventListener('click', confirmClearAll);
+        // Filter button
+        document.getElementById('btnApplyFilter').addEventListener('click', applyFilters);
+
+        // Real-time search
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
     });
+
+    // Apply filters
+    function applyFilters() {
+        const dateFilter = document.getElementById('dateFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+
+        // Get active tab
+        const activeTab = document.querySelector('#historyTabs .nav-link.active');
+        if (!activeTab) return;
+
+        const tabId = activeTab.id;
+
+        let filteredData = [];
+
+        if (tabId === 'training-tab') {
+            filteredData = filterData(allTrainingData, dateFilter, statusFilter, searchText, 'training');
+            if (filteredData.length > 0) {
+                renderTrainingTable(filteredData);
+            } else {
+                document.getElementById('trainingTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="fas fa-filter fa-2x mb-3 d-block"></i>
+                            <p>Tidak ada data yang sesuai dengan filter</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        } else if (tabId === 'data-tab') {
+            filteredData = filterData(allDataUpdateData, dateFilter, statusFilter, searchText, 'data');
+            if (filteredData.length > 0) {
+                renderDataTable(filteredData);
+            } else {
+                document.getElementById('dataTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="fas fa-filter fa-2x mb-3 d-block"></i>
+                            <p>Tidak ada data yang sesuai dengan filter</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        } else if (tabId === 'prediction-tab') {
+            filteredData = filterData(allPredictionData, dateFilter, statusFilter, searchText, 'prediction');
+            if (filteredData.length > 0) {
+                renderPredictionTable(filteredData);
+            } else {
+                document.getElementById('predictionTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="fas fa-filter fa-2x mb-3 d-block"></i>
+                            <p>Tidak ada data yang sesuai dengan filter</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        console.log(`Filter applied: ${filteredData.length} items found`);
+    }
+
+    // Filter data based on criteria
+    function filterData(data, dateFilter, statusFilter, searchText, type) {
+        console.log(`Filtering ${type} data:`, {
+            totalItems: data.length,
+            dateFilter,
+            statusFilter,
+            searchText
+        });
+
+        const filtered = data.filter(item => {
+            // Date filter
+            if (dateFilter !== 'all') {
+                const itemDate = new Date(item.training_date || item.update_date || item.prediction_date);
+                const now = new Date();
+                const daysDiff = Math.floor((now - itemDate) / (1000 * 60 * 60 * 24));
+
+                if (dateFilter === 'today' && daysDiff > 0) return false;
+                if (dateFilter === 'week' && daysDiff > 7) return false;
+                if (dateFilter === 'month' && daysDiff > 30) return false;
+                if (dateFilter === 'year' && daysDiff > 365) return false;
+            }
+
+            // Status filter
+            if (statusFilter !== 'all') {
+                const itemStatus = (item.status || 'success').toLowerCase();
+                if (itemStatus !== statusFilter) return false;
+            }
+
+            // Search filter
+            if (searchText) {
+                const searchableText = [
+                    item.notes || '',
+                    item.message || '',
+                    item.model_version || '',
+                    item.source || '',
+                    item.scenario || '',
+                    `${item.p},${item.d},${item.q}`
+                ].join(' ').toLowerCase();
+
+                if (!searchableText.includes(searchText)) return false;
+            }
+
+            return true;
+        });
+
+        console.log(`Filtered result: ${filtered.length} items`);
+        return filtered;
+    }
 
     // Load summary statistics
     function loadSummary() {
@@ -335,8 +453,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.data && data.data.length > 0) {
-                    renderTrainingTable(data.data);
+                    allTrainingData = data.data; // Store for filtering
+                    applyFilters(); // Apply current filters
                 } else {
+                    allTrainingData = [];
                     document.getElementById('trainingTableBody').innerHTML = `
                         <tr>
                             <td colspan="8" class="text-center text-muted py-4">
@@ -379,8 +499,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.data && data.data.length > 0) {
-                    renderDataTable(data.data);
+                    allDataUpdateData = data.data; // Store for filtering
+                    applyFilters(); // Apply current filters
                 } else {
+                    allDataUpdateData = [];
                     document.getElementById('dataTableBody').innerHTML = `
                         <tr>
                             <td colspan="8" class="text-center text-muted py-4">
@@ -428,8 +550,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.data && data.data.length > 0) {
-                    renderPredictionTable(data.data);
+                    allPredictionData = data.data; // Store for filtering
+                    applyFilters(); // Apply current filters
                 } else {
+                    allPredictionData = [];
                     document.getElementById('predictionTableBody').innerHTML = `
                         <tr>
                             <td colspan="8" class="text-center text-muted py-4">

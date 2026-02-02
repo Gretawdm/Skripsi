@@ -106,7 +106,7 @@ def init_database():
         print(f"Error initializing database: {e}")
         return False
 
-def save_training_history(metrics, year_range, energy_stats, gdp_stats):
+def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast_years=3):
     """
     Save training result to database as CANDIDATE
     
@@ -115,6 +115,7 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats):
         year_range: String like "1965-2024"
         energy_stats: Dictionary with energy statistics
         gdp_stats: Dictionary with GDP statistics
+        forecast_years: Number of years to forecast (default: 3)
         
     Returns:
         model_id: ID of the saved model (for file naming)
@@ -132,13 +133,13 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats):
                 train_size, test_size, train_percentage, test_percentage,
                 total_data, year_range,
                 energy_min, energy_max, energy_mean,
-                gdp_min, gdp_max, gdp_mean, status, model_status
+                gdp_min, gdp_max, gdp_mean, status, model_status, forecast_years
             ) VALUES (
                 %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s,
                 %s, %s,
                 %s, %s, %s,
-                %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s
             )
         """
         
@@ -164,7 +165,8 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats):
             gdp_stats.get('max', 0),
             gdp_stats.get('mean', 0),
             'success',
-            'candidate'  # NEW: Save as candidate by default
+            'candidate',  # NEW: Save as candidate by default
+            forecast_years  # NEW: Save forecast_years
         )
         
         cursor.execute(query, values)
@@ -661,7 +663,10 @@ def get_all_models_comparison():
                 id, training_date, p, d, q,
                 mape, rmse, mae, r2,
                 total_data, model_status,
-                activated_at, activated_by
+                activated_at, activated_by,
+                train_size, test_size, 
+                train_percentage, test_percentage,
+                forecast_years
             FROM training_history 
             WHERE model_status IN ('active', 'candidate')
             ORDER BY 

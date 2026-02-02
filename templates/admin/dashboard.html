@@ -95,19 +95,10 @@
                                 Skenario: Moderat (GDP Growth +5%/tahun)
                             </small>
                         </div>
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-primary active" id="btnChartLine"
-                                onclick="changeChartType('line')">
-                                <i class="fas fa-chart-line"></i>
-                            </button>
-                            <button class="btn btn-outline-primary" id="btnChartArea" onclick="changeChartType('area')">
-                                <i class="fas fa-chart-area"></i>
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div id="predictionChartContainer" style="height: 400px;">
+                    <div id="predictionChartContainer" style="height: 450px;">
                         <canvas id="predictionChart"></canvas>
                     </div>
                     <div class="mt-3 text-center">
@@ -358,7 +349,6 @@
 
 <script>
     let charts = {};
-    let currentChartType = 'line';
 
     // Dummy data untuk testing
     const dummyData = {
@@ -645,6 +635,11 @@
                 }
 
                 if (data.success) {
+                    // Debug: Log data struktur
+                    console.log('Prediction Data:', data);
+                    console.log('Historical sample:', data.historical.slice(-3));
+                    console.log('Predictions sample:', data.predictions.slice(0, 3));
+
                     // Update trend
                     if (data.trend !== undefined) {
                         const trendIcon = data.trend > 0 ?
@@ -690,32 +685,50 @@
         const ctx = document.getElementById('predictionChart');
         if (!ctx) return;
 
+        console.log('Creating prediction chart with data:', {
+            historicalCount: data.historical?.length,
+            predictionsCount: data.predictions?.length,
+            firstHistorical: data.historical?.[0],
+            lastHistorical: data.historical?.[data.historical?.length - 1],
+            firstPrediction: data.predictions?.[0],
+            lastPrediction: data.predictions?.[data.predictions?.length - 1]
+        });
+
         // Destroy existing chart
         if (charts.prediction) {
             charts.prediction.destroy();
         }
 
+        // Map data with explicit year values
+        const historicalData = data.historical.map(d => ({ x: d.year, y: d.value }));
+        const predictionData = data.predictions.map(d => ({ x: d.year, y: d.value }));
+
+        // Debug: Log mapped data
+        console.log('Mapped historical data (first 3):', historicalData.slice(0, 3));
+        console.log('Mapped historical data (last 3):', historicalData.slice(-3));
+        console.log('Mapped prediction data:', predictionData);
+
         const datasets = [
             {
                 label: 'Data Aktual',
-                data: data.historical.map(d => ({ x: d.year, y: d.value })),
+                data: historicalData,
                 borderColor: 'rgb(54, 162, 235)',
                 backgroundColor: 'rgba(54, 162, 235, 0.1)',
                 borderWidth: 2,
                 pointRadius: 3,
                 pointHoverRadius: 5,
-                fill: currentChartType === 'area'
+                fill: false
             },
             {
                 label: 'Prediksi',
-                data: data.predictions.map(d => ({ x: d.year, y: d.value })),
+                data: predictionData,
                 borderColor: 'rgb(255, 99, 132)',
                 backgroundColor: 'rgba(255, 99, 132, 0.1)',
                 borderWidth: 2,
                 borderDash: [5, 5],
                 pointRadius: 4,
                 pointHoverRadius: 6,
-                fill: currentChartType === 'area'
+                fill: false
             }
         ];
 
@@ -755,11 +768,22 @@
                         display: false
                     },
                     tooltip: {
-                        mode: 'index',
+                        mode: 'nearest',
                         intersect: false,
                         callbacks: {
                             title: function (context) {
-                                // Display year as integer without thousand separator
+                                // Get year from the actual hovered dataset
+                                if (context && context.length > 0) {
+                                    const datasetIndex = context[0].datasetIndex;
+                                    const dataIndex = context[0].dataIndex;
+                                    const dataPoint = context[0].chart.data.datasets[datasetIndex].data[dataIndex];
+
+                                    if (dataPoint && typeof dataPoint === 'object' && dataPoint.x) {
+                                        return 'Tahun ' + Math.round(dataPoint.x);
+                                    }
+                                }
+
+                                // Fallback
                                 return 'Tahun ' + Math.round(context[0].parsed.x);
                             },
                             label: function (context) {
@@ -778,6 +802,8 @@
                 scales: {
                     x: {
                         type: 'linear',
+                        min: Math.min(...historicalData.map(d => d.x)),
+                        max: Math.max(...predictionData.map(d => d.x)),
                         title: {
                             display: true,
                             text: 'Tahun'
@@ -1085,17 +1111,6 @@
                 document.getElementById('modelServerStatus').className = 'badge bg-danger';
                 document.getElementById('modelServerStatus').innerHTML = '<i class="fas fa-times-circle"></i> Stopped';
             });
-    }
-
-    // Change chart type
-    function changeChartType(type) {
-        currentChartType = type;
-        document.getElementById('btnChartLine').classList.remove('active');
-        document.getElementById('btnChartArea').classList.remove('active');
-        document.getElementById('btnChart' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
-
-        // Reload prediction chart
-        loadPredictionData();
     }
 
     // Generate report
