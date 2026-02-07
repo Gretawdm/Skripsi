@@ -106,7 +106,7 @@ def init_database():
         print(f"Error initializing database: {e}")
         return False
 
-def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast_years=3):
+def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast_years=3, viz_plots=None, preprocessing_steps=None):
     """
     Save training result to database as CANDIDATE
     
@@ -116,6 +116,8 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast
         energy_stats: Dictionary with energy statistics
         gdp_stats: Dictionary with GDP statistics
         forecast_years: Number of years to forecast (default: 3)
+        viz_plots: Dictionary with visualization plots as base64 strings
+        preprocessing_steps: List of preprocessing step dictionaries
         
     Returns:
         model_id: ID of the saved model (for file naming)
@@ -127,47 +129,113 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast
         
         cursor = connection.cursor()
         
-        query = """
-            INSERT INTO training_history (
-                training_date, p, d, q, mape, rmse, mae, r2,
-                train_size, test_size, train_percentage, test_percentage,
-                total_data, year_range,
-                energy_min, energy_max, energy_mean,
-                gdp_min, gdp_max, gdp_mean, status, model_status, forecast_years
-            ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s,
-                %s, %s,
-                %s, %s, %s,
-                %s, %s, %s, %s, %s, %s
-            )
-        """
+        # Convert preprocessing_steps to JSON string if provided
+        preprocessing_steps_json = None
+        if preprocessing_steps:
+            preprocessing_steps_json = json.dumps(preprocessing_steps, ensure_ascii=False)
         
-        values = (
-            datetime.now(),
-            metrics.get('p', 0),
-            metrics.get('d', 0),
-            metrics.get('q', 0),
-            metrics.get('mape', 0),
-            metrics.get('rmse', 0),
-            metrics.get('mae', 0),
-            metrics.get('r2', 0),
-            metrics.get('train_size', 0),
-            metrics.get('test_size', 0),
-            metrics.get('train_percentage', 0),
-            metrics.get('test_percentage', 0),
-            metrics.get('total_data', 0),
-            year_range,
-            energy_stats.get('min', 0),
-            energy_stats.get('max', 0),
-            energy_stats.get('mean', 0),
-            gdp_stats.get('min', 0),
-            gdp_stats.get('max', 0),
-            gdp_stats.get('mean', 0),
-            'success',
-            'candidate',  # NEW: Save as candidate by default
-            forecast_years  # NEW: Save forecast_years
-        )
+        # Build query dynamically based on whether viz_plots is provided
+        if viz_plots:
+            query = """
+                INSERT INTO training_history (
+                    training_date, p, d, q, mape, rmse, mae, r2,
+                    train_size, test_size, train_percentage, test_percentage,
+                    total_data, year_range,
+                    energy_min, energy_max, energy_mean,
+                    gdp_min, gdp_max, gdp_mean, status, model_status, forecast_years,
+                    acf_plot, pacf_plot, preprocessing_plot, train_test_plot,
+                    residual_plot, residual_acf_plot, qq_plot,
+                    preprocessing_steps
+                ) VALUES (
+                    %s, %s, %s, %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s,
+                    %s, %s, %s,
+                    %s, %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s, %s,
+                    %s
+                )
+            """
+            
+            values = (
+                datetime.now(),
+                metrics.get('p', 0),
+                metrics.get('d', 0),
+                metrics.get('q', 0),
+                metrics.get('mape', 0),
+                metrics.get('rmse', 0),
+                metrics.get('mae', 0),
+                metrics.get('r2', 0),
+                metrics.get('train_size', 0),
+                metrics.get('test_size', 0),
+                metrics.get('train_percentage', 0),
+                metrics.get('test_percentage', 0),
+                metrics.get('total_data', 0),
+                year_range,
+                energy_stats.get('min', 0),
+                energy_stats.get('max', 0),
+                energy_stats.get('mean', 0),
+                gdp_stats.get('min', 0),
+                gdp_stats.get('max', 0),
+                gdp_stats.get('mean', 0),
+                'success',
+                'candidate',
+                forecast_years,
+                viz_plots.get('acf_plot'),
+                viz_plots.get('pacf_plot'),
+                viz_plots.get('preprocessing_plot'),
+                viz_plots.get('train_test_plot'),
+                viz_plots.get('residual_plot'),
+                viz_plots.get('residual_acf_plot'),
+                viz_plots.get('qq_plot'),
+                preprocessing_steps_json
+            )
+        else:
+            query = """
+                INSERT INTO training_history (
+                    training_date, p, d, q, mape, rmse, mae, r2,
+                    train_size, test_size, train_percentage, test_percentage,
+                    total_data, year_range,
+                    energy_min, energy_max, energy_mean,
+                    gdp_min, gdp_max, gdp_mean, status, model_status, forecast_years,
+                    preprocessing_steps
+                ) VALUES (
+                    %s, %s, %s, %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s,
+                    %s, %s, %s,
+                    %s, %s, %s, %s, %s, %s,
+                    %s
+                )
+            """
+            
+            values = (
+                datetime.now(),
+                metrics.get('p', 0),
+                metrics.get('d', 0),
+                metrics.get('q', 0),
+                metrics.get('mape', 0),
+                metrics.get('rmse', 0),
+                metrics.get('mae', 0),
+                metrics.get('r2', 0),
+                metrics.get('train_size', 0),
+                metrics.get('test_size', 0),
+                metrics.get('train_percentage', 0),
+                metrics.get('test_percentage', 0),
+                metrics.get('total_data', 0),
+                year_range,
+                energy_stats.get('min', 0),
+                energy_stats.get('max', 0),
+                energy_stats.get('mean', 0),
+                gdp_stats.get('min', 0),
+                gdp_stats.get('max', 0),
+                gdp_stats.get('mean', 0),
+                'success',
+                'candidate',
+                forecast_years,
+                preprocessing_steps_json
+            )
         
         cursor.execute(query, values)
         model_id = cursor.lastrowid  # Get the ID of inserted row

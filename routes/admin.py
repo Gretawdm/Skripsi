@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request, redirect, url_for, session
+from routes.auth import admin_required
 from services.update_data_api import (
     update_from_api, 
     fetch_data_from_api, 
@@ -18,18 +19,22 @@ last_update_info = {
 }
 
 @admin_bp.route("/dashboard")
+@admin_required
 def dashboard():
     return render_template("dashboard.html")
 
 @admin_bp.route("/scraping-data")
+@admin_required
 def scraping_data():
     return render_template("scraping_data.html", page_title="Scraping Data")
 
 @admin_bp.route("/update-model")
+@admin_required
 def update_model():
     return render_template("update_model.html")
 
 @admin_bp.route("/riwayat")
+@admin_required
 def riwayat():  
     return render_template("riwayat.html", page_title="Riwayat")
 

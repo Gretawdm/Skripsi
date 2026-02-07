@@ -175,21 +175,17 @@ h6 {
 # Global Header
 --------------------------------------------------------------*/
 .header {
-  position: fixed;
-  top: 1rem;
-  left: 280px;
-  right: 2rem;
-  height: 60px;
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-  border-radius: 10px;
-  padding: 0 1.2rem;
-  display: flex;
-  align-items: center;
-  z-index: 1000;
+
+  --surface-color: #1b1933;
+  color: var(--default-color);
+  padding: 20px 0;
+  transition: all 0.5s;
+  z-index: 997;
+
 }
 
 .header .header-container {
-  background: var(--heading-color);
+  background: white;
   border-radius: 50px;
   padding: 5px 25px;
   box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.1);
@@ -333,7 +329,7 @@ h6 {
   .navmenu li:hover>a,
   .navmenu .active,
   .navmenu .active:focus {
-    color: white;
+    color: var(--heading-color);
     font-weight: 600;
   }
 
@@ -397,7 +393,7 @@ h6 {
 /* Mobile Navigation */
 @media (max-width: 1199px) {
   .mobile-nav-toggle {
-    color: white;
+    color: var(--nav-hover-color);
     font-size: 28px;
     line-height: 0;
     margin-right: 10px;
@@ -406,7 +402,7 @@ h6 {
   }
 
   body.mobile-nav-active .mobile-nav-toggle {
-    color: white;
+    color: var(--nav-hover-color);
   }
 
   .navmenu {
@@ -459,6 +455,16 @@ h6 {
     background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
   }
 
+  .navmenu .mobile-login-link {
+    background: var(--nav-hover-color);
+    color: white !important;
+    border-radius: 25px;
+    margin: 10px 20px;
+    text-align: center;
+    font-weight: 700;
+    padding: 12px 20px !important;
+  }
+
   .navmenu a i:hover,
   .navmenu a:focus i:hover {
     background-color: var(--accent-color);
@@ -502,7 +508,7 @@ h6 {
   }
 
   .mobile-nav-active .mobile-nav-toggle {
-    color: #fff;
+    color: var(--nav-hover-color);
     position: absolute;
     font-size: 32px;
     top: 15px;
@@ -904,26 +910,32 @@ section,
   content: "";
   position: absolute;
   inset: 0;
-
+  z-index: 1;
   background: linear-gradient(to bottom,
       rgba(255, 255, 255, 0.85),
       rgba(255, 255, 255, 0.9));
 }
 
+.hero .container {
+  position: relative;
+  z-index: 2;
+}
+
 .hero .hero-content {
-  text-align: center;
-  color: white;
   position: relative;
   z-index: 3;
 }
 
 .hero .hero-content h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
   line-height: 1.2;
-  color: var(--heading-color);
+  color: #01384F !important;
   margin-bottom: 1.5rem;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
 }
 
 @media (max-width: 768px) {
@@ -947,8 +959,8 @@ section,
 }
 
 .hero .hero-content p {
-  font-size: 1rem;
-  color: black;
+  font-size: 1rem !important;
+  color: #333333 !important;
   margin-bottom: 2rem;
   line-height: 1.6;
   font-weight: 400;

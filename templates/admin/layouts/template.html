@@ -43,6 +43,23 @@
         <div class="main">
             {% include 'admin/layouts/header.html' %}
             <div class="content">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="container-fluid">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show"
+                        role="alert">
+                        <i
+                            class="fas fa-{{ 'exclamation-circle' if category == 'danger' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
                 {% block content %}{% endblock %}
             </div>
         </div>

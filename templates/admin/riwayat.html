@@ -596,8 +596,376 @@
 
     // View detail functions (modal)
     function viewTrainingDetail(id) {
-        // TODO: Implement detail modal
-        alert('Detail untuk Training ID: ' + id);
+        // Fetch detail from API
+        fetch(`/api/training-history/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    const modalBody = document.getElementById('detailModalBody');
+                    
+                    // Build detail HTML with preprocessing visualizations
+                    let visualizationHtml = '';
+                    
+                    if (data.acf_plot || data.pacf_plot || data.preprocessing_plot || data.train_test_plot) {
+                        visualizationHtml = `
+                            <h6 class="mt-4 mb-3 fw-bold text-primary">
+                                <i class="fas fa-chart-bar me-2"></i>Visualisasi Preprocessing Data
+                            </h6>
+                            <div class="row g-3">
+                                ${data.acf_plot ? `
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title fw-bold">ACF Plot (Autocorrelation Function)</h6>
+                                                <p class="text-muted small">Menunjukkan korelasi data dengan lag sebelumnya untuk identifikasi order MA (q)</p>
+                                                <img src="${data.acf_plot}" class="img-fluid rounded" alt="ACF Plot">
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${data.pacf_plot ? `
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title fw-bold">PACF Plot (Partial Autocorrelation Function)</h6>
+                                                <p class="text-muted small">Menunjukkan korelasi parsial untuk identifikasi order AR (p)</p>
+                                                <img src="${data.pacf_plot}" class="img-fluid rounded" alt="PACF Plot">
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${data.preprocessing_plot ? `
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title fw-bold">Data Preprocessing: Train-Test Split</h6>
+                                                <p class="text-muted small">Pembagian data training (hijau) dan testing (orange) untuk evaluasi model</p>
+                                                <img src="${data.preprocessing_plot}" class="img-fluid rounded" alt="Preprocessing Plot">
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${data.train_test_plot ? `
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title fw-bold">Training vs Testing Data</h6>
+                                                <p class="text-muted small">Perbandingan data point training dan testing yang digunakan</p>
+                                                <img src="${data.train_test_plot}" class="img-fluid rounded" alt="Train Test Plot">
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }
+                    
+                    modalBody.innerHTML = `
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">ID Training</h6>
+                                <p class="fw-bold">#${data.id}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Tanggal Training</h6>
+                                <p class="fw-bold">${new Date(data.training_date).toLocaleString('id-ID')}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- PREPROCESSING STEPS TIMELINE -->
+                        ${data.preprocessing_steps && data.preprocessing_steps.length > 0 ? `
+                        <div class="alert alert-primary mb-4">
+                            <i class="fas fa-timeline me-2"></i><strong>Tahapan Preprocessing Data</strong>
+                        </div>
+                        <div class="accordion" id="preprocessingAccordion">
+                            ${data.preprocessing_steps.map(step => `
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading${step.step}">
+                                        <button class="accordion-button ${step.step === 1 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${step.step}" aria-expanded="${step.step === 1 ? 'true' : 'false'}">
+                                            <span class="badge ${step.status === 'success' ? 'bg-success' : step.status === 'warning' ? 'bg-warning' : 'bg-danger'} me-3">${step.step}</span>
+                                            <strong>${step.title}</strong>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse${step.step}" class="accordion-collapse collapse ${step.step === 1 ? 'show' : ''}" data-bs-parent="#preprocessingAccordion">
+                                        <div class="accordion-body">
+                                            <p class="text-muted mb-3">${step.description}</p>
+                                            <ul class="list-unstyled">
+                                                ${step.details.map(detail => `<li><i class="fas fa-check-circle text-success me-2"></i>${detail}</li>`).join('')}
+                                            </ul>
+                                            
+                                            <!-- STEP 4: Train-Test Split Visualization -->
+                                            ${step.step === 4 && (data.preprocessing_plot || data.train_test_plot) ? `
+                                                <div class="mt-3">
+                                                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-chart-area me-2"></i>Visualisasi Split Data</h6>
+                                                    <div class="row g-3">
+                                                        ${data.preprocessing_plot ? `
+                                                            <div class="col-12">
+                                                                <div class="card">
+                                                                    <div class="card-body">
+                                                                        <img src="${data.preprocessing_plot}" class="img-fluid rounded" alt="Train-Test Split">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ` : ''}
+                                                        ${data.train_test_plot ? `
+                                                            <div class="col-12">
+                                                                <div class="card">
+                                                                    <div class="card-body">
+                                                                        <img src="${data.train_test_plot}" class="img-fluid rounded" alt="Comparison Chart">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ` : ''}
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                            
+                                            <!-- STEP 5: ACF & PACF Plots -->
+                                            ${step.step === 5 && (data.acf_plot || data.pacf_plot) ? `
+                                                <div class="mt-3">
+                                                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-chart-line me-2"></i>Grafik ACF & PACF</h6>
+                                                    <div class="row g-3">
+                                                        ${data.acf_plot ? `
+                                                            <div class="col-md-6">
+                                                                <div class="card">
+                                                                    <div class="card-body">
+                                                                        <h6 class="card-title fw-bold">ACF Plot</h6>
+                                                                        <p class="text-muted small">Hitung berapa lag yang keluar dari confidence interval (garis biru) → order q</p>
+                                                                        <img src="${data.acf_plot}" class="img-fluid rounded" alt="ACF Plot">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ` : ''}
+                                                        ${data.pacf_plot ? `
+                                                            <div class="col-md-6">
+                                                                <div class="card">
+                                                                    <div class="card-body">
+                                                                        <h6 class="card-title fw-bold">PACF Plot</h6>
+                                                                        <p class="text-muted small">Hitung berapa lag yang keluar dari confidence interval (garis biru) → order p</p>
+                                                                        <img src="${data.pacf_plot}" class="img-fluid rounded" alt="PACF Plot">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ` : ''}
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                            
+                                            <!-- STEP 9: Residual Diagnostics -->
+                                            ${step.step === 9 && (data.residual_plot || data.residual_acf_plot || data.qq_plot) ? `
+                                                <div class="mt-3">
+                                                    <h6 class="fw-bold text-warning mb-3"><i class="fas fa-microscope me-2"></i>Grafik Diagnosis Residual</h6>
+                                                    <div class="row g-3">
+                                                        ${data.residual_plot ? `
+                                                            <div class="col-12">
+                                                                <div class="card border-warning">
+                                                                    <div class="card-body">
+                                                                        <h6 class="card-title fw-bold">Residual Plot</h6>
+                                                                        <p class="text-muted small">Residual harus random tanpa pola (white noise)</p>
+                                                                        <img src="${data.residual_plot}" class="img-fluid rounded" alt="Residual Plot">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ` : ''}
+                                                        ${data.residual_acf_plot ? `
+                                                            <div class="col-md-6">
+                                                                <div class="card border-warning">
+                                                                    <div class="card-body">
+                                                                        <h6 class="card-title fw-bold">ACF Residual</h6>
+                                                                        <p class="text-muted small">Semua lag harus dalam confidence interval</p>
+                                                                        <img src="${data.residual_acf_plot}" class="img-fluid rounded" alt="ACF Residual">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ` : ''}
+                                                        ${data.qq_plot ? `
+                                                            <div class="col-md-6">
+                                                                <div class="card border-warning">
+                                                                    <div class="card-body">
+                                                                        <h6 class="card-title fw-bold">Q-Q Plot</h6>
+                                                                        <p class="text-muted small">Points harus mengikuti garis diagonal (normalitas)</p>
+                                                                        <img src="${data.qq_plot}" class="img-fluid rounded" alt="Q-Q Plot">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ` : ''}
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <hr class="my-4">
+                        ` : ''}
+                        
+                        <!-- PARAMETER MODEL -->
+                        <h6 class="mt-4 mb-3 fw-bold text-primary">
+                            <i class="fas fa-cog me-2"></i>Parameter Model & Hasil Evaluasi
+                        </h6>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="text-muted mb-1">Order (p,d,q)</h6>
+                                        <h4 class="mb-0 text-primary">(${data.p}, ${data.d}, ${data.q})</h4>
+                                        <small class="text-muted">AR, Diff, MA</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="text-muted mb-1">Data Split</h6>
+                                        <h4 class="mb-0 text-success">${data.train_percentage}% / ${data.test_percentage}%</h4>
+                                        <small class="text-muted">Train / Test</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="text-muted mb-1">Total Data</h6>
+                                        <h4 class="mb-0 text-info">${data.total_data} records</h4>
+                                        <small class="text-muted">Data Points</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <h6 class="text-muted">MAPE</h6>
+                                <p class="fw-bold text-success">${data.mape ? Number(data.mape).toFixed(2) : '0.00'}%</p>
+                                <small class="text-muted">Akurasi</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h6 class="text-muted">RMSE</h6>
+                                <p class="fw-bold">${data.rmse ? Number(data.rmse).toFixed(2) : '0.00'}</p>
+                                <small class="text-muted">Root MSE</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h6 class="text-muted">MAE</h6>
+                                <p class="fw-bold">${data.mae ? Number(data.mae).toFixed(2) : '0.00'}</p>
+                                <small class="text-muted">Mean Error</small>
+                            </div>
+                            <div class="col-md-3">
+                                <h6 class="text-muted">R²</h6>
+                                <p class="fw-bold text-info">${data.r2 ? Number(data.r2).toFixed(4) : '0.0000'}</p>
+                                <small class="text-muted">Goodness</small>
+                            </div>
+                        </div>
+                        
+                        <!-- VISUALIZATIONS -->
+                        ${data.acf_plot || data.pacf_plot || data.preprocessing_plot || data.train_test_plot ? `
+                        <h6 class="mt-4 mb-3 fw-bold text-primary">
+                            <i class="fas fa-chart-bar me-2"></i>Grafik Visualisasi
+                        </h6>
+                        <div class="row g-3">
+                            ${data.acf_plot ? `
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title fw-bold">ACF Plot</h6>
+                                            <img src="${data.acf_plot}" class="img-fluid rounded" alt="ACF Plot">
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${data.pacf_plot ? `
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title fw-bold">PACF Plot</h6>
+                                            <img src="${data.pacf_plot}" class="img-fluid rounded" alt="PACF Plot">
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${data.preprocessing_plot ? `
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title fw-bold">Train-Test Split</h6>
+                                            <img src="${data.preprocessing_plot}" class="img-fluid rounded" alt="Preprocessing Plot">
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${data.train_test_plot ? `
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title fw-bold">Comparison Chart</h6>
+                                            <img src="${data.train_test_plot}" class="img-fluid rounded" alt="Train Test Plot">
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${data.residual_plot ? `
+                                <div class="col-12">
+                                    <div class="card border-warning">
+                                        <div class="card-body">
+                                            <h6 class="card-title fw-bold text-warning">
+                                                <i class="fas fa-chart-line me-2"></i>Residual Plot
+                                            </h6>
+                                            <p class="text-muted small">Residual harus random tanpa pola (white noise)</p>
+                                            <img src="${data.residual_plot}" class="img-fluid rounded" alt="Residual Plot">
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${data.residual_acf_plot ? `
+                                <div class="col-md-6">
+                                    <div class="card border-warning">
+                                        <div class="card-body">
+                                            <h6 class="card-title fw-bold text-warning">
+                                                <i class="fas fa-wave-square me-2"></i>ACF Residual
+                                            </h6>
+                                            <p class="text-muted small">Semua lag harus dalam confidence interval (white noise)</p>
+                                            <img src="${data.residual_acf_plot}" class="img-fluid rounded" alt="Residual ACF">
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${data.qq_plot ? `
+                                <div class="col-md-6">
+                                    <div class="card border-warning">
+                                        <div class="card-body">
+                                            <h6 class="card-title fw-bold text-warning">
+                                                <i class="fas fa-chart-scatter me-2"></i>Q-Q Plot
+                                            </h6>
+                                            <p class="text-muted small">Points harus mengikuti garis diagonal (normalitas)</p>
+                                            <img src="${data.qq_plot}" class="img-fluid rounded" alt="Q-Q Plot">
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        ` : ''}
+                    `;
+                    
+                    // Show modal
+                    const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+                    modal.show();
+                } else {
+                    alert('Data tidak ditemukan');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching detail:', error);
+                alert('Error: ' + error.message);
+            });
     }
 
     function viewDataDetail(id) {

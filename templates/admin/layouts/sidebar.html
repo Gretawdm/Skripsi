@@ -3,9 +3,9 @@
         <div class="d-flex align-items-center justify-content-center">
             <img src="{{ url_for('static', filename='assets/img/logo_web.png') }}" alt="Logo" class="sidebar-logo me-2"
                 style="height: 40px; width: auto;">
-                <h5 class="mb-0 text-logo fw-bold" style="font-size: 14px; color: #01384F; font-weight: 700;">
-                    FosilTrack
-                </h5>
+            <h5 class="mb-0 text-logo fw-bold" style="font-size: 14px; color: #01384F; font-weight: 700;">
+                FosilTrack
+            </h5>
         </div>
     </div>
 
@@ -52,10 +52,44 @@
 
         <!-- Logout -->
         <div class="p-3">
-            <a href="" class="nav-link text-danger">
+            <a href="javascript:void(0)" class="nav-link text-danger" onclick="showLogoutModal()">
                 <i class="fas fa-sign-out-alt"></i>
                 <span class="sidebar-text">Logout</span>
             </a>
         </div>
     </div>
 </div>
+
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-body text-center p-4">
+                <div class="mb-4">
+                    <div class="mx-auto d-flex align-items-center justify-content-center"
+                        style="width: 80px; height: 80px; background: linear-gradient(135deg, #dc3545, #c82333); border-radius: 50%;">
+                        <i class="fas fa-sign-out-alt text-white" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+                <h4 class="mb-3 fw-bold" style="color: #01384F;">Konfirmasi Logout</h4>
+                <p class="text-muted mb-4">Apakah Anda yakin ingin keluar dari sistem?</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Batal
+                    </button>
+                    <a href="{{ url_for('auth.logout') }}" class="btn px-4 text-white"
+                        style="background: linear-gradient(135deg, #dc3545, #c82333);">
+                        <i class="fas fa-check me-2"></i>Ya, Keluar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showLogoutModal() {
+        const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+        modal.show();
+    }
+</script>

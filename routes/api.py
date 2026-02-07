@@ -43,29 +43,33 @@ api_bp = Blueprint("api", __name__)
 def predict():
     data = request.json
     scenario = data.get("scenario")
-    years = int(data.get("years"))
+    years = int(data.get("years", data.get("forecast_years", 3)))  # Support both params
+    save_to_db = data.get("save_to_database", True)  # Default True untuk backward compatibility
 
     if scenario not in ["optimis", "moderat", "pesimistis"]:
         return jsonify({"error": "Invalid scenario"}), 400
 
-    if years < 1 or years > 5:
-        return jsonify({"error": "Periode prediksi max 5 tahun"}), 400
+    if years < 1 or years > 10:
+        return jsonify({"error": "Periode prediksi max 10 tahun"}), 400
 
     result = predict_energy_service(scenario, years)
     
-    # Save prediction to database
-    try:
-        # Save predictions only (for backward compatibility)
-        save_prediction_history(scenario, years, result['predictions'])
-    except Exception as e:
-        print(f"Warning: Failed to save prediction history: {e}")
+    # Save prediction to database only if requested
+    if save_to_db:
+        try:
+            # Save predictions only (for backward compatibility)
+            save_prediction_history(scenario, years, result['predictions'])
+        except Exception as e:
+            print(f"Warning: Failed to save prediction history: {e}")
 
     return jsonify({
+        "status": "success",
         "scenario": scenario,
         "years": years,
-        "prediction": result['predictions'],
+        "predictions": result['predictions'],  # Changed from 'prediction' to 'predictions'
         "lower_bounds": result['lower_bounds'],
-        "upper_bounds": result['upper_bounds']
+        "upper_bounds": result['upper_bounds'],
+        "saved_to_database": save_to_db
     })
 
 
@@ -134,16 +138,11 @@ def energy_data():
         for row in data_limited:
             data_json.append({
                 "year": int(row.get('Year', 0)),
-                "energy_value": float(row.get('fossil_fuels__twh', 0)),
+                "fossil_fuels__twh": float(row.get('fossil_fuels__twh', 0)),
                 "updated_at": row.get('updated_at').isoformat() if row.get('updated_at') else None
             })
         
-        return jsonify({
-            "success": True,
-            "data": data_json,
-            "total": len(data),
-            "showing": len(data_limited)
-        })
+        return jsonify(data_json)  # Return array langsung untuk kompatibilitas
     except Exception as e:
         print(f"Error in energy_data API: {str(e)}")
         import traceback
@@ -418,6 +417,58 @@ def model_info():
         }), 500
 
 
+@api_bp.route("/model/metrics", methods=["GET"])
+def model_metrics():
+    """Get active model metrics dari database"""
+    try:
+        from services.database_service import get_db_connection
+        
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get active model metrics
+        query = """
+        SELECT model_version, mape, forecast_years, training_date, p, d, q
+        FROM training_history
+        WHERE model_status = 'active'
+        ORDER BY training_date DESC
+        LIMIT 1
+        """
+        
+        cursor.execute(query)
+        result = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        if result:
+            mape = float(result['mape'])
+            accuracy = round(100 - mape, 2)
+            
+            return jsonify({
+                "success": True,
+                "metrics": {
+                    "model_version": result['model_version'],
+                    "order": f"({result['p']},{result['d']},{result['q']})",
+                    "mape": mape,
+                    "accuracy": accuracy,
+                    "forecast_years": result['forecast_years'],
+                    "training_date": result['training_date'].strftime("%Y-%m-%d") if result['training_date'] else None
+                }
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "message": "No active model found"
+            }), 404
+            
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+
 @api_bp.route("/model/parameters", methods=["GET"])
 def model_parameters():
     """Get model parameters dari saved model"""
@@ -480,6 +531,46 @@ def history_training():
             "message": str(e)
         }), 500
 
+@api_bp.route("/training-history/<int:id>", methods=["GET"])
+def get_training_detail(id):
+    """Get detail training history by ID with visualization plots"""
+    try:
+        from services.database_service import get_db_connection
+        import json
+        
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT * FROM training_history WHERE id = %s
+        """, (id,))
+        
+        record = cursor.fetchone()
+        
+        cursor.close()
+        connection.close()
+        
+        if record:
+            # Convert datetime to string
+            if record.get('training_date'):
+                record['training_date'] = record['training_date'].isoformat()
+            if record.get('created_at'):
+                record['created_at'] = record['created_at'].isoformat()
+            
+            # Parse preprocessing_steps JSON if exists
+            if record.get('preprocessing_steps'):
+                try:
+                    record['preprocessing_steps'] = json.loads(record['preprocessing_steps'])
+                except:
+                    record['preprocessing_steps'] = None
+            
+            return jsonify(record)
+        else:
+            return jsonify({"error": "Training history not found"}), 404
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @api_bp.route("/history/data-update", methods=["GET"])
 def history_data_update():
@@ -515,6 +606,76 @@ def history_prediction():
             "success": False,
             "message": str(e)
         }), 500
+
+
+@api_bp.route("/prediction/latest", methods=["GET"])
+def get_latest_prediction():
+    """Get latest prediction from database (auto-updated by dashboard)"""
+    try:
+        from services.database_service import get_db_connection
+        from services.data_mysql_service import get_energy_from_db
+        import pandas as pd
+        import json
+        
+        connection = get_db_connection()
+        if not connection:
+            return jsonify({'predictions': [], 'years': 0, 'scenario': 'moderat'})
+        
+        cursor = connection.cursor(dictionary=True)
+        
+        # Get latest moderat prediction from database
+        cursor.execute("""
+            SELECT * FROM prediction_history 
+            WHERE scenario = 'moderat'
+            ORDER BY prediction_date DESC 
+            LIMIT 1
+        """)
+        
+        record = cursor.fetchone()
+        cursor.close()
+        connection.close()
+        
+        if not record:
+            return jsonify({'predictions': [], 'years': 0, 'scenario': 'moderat'})
+        
+        # Get last year from energy data
+        energy_data = get_energy_from_db()
+        if energy_data:
+            energy_df = pd.DataFrame(energy_data)
+            last_year = int(energy_df['Year'].max())
+        else:
+            last_year = 2024
+        
+        # Parse prediction_data
+        prediction_values = json.loads(record['prediction_data']) if record['prediction_data'] else []
+        
+        # Format predictions starting from last_year + 1
+        formatted_predictions = []
+        for i, value in enumerate(prediction_values):
+            formatted_predictions.append({
+                'year': last_year + i + 1,
+                'prediction_value': float(value)
+            })
+        
+        return jsonify({
+            'predictions': formatted_predictions,
+            'years': record['years'],
+            'scenario': record['scenario']
+        })
+        
+    except Exception as e:
+        print(f"Error getting latest prediction: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'predictions': [],
+            'years': 0,
+            'scenario': 'moderat'
+        }), 500
+        
+    except Exception as e:
+        print(f"Error getting latest prediction: {e}")
+        return jsonify([]), 500
 
 
 @api_bp.route("/history/summary", methods=["GET"])
@@ -972,6 +1133,23 @@ def dashboard_prediction():
         
         # Get prediction for 2030
         prediction_2030 = next((p['value'] for p in predictions if p['year'] == 2030), None)
+        
+        # Auto-save prediction to database for landing page
+        try:
+            active_model = get_active_model()
+            model_version = f"ARIMAX ({active_model.get('p', 0)},{active_model.get('d', 0)},{active_model.get('q', 0)})" if active_model else 'ARIMAX v1.0'
+            
+            # Save only prediction values (not full object)
+            prediction_values = [p['value'] for p in predictions]
+            save_prediction_history(
+                scenario='moderat',
+                years=forecast_years,
+                prediction_data=prediction_values,
+                model_version=model_version
+            )
+            print(f"✓ Saved {forecast_years} years prediction to database")
+        except Exception as save_error:
+            print(f"Warning: Failed to save prediction history: {save_error}")
         
         return jsonify({
             "success": True,

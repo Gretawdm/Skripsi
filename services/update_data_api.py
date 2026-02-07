@@ -97,13 +97,41 @@ def fetch_data_from_api(data_type='all', start_year=1990, end_year=2023):
             energy_url = "https://ourworldindata.org/grapher/fossil-fuel-primary-energy.csv?v=1&csvType=full&useColumnShortNames=true"
             energy_df = pd.read_csv(energy_url, storage_options=headers)
             
-            # Filter Indonesia dan tahun
-            energy_df = energy_df[energy_df["Entity"] == "Indonesia"]
-            if "Year" in energy_df.columns:
+            # Filter Indonesia - cek berbagai kemungkinan nama kolom
+            entity_col = None
+            for col in ['Entity', 'entity', 'Country', 'country', 'location', 'Location']:
+                if col in energy_df.columns:
+                    entity_col = col
+                    break
+            
+            if entity_col:
+                energy_df = energy_df[energy_df[entity_col] == "Indonesia"]
+            else:
+                return {
+                    "success": False,
+                    "message": f"Kolom Entity/Country tidak ditemukan. Kolom tersedia: {', '.join(energy_df.columns[:10])}"
+                }
+            
+            # Filter tahun - cek berbagai kemungkinan nama kolom
+            year_col = None
+            for col in ['Year', 'year', 'Date', 'date', 'Time', 'time']:
+                if col in energy_df.columns:
+                    year_col = col
+                    break
+            
+            if year_col:
                 energy_df = energy_df[
-                    (energy_df["Year"] >= start_year) & 
-                    (energy_df["Year"] <= end_year)
+                    (energy_df[year_col] >= start_year) & 
+                    (energy_df[year_col] <= end_year)
                 ]
+                # Normalize column name
+                if year_col != 'Year':
+                    energy_df = energy_df.rename(columns={year_col: 'Year'})
+            else:
+                return {
+                    "success": False,
+                    "message": f"Kolom Year tidak ditemukan. Kolom tersedia: {', '.join(energy_df.columns[:10])}"
+                }
         
         # Fetch GDP Data
         if data_type in ['all', 'gdp']:
