@@ -106,7 +106,7 @@ def init_database():
         print(f"Error initializing database: {e}")
         return False
 
-def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast_years=3, viz_plots=None, preprocessing_steps=None):
+def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast_years=3, viz_plots=None, preprocessing_steps=None, training_duration=None):
     """
     Save training result to database as CANDIDATE
     
@@ -118,6 +118,7 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast
         forecast_years: Number of years to forecast (default: 3)
         viz_plots: Dictionary with visualization plots as base64 strings
         preprocessing_steps: List of preprocessing step dictionaries
+        training_duration: Training duration in seconds (optional)
         
     Returns:
         model_id: ID of the saved model (for file naming)
@@ -145,7 +146,7 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast
                     gdp_min, gdp_max, gdp_mean, status, model_status, forecast_years,
                     acf_plot, pacf_plot, preprocessing_plot, train_test_plot,
                     residual_plot, residual_acf_plot, qq_plot,
-                    preprocessing_steps
+                    preprocessing_steps, training_duration
                 ) VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s,
                     %s, %s, %s, %s,
@@ -154,7 +155,7 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast
                     %s, %s, %s, %s, %s, %s,
                     %s, %s, %s, %s,
                     %s, %s, %s,
-                    %s
+                    %s, %s
                 )
             """
             
@@ -189,7 +190,8 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast
                 viz_plots.get('residual_plot'),
                 viz_plots.get('residual_acf_plot'),
                 viz_plots.get('qq_plot'),
-                preprocessing_steps_json
+                preprocessing_steps_json,
+                training_duration
             )
         else:
             query = """
@@ -199,14 +201,14 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast
                     total_data, year_range,
                     energy_min, energy_max, energy_mean,
                     gdp_min, gdp_max, gdp_mean, status, model_status, forecast_years,
-                    preprocessing_steps
+                    preprocessing_steps, training_duration
                 ) VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s,
                     %s, %s, %s, %s,
                     %s, %s,
                     %s, %s, %s,
                     %s, %s, %s, %s, %s, %s,
-                    %s
+                    %s, %s
                 )
             """
             
@@ -234,7 +236,8 @@ def save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast
                 'success',
                 'candidate',
                 forecast_years,
-                preprocessing_steps_json
+                preprocessing_steps_json,
+                training_duration
             )
         
         cursor.execute(query, values)

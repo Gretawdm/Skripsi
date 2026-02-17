@@ -201,8 +201,6 @@ def login():
             session['role'] = user['role']
             session['full_name'] = user['full_name']
             
-            flash(f'Selamat datang, {user["full_name"] or user["username"]}!', 'success')
-            
             # Redirect based on role
             if user['role'] == 'admin':
                 return redirect('/admin/dashboard')

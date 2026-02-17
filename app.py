@@ -1,7 +1,8 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from routes.admin import admin_bp
 from routes.api import api_bp
 from routes.auth import auth_bp
+from services.data_mysql_service import get_energy_from_db, get_gdp_from_db
 # from services.scheduler_service import initialize_scheduler  # DISABLED: Tidak reliable di lokal
 from services.database_service import init_database
 from services.data_mysql_service import init_data_tables
@@ -30,6 +31,32 @@ def prediksi():
 def metode():
     return render_template("metode.html")
 
+@app.route('/api/dashboard/actual-gdp')
+def api_actual_gdp():
+
+    energy_rows = get_energy_from_db()
+    gdp_rows = get_gdp_from_db()
+
+    actual = [
+        {
+            "year": row["Year"], 
+            "value": float(row["fossil_fuels__twh"])
+        }
+        for row in energy_rows
+    ]
+
+    gdp = [
+        {
+            "year": row["year"], 
+            "value": float(row["gdp"])
+        }
+        for row in gdp_rows
+    ]
+
+    return jsonify({
+        "actual": actual,
+        "gdp": gdp
+    })
 
 
 app.register_blueprint(admin_bp)

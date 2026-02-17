@@ -134,16 +134,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadOfficialPrediction() {
         try {
-            // Load historical data
-            const energyRes = await fetch('/api/data/energy');
-            const energyData = await energyRes.json();
+            // Load ALL historical data (untuk landing page tampilkan semua)
+            const energyRes = await fetch('/api/data/energy?limit=1000');
+            const energyResponse = await energyRes.json();
             
             // Load prediction data (official - moderat) - NEW ENDPOINT
             const predictionRes = await fetch('/api/prediction/latest');
             const predictionInfo = await predictionRes.json();
             
-            console.log('Energy data:', energyData);
+            console.log('Energy response:', energyResponse);
             console.log('Prediction info:', predictionInfo);
+            
+            // Extract data array from response
+            const energyData = energyResponse.success ? energyResponse.data : energyResponse;
             
             if (energyData && energyData.length > 0) {
                 const historical = energyData.map(item => ({
@@ -154,9 +157,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const predictions = predictionInfo.predictions || [];
                 const maxYears = predictionInfo.years || 5;
                 
-                console.log('Historical data points:', historical.length);
-                console.log('Prediction data points:', predictions.length);
-                console.log('Max years from admin:', maxYears);
+                console.log('📊 Data loaded successfully:');
+                console.log(`  - Historical: ${historical.length} data points (${historical[0]?.year}-${historical[historical.length-1]?.year})`);
+                console.log(`  - Predictions: ${predictions.length} data points`);
+                console.log(`  - Forecast years: ${maxYears} years`);
                 
                 // Simpan data official
                 officialPredictionData = { 
@@ -307,14 +311,30 @@ document.addEventListener("DOMContentLoaded", () => {
                         position: 'top'
                     },
                     tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        padding: 12,
                         callbacks: {
+                            title: function(context) {
+                                return 'Tahun ' + context[0].label;
+                            },
                             label: function(context) {
                                 let label = context.dataset.label || '';
                                 if (label) {
                                     label += ': ';
                                 }
                                 if (context.parsed.y !== null) {
-                                    label += context.parsed.y.toFixed(2) + ' TWh';
+                                    const value = context.parsed.y.toFixed(2);
+                                    label += value + ' TWh';
+                                    
+                                    // Add context info
+                                    const year = parseInt(context.label);
+                                    if (year <= 2024) {
+                                        return [label, '📊 Data Aktual'];
+                                    } else {
+                                        return [label, '🎯 Prediksi Model ARIMAX'];
+                                    }
                                 }
                                 return label;
                             }

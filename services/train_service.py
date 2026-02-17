@@ -11,10 +11,80 @@ import base64
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.stats.diagnostic import acorr_ljungbox
+from statsmodels.tsa.stattools import adfuller, kpss  # Uji stasioneritas
 from scipy import stats
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from pmdarima import auto_arima
 from services.database_service import save_training_history
+
+def test_stationarity(data, series_name="Series"):
+    """
+    Uji stasioneritas menggunakan Augmented Dickey-Fuller (ADF) dan KPSS test
+    
+    Returns:
+        dict: Hasil uji stasioneritas dengan interpretasi
+    """
+    results = {
+        'series_name': series_name,
+        'adf': {},
+        'kpss': {},
+        'conclusion': ''
+    }
+    
+    # 1. Augmented Dickey-Fuller Test (H0: Data memiliki unit root / tidak stasioner)
+    try:
+        adf_result = adfuller(data, autolag='AIC')
+        results['adf'] = {
+            'test_statistic': float(adf_result[0]),
+            'p_value': float(adf_result[1]),
+            'critical_values': {k: float(v) for k, v in adf_result[4].items()},
+            'used_lag': int(adf_result[2]),
+            'n_obs': int(adf_result[3]),
+            'is_stationary': adf_result[1] < 0.05  # p-value < 0.05 = reject H0 = stasioner
+        }
+        
+        # Interpretasi ADF
+        if results['adf']['is_stationary']:
+            adf_interpretation = f"✓ Stasioner (p-value={adf_result[1]:.4f} < 0.05)"
+        else:
+            adf_interpretation = f"✗ Tidak Stasioner (p-value={adf_result[1]:.4f} ≥ 0.05)"
+        results['adf']['interpretation'] = adf_interpretation
+        
+    except Exception as e:
+        print(f"Warning: ADF test failed: {e}")
+        results['adf']['error'] = str(e)
+    
+    # 2. KPSS Test (H0: Data stasioner)
+    try:
+        kpss_result = kpss(data, regression='ct', nlags='auto')
+        results['kpss'] = {
+            'test_statistic': float(kpss_result[0]),
+            'p_value': float(kpss_result[1]),
+            'critical_values': {k: float(v) for k, v in kpss_result[3].items()},
+            'used_lag': int(kpss_result[2]),
+            'is_stationary': kpss_result[1] > 0.05  # p-value > 0.05 = fail to reject H0 = stasioner
+        }
+        
+        # Interpretasi KPSS
+        if results['kpss']['is_stationary']:
+            kpss_interpretation = f"✓ Stasioner (p-value={kpss_result[1]:.4f} > 0.05)"
+        else:
+            kpss_interpretation = f"✗ Tidak Stasioner (p-value={kpss_result[1]:.4f} ≤ 0.05)"
+        results['kpss']['interpretation'] = kpss_interpretation
+        
+    except Exception as e:
+        print(f"Warning: KPSS test failed: {e}")
+        results['kpss']['error'] = str(e)
+    
+    # Kesimpulan gabungan
+    if results['adf'].get('is_stationary') and results['kpss'].get('is_stationary'):
+        results['conclusion'] = "STASIONER (ADF & KPSS setuju)"
+    elif not results['adf'].get('is_stationary') and not results['kpss'].get('is_stationary'):
+        results['conclusion'] = "TIDAK STASIONER (ADF & KPSS setuju) - Perlu differencing"
+    else:
+        results['conclusion'] = "HASIL BERBEDA (Perlu analisis lebih lanjut)"
+    
+    return results
 
 def plot_to_base64(fig):
     """Convert matplotlib figure to base64 string"""
@@ -338,9 +408,58 @@ def retrain_model(train_test_split=0.8, order_mode='auto', manual_order=None, fo
                 f"Standar deviasi Energy: {y.std():.2f}",
                 f"Standar deviasi GDP: {exog['gdp'].std():.2f}"
             ],
-            "status": "success"
+            "status": "info"
         }
         preprocessing_steps.append(step3)
+        
+        # STEP 4: Uji Stasioneritas (ADF & KPSS Test)
+        print(f"{'='*60}")
+        print("STEP 4: UJI STASIONERITAS")
+        print(f"{'='*60}")
+        
+        stationarity_test = test_stationarity(y, "Energy Consumption")
+        
+        print(f"\n📊 Augmented Dickey-Fuller (ADF) Test:")
+        print(f"   H0: Data memiliki unit root (tidak stasioner)")
+        print(f"   Test Statistic: {stationarity_test['adf']['test_statistic']:.4f}")
+        print(f"   P-value: {stationarity_test['adf']['p_value']:.4f}")
+        print(f"   Critical Values:")
+        for key, value in stationarity_test['adf']['critical_values'].items():
+            print(f"      {key}: {value:.4f}")
+        print(f"   Hasil: {stationarity_test['adf']['interpretation']}")
+        
+        print(f"\n📊 KPSS Test:")
+        print(f"   H0: Data stasioner")
+        print(f"   Test Statistic: {stationarity_test['kpss']['test_statistic']:.4f}")
+        print(f"   P-value: {stationarity_test['kpss']['p_value']:.4f}")
+        print(f"   Critical Values:")
+        for key, value in stationarity_test['kpss']['critical_values'].items():
+            print(f"      {key}: {value:.4f}")
+        print(f"   Hasil: {stationarity_test['kpss']['interpretation']}")
+        
+        print(f"\n🎯 Kesimpulan: {stationarity_test['conclusion']}")
+        
+        step4 = {
+            "step": 4,
+            "title": "Uji Stasioneritas Data",
+            "description": "Augmented Dickey-Fuller (ADF) dan KPSS Test untuk deteksi unit root",
+            "details": [
+                f"🔍 ADF Test (H0: Terdapat unit root / tidak stasioner):",
+                f"   - Test Statistic: {stationarity_test['adf']['test_statistic']:.4f}",
+                f"   - P-value: {stationarity_test['adf']['p_value']:.4f}",
+                f"   - Hasil: {stationarity_test['adf']['interpretation']}",
+                "",
+                f"🔍 KPSS Test (H0: Data stasioner):",
+                f"   - Test Statistic: {stationarity_test['kpss']['test_statistic']:.4f}",
+                f"   - P-value: {stationarity_test['kpss']['p_value']:.4f}",
+                f"   - Hasil: {stationarity_test['kpss']['interpretation']}",
+                "",
+                f"✅ Kesimpulan: {stationarity_test['conclusion']}"
+            ],
+            "status": "success" if stationarity_test['adf'].get('is_stationary') else "warning"
+        }
+        preprocessing_steps.append(step4)
+        print(f"{'='*60}\n")
         
         # Train-test split untuk evaluasi (gunakan parameter dari user)
         train_size = int(len(df) * train_test_split)
@@ -349,9 +468,9 @@ def retrain_model(train_test_split=0.8, order_mode='auto', manual_order=None, fo
         exog_train = exog.iloc[:train_size]
         exog_test = exog.iloc[train_size:]
         
-        # STEP 4: Split Data
-        step4 = {
-            "step": 4,
+        # STEP 5: Split Data
+        step5 = {
+            "step": 5,
             "title": "Split Data Training & Testing",
             "description": "Pembagian dataset untuk training dan evaluasi model",
             "details": [
@@ -362,15 +481,15 @@ def retrain_model(train_test_split=0.8, order_mode='auto', manual_order=None, fo
             ],
             "status": "success"
         }
-        preprocessing_steps.append(step4)
+        preprocessing_steps.append(step5)
         
         # Generate preprocessing plots
         print("Generating visualization plots...")
         viz_plots = generate_preprocessing_plots(y, y_train, y_test, train_size)
         
-        # STEP 5: Identifikasi Parameter ACF & PACF
-        step5 = {
-            "step": 5,
+        # STEP 6: Identifikasi Parameter ACF & PACF
+        step6 = {
+            "step": 6,
             "title": "Identifikasi Parameter (p,d,q)",
             "description": "Analisis ACF dan PACF untuk menentukan order ARIMAX",
             "details": [
@@ -381,7 +500,7 @@ def retrain_model(train_test_split=0.8, order_mode='auto', manual_order=None, fo
             ],
             "status": "success"
         }
-        preprocessing_steps.append(step5)
+        preprocessing_steps.append(step6)
         
         # Determine ARIMA order based on mode
         if order_mode == 'auto':
@@ -637,7 +756,16 @@ def retrain_model(train_test_split=0.8, order_mode='auto', manual_order=None, fo
         # Save to database as CANDIDATE
         model_id = None
         try:
-            model_id = save_training_history(metrics, year_range, energy_stats, gdp_stats, forecast_years, viz_plots, preprocessing_steps)
+            model_id = save_training_history(
+                metrics, 
+                year_range, 
+                energy_stats, 
+                gdp_stats, 
+                forecast_years, 
+                viz_plots, 
+                preprocessing_steps,
+                training_duration  # Pass training duration to database
+            )
         except Exception as db_error:
             print(f"Warning: Failed to save to database: {db_error}")
             # Continue even if database save fails

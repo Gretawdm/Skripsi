@@ -121,12 +121,14 @@ def upload_data():
 def energy_data():
     """Get preview data energi dari MySQL"""
     try:
-        limit = request.args.get('limit', 100, type=int)
+        limit = request.args.get('limit', 10, type=int)
         data = get_energy_from_db()  # Returns list of dicts
         
         if not data or len(data) == 0:
             return jsonify({
-                "success": False,
+                "success": True,
+                "data": [],
+                "count": 0,
                 "message": "Belum ada data energy. Lakukan fetch/upload terlebih dahulu."
             })
         
@@ -139,10 +141,15 @@ def energy_data():
             data_json.append({
                 "year": int(row.get('Year', 0)),
                 "fossil_fuels__twh": float(row.get('fossil_fuels__twh', 0)),
+                "energy_value": float(row.get('fossil_fuels__twh', 0)),  # Alias untuk frontend
                 "updated_at": row.get('updated_at').isoformat() if row.get('updated_at') else None
             })
         
-        return jsonify(data_json)  # Return array langsung untuk kompatibilitas
+        return jsonify({
+            "success": True,
+            "data": data_json,
+            "count": len(data_json)
+        })
     except Exception as e:
         print(f"Error in energy_data API: {str(e)}")
         import traceback
@@ -157,12 +164,14 @@ def energy_data():
 def gdp_data():
     """Get preview data GDP dari MySQL"""
     try:
-        limit = request.args.get('limit', 100, type=int)
+        limit = request.args.get('limit', 10, type=int)
         data = get_gdp_from_db()  # Returns list of dicts
         
         if not data or len(data) == 0:
             return jsonify({
-                "success": False,
+                "success": True,
+                "data": [],
+                "count": 0,
                 "message": "Belum ada data GDP. Lakukan fetch/upload terlebih dahulu."
             })
         
@@ -181,9 +190,16 @@ def gdp_data():
         return jsonify({
             "success": True,
             "data": data_json,
-            "total": len(data),
-            "showing": len(data_limited)
+            "count": len(data_json)
         })
+    except Exception as e:
+        print(f"Error in gdp_data API: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
     except Exception as e:
         print(f"Error in gdp_data API: {str(e)}")
         import traceback
@@ -635,8 +651,53 @@ def get_latest_prediction():
         cursor.close()
         connection.close()
         
+        # If no record, try to generate prediction automatically
         if not record:
-            return jsonify({'predictions': [], 'years': 0, 'scenario': 'moderat'})
+            print("No prediction record found, generating default prediction...")
+            try:
+                # Get active model's forecast_years
+                active_model = get_active_model()
+                forecast_years = active_model.get('forecast_years', 3) if active_model else 3
+                
+                # Generate prediction
+                forecast_result = predict_energy_service(scenario='moderat', years=forecast_years)
+                
+                # Save to database
+                model_version = f"ARIMAX ({active_model.get('p', 0)},{active_model.get('d', 0)},{active_model.get('q', 0)})" if active_model else 'ARIMAX v1.0'
+                prediction_values = forecast_result['predictions']
+                
+                save_prediction_history(
+                    scenario='moderat',
+                    years=forecast_years,
+                    prediction_data=prediction_values,
+                    model_version=model_version
+                )
+                
+                # Get last year
+                energy_data = get_energy_from_db()
+                if energy_data:
+                    energy_df = pd.DataFrame(energy_data)
+                    last_year = int(energy_df['Year'].max())
+                else:
+                    last_year = 2024
+                
+                # Format predictions
+                formatted_predictions = []
+                for i, value in enumerate(prediction_values):
+                    formatted_predictions.append({
+                        'year': last_year + i + 1,
+                        'prediction_value': float(value)
+                    })
+                
+                return jsonify({
+                    'predictions': formatted_predictions,
+                    'years': forecast_years,
+                    'scenario': 'moderat'
+                })
+                
+            except Exception as gen_error:
+                print(f"Error generating prediction: {gen_error}")
+                return jsonify({'predictions': [], 'years': 0, 'scenario': 'moderat'})
         
         # Get last year from energy data
         energy_data = get_energy_from_db()
@@ -672,10 +733,6 @@ def get_latest_prediction():
             'years': 0,
             'scenario': 'moderat'
         }), 500
-        
-    except Exception as e:
-        print(f"Error getting latest prediction: {e}")
-        return jsonify([]), 500
 
 
 @api_bp.route("/history/summary", methods=["GET"])
@@ -989,19 +1046,9 @@ def dashboard_model_info():
             import traceback
             traceback.print_exc()
         
-        # Calculate training duration if available
+        # Get training duration from database
         duration = "-"
-        try:
-            # Try to get from model metrics file
-            metrics_path = os.path.join('models', 'model_metrics.pkl')
-            if os.path.exists(metrics_path):
-                metrics_data = joblib.load(metrics_path)
-                if 'training_duration' in metrics_data:
-                    duration = f"{float(metrics_data['training_duration']):.2f}s"
-        except Exception as e:
-            print(f"Could not load training duration: {e}")
-        
-        if 'training_duration' in active_model and active_model['training_duration']:
+        if 'training_duration' in active_model and active_model['training_duration'] is not None:
             duration = f"{float(active_model['training_duration']):.2f}s"
         
         response_data = {

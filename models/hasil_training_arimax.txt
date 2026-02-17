@@ -1,0 +1,25 @@
+[1] Data awal:
+   year  energy_value  gdp_value
+0  1965       79.1189      58.15
+1  1966       76.8785      59.77
+2  1967       75.0172      60.60
+3  1968       78.6896      67.21
+4  1969       89.6060      71.79
+
+[2] Cek missing/null:
+year            0
+energy_value    0
+gdp_value       0
+dtype: int64
+
+[3] Data setelah drop NA:
+   year  energy_value  gdp_value
+0  1965       79.1189      58.15
+1  1966       76.8785      59.77
+2  1967       75.0172      60.60
+3  1968       78.6896      67.21
+4  1969       89.6060      71.79
+
+[4] Split: Train=42, Test=18
+[5] ARIMAX order: (5, 2, 2), AIC: 380.53
+[6] MAPE ARIMAX (test set): 5.90%

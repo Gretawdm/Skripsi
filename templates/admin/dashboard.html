@@ -3,7 +3,7 @@
 {% block page_title %}Dashboard - Admin{% endblock %}
 
 {% block content %}
-<div class="section-dashboard container-fluid mt-3">
+<div class="section-dashboard container-fluid mt-3 mb-5">
     <!-- Key Metrics Cards -->
     <div class="row mt-1 g-4 mb-4">
         <div class="col-md-6 col-lg-3">
@@ -82,22 +82,27 @@
     <div class="row mb-4">
         <!-- Prediction Chart -->
         <div class="col-lg-8 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white">
+            <!-- Title Card -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-body py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h5 class="mb-0 fw-bold">
+                            <h5 class="mb-1 fw-bold">
                                 <i class="fas fa-chart-line text-primary me-2"></i>
-                                Prediksi Konsumsi Energi Fosil (2024-2030)
+                                Grafik Prediksi Konsumsi Energi Fosil
                             </h5>
-                            <small class="text-muted">
-                                <i class="fas fa-info-circle"></i>
-                                Skenario: Moderat (GDP Growth +5%/tahun)
-                            </small>
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Menggunakan Moderat ( GDP Growth +5% / tahun )
+                            </span>
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
+            </div>
+
+            <!-- Chart Card -->
+            <div class="card shadow-sm" style="border: 2px solid #0d6efd;">
+                <div class="card-body p-4">
                     <div id="predictionChartContainer" style="height: 450px;">
                         <canvas id="predictionChart"></canvas>
                     </div>
@@ -136,6 +141,13 @@
                         <div class="progress" style="height: 8px;">
                             <div class="progress-bar bg-success" id="mapeBar" style="width: 0%"></div>
                         </div>
+                        <!-- Penjelasan singkat tentang MAPE -->
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <strong>MAPE</strong> (Mean Absolute Percentage Error) menunjukkan rata-rata persentase
+                                kesalahan prediksi. Semakin kecil nilai MAPE, semakin tinggi akurasi model.
+                            </small>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <div class="d-flex justify-content-between mb-1">
@@ -144,6 +156,13 @@
                         </div>
                         <div class="progress" style="height: 8px;">
                             <div class="progress-bar bg-info" id="r2Bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <!-- Grafik kecil: Actual vs Predicted (Test Set) -->
+                    <div class="mt-3">
+                        <small class="text-muted">Perbandingan Data Asli & Prediksi (Test Set):</small>
+                        <div style="height: 120px;">
+                            <canvas id="miniComparisonChart"></canvas>
                         </div>
                     </div>
                     <hr>
@@ -239,6 +258,41 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Grafik Data Asli vs GDP -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-chart-area text-success me-2"></i>
+                        Grafik Data GDP
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div style="height: 350px;">
+                        <canvas id="gdpChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-chart-area text-success me-2"></i>
+                        Grafik Data Energi
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div style="height: 350px;">
+                        <canvas id="energyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Recent Activities & Quick Actions -->
@@ -447,18 +501,192 @@
 
     // Load all dashboard data
     function loadDashboardData() {
-        // Use real API
         loadModelInfo();
         loadPredictionData();
         loadRecentActivities();
         loadSystemStatus();
+        loadActualAndGDPData(); // <-- panggil API untuk grafik Data Asli vs GDP
     }
 
-    // Update last update time
-    function updateLastUpdateTime() {
-        const now = new Date();
-        document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('id-ID');
+    // Fungsi ambil data asli dan GDP dari database
+    function loadActualAndGDPData() {
+        fetch('/api/dashboard/actual-gdp')
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    // Tampilkan error khusus jika endpoint tidak ditemukan
+                    throw new Error('ENDPOINT_NOT_FOUND');
+                }
+            })
+            .then(data => {
+                console.log('DATA API /api/dashboard/actual-gdp:', data);
+
+                // Tampilkan grafik meskipun data.gdp kosong, asalkan array
+                if (
+                    data &&
+                    Array.isArray(data.actual) && data.actual.length > 0 &&
+                    Array.isArray(data.gdp)
+                ) {
+                    createEnergyChart(data.actual);
+                    createGDPChart(data.gdp);
+
+
+                    // Tampilkan tabel GDP mentah di bawah grafik (debug)
+                    const ctx = document.getElementById('actualVsGDPChart');
+                    if (ctx) {
+                        const prev = ctx.parentElement.querySelector('.gdp-raw-table');
+                        if (prev) prev.remove();
+                        ctx.parentElement.insertAdjacentHTML('beforeend', `
+                            <div class="gdp-raw-table mt-3">
+                                <h6 class="text-secondary">Preview Data GDP dari Backend:</h6>
+                                <div style="max-height:180px;overflow:auto;">
+                                    <table class="table table-sm table-bordered bg-white">
+                                        <thead>
+                                            <tr>
+                                                <th>Tahun</th>
+                                                <th>GDP (M USD)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${data.gdp.length > 0 ? data.gdp.map(row => `
+                                                <tr>
+                                                    <td>${row.year}</td>
+                                                    <td>${row.value}</td>
+                                                </tr>
+                                            `).join('') : `<tr><td colspan="2" class="text-muted">Data GDP kosong</td></tr>`}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        `);
+                    }
+                } else {
+                    // Tampilkan pesan jika data tidak lengkap
+                    const ctx = document.getElementById('actualVsGDPChart');
+                    if (ctx) {
+                        ctx.parentElement.innerHTML = `
+                            <div class="text-center text-warning py-2">
+                                <small>
+                                    Data asli atau GDP dari backend tidak tersedia atau format salah.<br>
+                                    <b>Isi data.gdp:</b> <code>${JSON.stringify(data && data.gdp)}</code><br>
+                                    <b>Isi data.actual:</b> <code>${JSON.stringify(data && data.actual)}</code>
+                                </small>
+                            </div>
+                        `;
+                    }
+                }
+            })
+            .catch(error => {
+                const ctx = document.getElementById('actualVsGDPChart');
+                if (ctx) {
+                    // Pesan khusus jika endpoint tidak ditemukan
+                    if (error && error.message === 'ENDPOINT_NOT_FOUND') {
+                        ctx.parentElement.innerHTML = `
+                            <div class="text-center text-danger py-2">
+                                <small>
+                                    <b>Gagal mengambil data asli & GDP dari backend.</b><br>
+                                    <b>Solusi:</b> Endpoint <code>/api/dashboard/actual-gdp</code> <b>belum ada di backend</b>.<br>
+                                    <br>
+                                    <b>Contoh response yang diharapkan:</b><br>
+                                    <code>
+                                    {
+                                        "actual": [ { "year": 2015, "value": 44.2 }, ... ],
+                                        "gdp": [ { "year": 2015, "value": 900 }, ... ]
+                                    }
+                                    </code>
+                                </small>
+                            </div>
+                        `;
+                    } else {
+                        // Error selain endpoint tidak ditemukan
+                        ctx.parentElement.innerHTML = `
+                            <div class="text-center text-danger py-2">
+                                <small>
+                                    Terjadi error saat mengambil data dari backend.<br>
+                                    <code>${error}</code>
+                                </small>
+                            </div>
+                        `;
+                    }
+                }
+            });
     }
+
+    //fungsi grafik data energy
+    function createEnergyChart(actualData) {
+        const ctx = document.getElementById('energyChart');
+        if (!ctx) return;
+
+        if (charts.energyChart) {
+            charts.energyChart.destroy();
+        }
+
+        charts.energyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: actualData.map(d => d.year),
+                datasets: [{
+                    label: 'Konsumsi Energi (TWh)',
+                    data: actualData.map(d => d.value),
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    //fungsi grafik data GDP
+    function createGDPChart(gdpData) {
+        const ctx = document.getElementById('gdpChart');
+        if (!ctx) return;
+
+        if (charts.gdpChart) {
+            charts.gdpChart.destroy();
+        }
+
+        charts.gdpChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: gdpData.map(d => d.year),
+                datasets: [{
+                    label: 'GDP (M USD)',
+                    data: gdpData.map(d => d.value),
+                    borderColor: 'rgb(255, 206, 86)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+
+
+    // Tambahkan dummy data GDP
+    dummyData.gdp = [
+        { year: 2015, value: 900 },
+        { year: 2016, value: 950 },
+        { year: 2017, value: 1000 },
+        { year: 2018, value: 1100 },
+        { year: 2019, value: 1200 },
+        { year: 2020, value: 1150 },
+        { year: 2021, value: 1250 },
+        { year: 2022, value: 1300 },
+        { year: 2023, value: 1400 }
+    ];
 
     // Load model info dengan dummy data
     function loadModelInfoDummy() {
@@ -575,6 +803,7 @@
                     // Load comparison chart
                     if (data.testData) {
                         createComparisonChart(data.testData);
+                        createMiniComparisonChart(data.testData); // Tambahan: grafik mini
                     } else {
                         // Show placeholder for comparison chart
                         const comparisonCanvas = document.getElementById('comparisonChart');
@@ -1152,6 +1381,162 @@
 
         toast.show();
     }
+
+    // Tambahkan fungsi untuk membuat grafik mini comparison (test set)
+    function createMiniComparisonChart(testData) {
+        const ctx = document.getElementById('miniComparisonChart');
+        if (!ctx) return;
+
+        if (charts.miniComparison) {
+            charts.miniComparison.destroy();
+        }
+
+        charts.miniComparison = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: testData.years,
+                datasets: [
+                    {
+                        label: 'Actual',
+                        data: testData.actual,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Predicted',
+                        data: testData.predicted,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderWidth: 2,
+                        borderDash: [4, 2],
+                        pointRadius: 2,
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                }
+            }
+        });
+    }
+
+    // Panggil grafik baru di loadDashboardData
+    function loadDashboardData() {
+        loadModelInfo();
+        loadPredictionData();
+        loadRecentActivities();
+        loadSystemStatus();
+        loadActualAndGDPData(); // <-- panggil API untuk grafik Data Asli vs GDP
+    }
+
+    // Fungsi membuat grafik data asli vs GDP
+    function createActualVsGDPChart(actualData, gdpData) {
+        const ctx = document.getElementById('actualVsGDPChart');
+        if (!ctx) return;
+
+        if (charts.actualVsGDP) {
+            charts.actualVsGDP.destroy();
+        }
+
+        // Map tahun dan nilai
+        const years = actualData.map(d => d.year);
+        const actualValues = actualData.map(d => d.value);
+        // Perbaikan: handle jika gdpData kosong, tetap tampilkan grafik energi
+        const gdpValues = Array.isArray(gdpData) && gdpData.length > 0
+            ? years.map(y => {
+                const found = gdpData.find(g => g.year === y);
+                return found ? found.value : null;
+            })
+            : years.map(() => null);
+
+        charts.actualVsGDP = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    {
+                        label: 'Data Asli (Energi)',
+                        data: actualValues,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        fill: false,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'GDP',
+                        data: gdpValues,
+                        borderColor: 'rgb(255, 206, 86)',
+                        backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        fill: false,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    y: {
+                        title: { display: true, text: 'Energi (TWh)' },
+                        position: 'left'
+                    },
+                    y1: {
+                        title: { display: true, text: 'GDP (M USD)' },
+                        position: 'right',
+                        grid: { drawOnChartArea: false }
+                    },
+                    x: {
+                        title: { display: true, text: 'Tahun' }
+                    }
+                }
+            }
+        });
+
+        // Pesan hanya jika data GDP benar-benar kosong/null
+        if (!Array.isArray(gdpData) || gdpData.length === 0) {
+            ctx.parentElement.insertAdjacentHTML('beforeend', `
+                <div class="text-center text-warning py-2">
+                    <small>Data GDP tidak tersedia dari backend.</small>
+                </div>
+            `);
+        }
+    }
+
+    // Tambahkan dummy data GDP
+    dummyData.gdp = [
+        { year: 2015, value: 900 },
+        { year: 2016, value: 950 },
+        { year: 2017, value: 1000 },
+        { year: 2018, value: 1100 },
+        { year: 2019, value: 1200 },
+        { year: 2020, value: 1150 },
+        { year: 2021, value: 1250 },
+        { year: 2022, value: 1300 },
+        { year: 2023, value: 1400 }
+    ];
+
 </script>
 
 <style>
