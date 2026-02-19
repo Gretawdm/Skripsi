@@ -9,18 +9,11 @@
         <div class="row justify-content-center text-center">
             <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
                 <div class="hero-content">
-                    <h1>Prediksi Konsumsi Energi Fosil Indonesia</h1>
-                    <p class="lead">Menggunakan model ARIMAX untuk memprediksi tren konsumsi energi fosil berdasarkan
-                        faktor ekonomi</p>
-                    <p class="text-light">Analisis berbasis data historis dengan 3 skenario ekonomi: Optimis, Moderat,
-                        dan Pesimis</p>
-                    <div class="hero-buttons mt-4">
-                        <a href="#prediksi" class="btn btn-success btn-lg smooth-scroll">
-                            <i class="fas fa-chart-line me-2"></i>Mulai Prediksi
-                        </a>
-                        <a href="#data-historis" class="btn btn-outline-light btn-lg smooth-scroll">
-                            <i class="fas fa-history me-2"></i>Lihat Data Historis
-                        </a>
+                    <h1>Prediksi, Analisis, dan Aksi untuk Masa Depan Energi Indonesia</h1>
+                    <p>Menggunakan Metode ARIMA dengan Variabel Eksternal Pertumbuhan PDB/Produk Domestik Bruto</p>
+                    <div class="hero-buttons">
+                        <a href="#" class="btn btn-outline-light">Lihat Data Historis</a>
+                        <a href="#" class="btn btn-success">Mulai Prediksi</a>
                     </div>
                 </div>
             </div>
@@ -49,762 +42,824 @@
         </svg>
     </div>
 </section>
+<section class="overview-section">
+    <div class="overview-container">
+        <!-- Left Side: Metode & Alur Sistem -->
+        <div class="overview-left">
+            <!-- Metode Card -->
+            <div class="about-card">
+                <h3>Metode</h3>
+                <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 2rem;">
+                    Metode yang digunakan dalam menganalisis dan memprediksi konsumsi energi
+                    fosil di Indonesia menggunakan metode prediksi Machine Learning ARIMAX.
+                </p>
 
-<!-- Cara Kerja Section -->
-<section id="cara-kerja" class="py-5 bg-light">
-    <div class="container">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title">Cara Menggunakan</h2>
-            <p class="text-muted">3 langkah mudah untuk mendapatkan prediksi konsumsi energi fosil</p>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="card h-100 border-0 shadow-sm text-center p-4">
-                    <div class="card-body">
-                        <div class="step-icon mb-3">
-                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
-                                style="width: 80px; height: 80px;">
-                                <i class="fas fa-sliders-h fa-2x text-primary"></i>
-                            </div>
-                        </div>
-                        <h5 class="card-title">1. Pilih Skenario Ekonomi</h5>
-                        <p class="text-muted">Tentukan asumsi pertumbuhan ekonomi: Optimis, Moderat, atau Pesimis</p>
+                <!-- Tab Icons -->
+                <div class="method-tabs" style="display: flex; gap: 15px; margin-bottom: 2rem;">
+                    <div class="method-tab active">
+                        <i class="fas fa-database" style="font-size: 24px; color: #2e7d32;"></i>
+                        <p style="font-size: 0.75rem; margin-top: 5px;">Data</p>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="card h-100 border-0 shadow-sm text-center p-4">
-                    <div class="card-body">
-                        <div class="step-icon mb-3">
-                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
-                                style="width: 80px; height: 80px;">
-                                <i class="fas fa-calendar-alt fa-2x text-success"></i>
-                            </div>
-                        </div>
-                        <h5 class="card-title">2. Tentukan Periode</h5>
-                        <p class="text-muted">Pilih tahun prediksi yang diinginkan (hingga 10 tahun ke depan)</p>
+                    <div class="method-tab">
+                        <i class="fas fa-sliders-h" style="font-size: 24px; color: #2e7d32;"></i>
+                        <p style="font-size: 0.75rem; margin-top: 5px;">Preprosessan</p>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="card h-100 border-0 shadow-sm text-center p-4">
-                    <div class="card-body">
-                        <div class="step-icon mb-3">
-                            <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
-                                style="width: 80px; height: 80px;">
-                                <i class="fas fa-chart-area fa-2x text-info"></i>
-                            </div>
-                        </div>
-                        <h5 class="card-title">3. Lihat Hasil Prediksi</h5>
-                        <p class="text-muted">Analisis grafik prediksi dengan confidence interval yang detail</p>
+                    <div class="method-tab">
+                        <i class="fas fa-chart-line" style="font-size: 24px; color: #2e7d32;"></i>
+                        <p style="font-size: 0.75rem; margin-top: 5px;">ARIMA</p>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Form Prediksi Section -->
-<section id="prediksi" class="py-5">
-    <div class="container">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title">Buat Prediksi Anda</h2>
-            <p class="text-muted">Masukkan parameter prediksi dan lihat hasilnya secara real-time</p>
-        </div>
-
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <!-- Form Card -->
-                <div class="card shadow-sm border-0 mb-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="card-body p-4">
-                        <form id="predictionForm">
-                            <div class="row g-4">
-                                <!-- Skenario Ekonomi -->
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">
-                                        <i class="fas fa-chart-line text-primary me-2"></i>Skenario Pertumbuhan Ekonomi
-                                        (GDP)
-                                    </label>
-                                    <div class="scenario-cards">
-                                        <div class="form-check scenario-card">
-                                            <input class="form-check-input" type="radio" name="scenario" id="optimis"
-                                                value="optimistic" checked>
-                                            <label class="form-check-label w-100" for="optimis">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-arrow-up text-success fa-2x me-3"></i>
-                                                    <div>
-                                                        <strong>Optimis</strong>
-                                                        <p class="mb-0 small text-muted">Pertumbuhan GDP tinggi (~6-7%)
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </label>
-                                        </div>
-
-                                        <div class="form-check scenario-card mt-2">
-                                            <input class="form-check-input" type="radio" name="scenario" id="moderat"
-                                                value="moderate">
-                                            <label class="form-check-label w-100" for="moderat">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-minus text-warning fa-2x me-3"></i>
-                                                    <div>
-                                                        <strong>Moderat</strong>
-                                                        <p class="mb-0 small text-muted">Pertumbuhan GDP stabil (~4-5%)
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </label>
-                                        </div>
-
-                                        <div class="form-check scenario-card mt-2">
-                                            <input class="form-check-input" type="radio" name="scenario" id="pesimis"
-                                                value="pessimistic">
-                                            <label class="form-check-label w-100" for="pesimis">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-arrow-down text-danger fa-2x me-3"></i>
-                                                    <div>
-                                                        <strong>Pesimis</strong>
-                                                        <p class="mb-0 small text-muted">Pertumbuhan GDP rendah (~2-3%)
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Periode Prediksi -->
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">
-                                        <i class="fas fa-calendar-alt text-success me-2"></i>Periode Prediksi
-                                    </label>
-
-                                    <div class="mb-3">
-                                        <label for="startYear" class="form-label small">Tahun Mulai</label>
-                                        <select class="form-select" id="startYear" required>
-                                            <option value="2024">2024</option>
-                                            <option value="2025">2025</option>
-                                            <option value="2026" selected>2026</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="forecastYears" class="form-label small">Proyeksi (Tahun ke
-                                            Depan)</label>
-                                        <select class="form-select" id="forecastYears" required>
-                                            <option value="3">3 Tahun</option>
-                                            <option value="5" selected>5 Tahun</option>
-                                            <option value="7">7 Tahun</option>
-                                            <option value="10">10 Tahun</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="alert alert-info mb-0">
-                                        <i class="fas fa-info-circle me-2"></i>
-                                        <small>Data training: 1990-2023 (34 tahun)</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg px-5">
-                                    <i class="fas fa-magic me-2"></i>Generate Prediksi
-                                </button>
-                            </div>
-                        </form>
+                    <div class="method-tab">
+                        <i class="fas fa-chart-bar" style="font-size: 24px; color: #2e7d32;"></i>
+                        <p style="font-size: 0.75rem; margin-top: 5px;">ARIMAX</p>
                     </div>
                 </div>
 
-                <!-- Hasil Prediksi -->
-                <div id="resultSection" class="card shadow-sm border-0" style="display: none;" data-aos="fade-up">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-chart-line me-2"></i>Hasil Prediksi Konsumsi Energi Fosil
-                        </h5>
+                <!-- Data yang Digunakan -->
+                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Data yang Digunakan</h4>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1.5rem;">
+                    Data yang digunakan meliputi tahap-tahap diolah/transformasi dari tiga menggunakan teknik pemodelan.
+                </p>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 2rem;">
+                    <div class="data-box">
+                        <i class="fas fa-file-alt" style="color: #2e7d32; font-size: 20px; margin-bottom: 8px;"></i>
+                        <h5 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Jenis Data</h5>
+                        <p style="font-size: 0.75rem; color: #6b7280;">Konsumsi energi fosil (exajoule) minyak,
+                            batubara, dan gas</p>
                     </div>
-                    <div class="card-body p-4">
-                        <!-- Summary Cards -->
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-4">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body text-center">
-                                        <i class="fas fa-calendar-check text-primary fa-2x mb-2"></i>
-                                        <p class="mb-1 small text-muted">Tahun Terakhir</p>
-                                        <h4 id="lastYear" class="mb-0">-</h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body text-center">
-                                        <i class="fas fa-bolt text-warning fa-2x mb-2"></i>
-                                        <p class="mb-1 small text-muted">Prediksi Konsumsi</p>
-                                        <h4 id="lastValue" class="mb-0">-</h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body text-center">
-                                        <i class="fas fa-chart-line text-success fa-2x mb-2"></i>
-                                        <p class="mb-1 small text-muted">Tren Rata-rata</p>
-                                        <h4 id="avgTrend" class="mb-0">-</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Chart -->
-                        <div style="height: 400px;">
-                            <canvas id="predictionChart"></canvas>
-                        </div>
-
-                        <!-- Tabel Detail -->
-                        <div class="mt-4">
-                            <h6 class="mb-3">Detail Prediksi per Tahun</h6>
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Tahun</th>
-                                            <th>Prediksi (%)</th>
-                                            <th>Batas Bawah (95% CI)</th>
-                                            <th>Batas Atas (95% CI)</th>
-                                            <th>Perubahan</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="predictionTableBody">
-                                        <!-- Filled by JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Data Historis Section -->
-<section id="data-historis" class="py-5 bg-light">
-    <div class="container">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title">Data Historis</h2>
-            <p class="text-muted">Tren konsumsi energi fosil Indonesia periode 1990-2023</p>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-12" data-aos="fade-up" data-aos-delay="100">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <div style="height: 400px;">
-                            <canvas id="historicalChart"></canvas>
-                        </div>
-
-                        <div class="row mt-4 g-3">
-                            <div class="col-md-3">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <p class="mb-1 small text-muted">Periode Data</p>
-                                    <h5 class="mb-0">1990 - 2023</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <p class="mb-1 small text-muted">Total Data Point</p>
-                                    <h5 class="mb-0">34 Tahun</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <p class="mb-1 small text-muted">Konsumsi 2023</p>
-                                    <h5 class="mb-0">51.2%</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center p-3 bg-light rounded">
-                                    <p class="mb-1 small text-muted">Tren Historis</p>
-                                    <h5 class="mb-0 text-danger">
-                                        <i class="fas fa-arrow-up"></i> +0.8%/tahun
-                                    </h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Metode Section -->
-<section id="metode" class="py-5">
-    <div class="container">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title">Tentang Metode ARIMAX</h2>
-            <p class="text-muted">Memahami model prediksi yang kami gunakan</p>
-        </div>
-
-        <div class="row g-4 align-items-center">
-            <div class="col-lg-6" data-aos="fade-right">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body p-4">
-                        <h4 class="mb-4">Apa itu ARIMAX?</h4>
-                        <p><strong>ARIMAX</strong> (AutoRegressive Integrated Moving Average with eXogenous variables)
-                            adalah metode statistik untuk prediksi time series yang mempertimbangkan faktor eksternal.
+                    <div class="data-box">
+                        <i class="fas fa-calendar-alt" style="color: #2e7d32; font-size: 20px; margin-bottom: 8px;"></i>
+                        <h5 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Periode Data</h5>
+                        <p style="font-size: 0.75rem; color: #6b7280;">Rentang tahun yang mencakup data dari 1990-2023
                         </p>
+                    </div>
+                    <div class="data-box">
+                        <i class="fas fa-chart-pie" style="color: #2e7d32; font-size: 20px; margin-bottom: 8px;"></i>
+                        <h5 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">Sumber Data</h5>
+                        <p style="font-size: 0.75rem; color: #6b7280;">Diambil dari One World in Data
+                            (ourworldindata.org)</p>
+                    </div>
+                </div>
 
-                        <div class="mt-4">
-                            <div class="d-flex mb-3">
-                                <div class="flex-shrink-0">
-                                    <i class="fas fa-check-circle text-success fa-lg me-3"></i>
-                                </div>
+                <!-- Pra-pemrosesan Data -->
+                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Pra-pemrosesan Data</h4>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1.5rem;">
+                    Data yang digunakan meliputi tujuh-tahapan proses preprocessing (praprocessing) berdasarkan
+                    transformasi-skala yang diolah menggunakan teknik transformasi, interpolasi dan standarisasi.
+                </p>
+
+                <!-- Preprocessing Steps with Illustration -->
+                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 2rem;">
+                    <div style="flex: 1;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                            <div class="prep-step">
+                                <i class="fas fa-broom" style="color: #2e7d32; margin-right: 8px;"></i>
                                 <div>
-                                    <strong>AR (AutoRegressive)</strong>
-                                    <p class="text-muted mb-0">Menggunakan nilai masa lalu untuk prediksi</p>
+                                    <h6 style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Pembersihan
+                                        data</h6>
+                                    <p style="font-size: 0.7rem; color: #6b7280;">Penanganan nilai hilang/duplikat</p>
                                 </div>
                             </div>
-
-                            <div class="d-flex mb-3">
-                                <div class="flex-shrink-0">
-                                    <i class="fas fa-check-circle text-success fa-lg me-3"></i>
-                                </div>
+                            <div class="prep-step">
+                                <i class="fas fa-sync-alt" style="color: #2e7d32; margin-right: 8px;"></i>
                                 <div>
-                                    <strong>I (Integrated)</strong>
-                                    <p class="text-muted mb-0">Diferensiasi data untuk stasioneritas</p>
+                                    <h6 style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Transformasi
+                                        dan normalisasi data</h6>
+                                    <p style="font-size: 0.7rem; color: #6b7280;">Deteksi stasioneritas</p>
                                 </div>
                             </div>
-
-                            <div class="d-flex mb-3">
-                                <div class="flex-shrink-0">
-                                    <i class="fas fa-check-circle text-success fa-lg me-3"></i>
-                                </div>
+                            <div class="prep-step">
+                                <i class="fas fa-search" style="color: #2e7d32; margin-right: 8px;"></i>
                                 <div>
-                                    <strong>MA (Moving Average)</strong>
-                                    <p class="text-muted mb-0">Menggunakan error masa lalu</p>
+                                    <h6 style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Uji
+                                        Stasionaritas</h6>
+                                    <p style="font-size: 0.7rem; color: #6b7280;">Uji Augmented Dickey Fuller untuk
+                                        stasionaritas</p>
                                 </div>
                             </div>
-
-                            <div class="d-flex">
-                                <div class="flex-shrink-0">
-                                    <i class="fas fa-check-circle text-success fa-lg me-3"></i>
-                                </div>
+                            <div class="prep-step">
+                                <i class="fas fa-chart-area" style="color: #2e7d32; margin-right: 8px;"></i>
                                 <div>
-                                    <strong>X (eXogenous)</strong>
-                                    <p class="text-muted mb-0">Memasukkan variabel eksternal (GDP)</p>
+                                    <h6 style="font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">Analisis ACF
+                                        dan PACF</h6>
+                                    <p style="font-size: 0.7rem; color: #6b7280;">Menentukan orde ARIMA</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div style="flex: 0.8;">
+                        <img src="https://via.placeholder.com/250x180/e8f5ee/2e7d32?text=Data+Processing"
+                            alt="Data Processing" style="width: 100%; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <!-- Metode ARIMA -->
+                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Metode ARIMA</h4>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;">
+                    ARIMA adalah model yang menggabungkan beberapa variabel stationaritas otomatis
+                    yang mengintegrasikan dan mensimulasikan skala properti peramalan time series.
+                </p>
+
+                <div
+                    style="display: flex; gap: 15px; margin-bottom: 2rem; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                    <div class="arima-param" style="text-align: center; flex: 1;">
+                        <div
+                            style="background: #2e7d32; color: white; width: 50px; height: 50px; border-radius: 50%;
+                                    display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 700; font-size: 1.2rem;">
+                            p
+                        </div>
+                        <h6 style="font-size: 0.8rem; font-weight: 600;">orde autoregressive</h6>
+                    </div>
+                    <div class="arima-param" style="text-align: center; flex: 1;">
+                        <div
+                            style="background: #1e88e5; color: white; width: 50px; height: 50px; border-radius: 50%;
+                                    display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 700; font-size: 1.2rem;">
+                            d
+                        </div>
+                        <h6 style="font-size: 0.8rem; font-weight: 600;">tingkat Differencing</h6>
+                    </div>
+                    <div class="arima-param" style="text-align: center; flex: 1;">
+                        <div
+                            style="background: #f57c00; color: white; width: 50px; height: 50px; border-radius: 50%;
+                                    display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 700; font-size: 1.2rem;">
+                            q
+                        </div>
+                        <h6 style="font-size: 0.8rem; font-weight: 600;">orde moving average</h6>
+                    </div>
+                </div>
+
+                <!-- Metode ARIMAX -->
+                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Metode ARIMAX</h4>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1.5rem;">
+                    ARIMAX atau digunakan juga merupakan memiliki metode external yang
+                    berpengaruh terhadap konsumsi energi.
+                </p>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                    <div
+                        style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                        <span style="font-weight: 700; color: #1e88e5;">Eksternal Sektoral Ekonomi</span>
+                        <i class="fas fa-arrow-right" style="color: #6b7280;"></i>
+                        <div
+                            style="background: white; padding: 10px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <strong style="color: #2e7d32; font-size: 1.1rem;">PDB</strong>
+                        </div>
+                    </div>
+                    <img src="https://via.placeholder.com/400x150/ffffff/2e7d32?text=ARIMAX+Chart" alt="ARIMAX"
+                        style="width: 100%; max-width: 400px; margin: 0 auto; border-radius: 8px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Alur Sistem & Evaluasi -->
+        <div class="overview-right">
+            <!-- Alur Sistem -->
+            <div class="about-card" style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 1.5rem;">Alur Sistem</h3>
+
+                <div class="workflow-clean">
+                    <div class="workflow-item">
+                        <div class="step-number-card">01</div>
+                        <div class="step-content-card">
+                            <h4>Pilih Data & Periode</h4>
+                            <p>Menggunakan dataset dari series dataset konsumsi, minyak, dan gas</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-item">
+                        <div class="step-number-card">02</div>
+                        <div class="step-content-card">
+                            <h4>Pra-pemrosesan Data</h4>
+                            <p>Melakukan transformasi Data lini pembersihan serta data normalisasi dilakukan untuk
+                                pelatihan model ARIMAX</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-item">
+                        <div class="step-number-card">03</div>
+                        <div class="step-content-card">
+                            <h4>Pemodelan ARIMA / ARIMAX</h4>
+                            <p>Atur tahun prediksi dari hasil sistem model ARIMAX dengan skenario biasa/best dan worst
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-item">
+                        <div class="step-number-card">04</div>
+                        <div class="step-content-card">
+                            <h4>Prediksi Konsumsi Energi</h4>
+                            <p>Menggunakan runtutan skala peramalan-skala hasil kinerja ekonomi best case</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-item">
+                        <div class="step-number-card">05</div>
+                        <div class="step-content-card">
+                            <h4>Visualisasi Hasil</h4>
+                            <p>Menampilkan hasil atau yang menyajikan indikator menjarah sentuhan penerimaan energi
+                                untuk perusahaan</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-6" data-aos="fade-left">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body p-4">
-                        <h4 class="mb-4">Performa Model</h4>
+            <!-- Evaluasi Model -->
+            <div class="about-card">
+                <h3 style="margin-bottom: 1rem;">Evaluasi Model</h3>
 
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>MAPE (Mean Absolute Percentage Error)</span>
-                                <strong class="text-success">3.45%</strong>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-success" style="width: 96.55%"></div>
-                            </div>
-                            <small class="text-muted">Semakin rendah semakin baik (Excellent < 10%)</small>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>R² (Coefficient of Determination)</span>
-                                <strong class="text-primary">0.9512</strong>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-primary" style="width: 95.12%"></div>
-                            </div>
-                            <small class="text-muted">Model menjelaskan 95.12% variasi data</small>
-                        </div>
-
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Variabel Eksternal:</strong> Pertumbuhan PDB (Produk Domestik Bruto) Indonesia
-                        </div>
-
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <strong>Catatan:</strong> Hasil prediksi adalah estimasi berdasarkan model statistik dan
-                            asumsi skenario ekonomi yang dipilih.
-                        </div>
+                <div
+                    style="display: flex; justify-content: space-around; margin-bottom: 2rem; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="text-align: center;">
+                        <h2 style="color: #2e7d32; font-size: 1.8rem; font-weight: 700; margin-bottom: 5px;">4.23%</h2>
+                        <p style="font-size: 0.8rem; color: #6b7280;">MAPE</p>
                     </div>
+                    <div style="text-align: center;">
+                        <h2 style="color: #2e7d32; font-size: 1.8rem; font-weight: 700; margin-bottom: 5px;">0.85</h2>
+                        <p style="font-size: 0.8rem; color: #6b7280;">R²</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <h2 style="color: #2e7d32; font-size: 1.8rem; font-weight: 700; margin-bottom: 5px;">1.12</h2>
+                        <p style="font-size: 0.8rem; color: #6b7280;">RMSE</p>
+                    </div>
+                </div>
+
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem;">Output Sistem</h4>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;">
+                    Tampilkan total produk yang disejajarkan sistem peringatan yang mampu
+                    merangsang parameter ARIMAX yang Anda bayarkan.
+                </p>
+
+                <!-- Output Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered" style="font-size: 0.8rem;">
+                        <thead style="background: #f8f9fa;">
+                            <tr>
+                                <th>Tahun</th>
+                                <th>Aktual</th>
+                                <th>Prediksi</th>
+                                <th>Residu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2019</td>
+                                <td>135.4</td>
+                                <td>134.2</td>
+                                <td>1.2</td>
+                            </tr>
+                            <tr>
+                                <td>2020</td>
+                                <td>124.6</td>
+                                <td>125.8</td>
+                                <td>-1.2</td>
+                            </tr>
+                            <tr>
+                                <td>2021</td>
+                                <td>128.5</td>
+                                <td>127.9</td>
+                                <td>0.6</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Smooth scrolling for navbar links
-        document.querySelectorAll('.smooth-scroll').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetSection = document.querySelector(targetId);
-                if (targetSection) {
-                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
-        // Load historical chart
-        loadHistoricalChart();
-
-        // Form submission
-        document.getElementById('predictionForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            generatePrediction();
-        });
-    });
-
-    // Data historis dummy (1990-2023)
-    const historicalData = [
-        { year: 1990, value: 44.2 }, { year: 1991, value: 44.5 }, { year: 1992, value: 44.8 },
-        { year: 1993, value: 45.1 }, { year: 1994, value: 45.6 }, { year: 1995, value: 46.0 },
-        { year: 1996, value: 46.3 }, { year: 1997, value: 46.8 }, { year: 1998, value: 45.9 },
-        { year: 1999, value: 46.2 }, { year: 2000, value: 46.7 }, { year: 2001, value: 47.1 },
-        { year: 2002, value: 47.5 }, { year: 2003, value: 47.8 }, { year: 2004, value: 48.2 },
-        { year: 2005, value: 48.5 }, { year: 2006, value: 48.9 }, { year: 2007, value: 49.2 },
-        { year: 2008, value: 49.6 }, { year: 2009, value: 48.8 }, { year: 2010, value: 49.3 },
-        { year: 2011, value: 49.7 }, { year: 2012, value: 50.0 }, { year: 2013, value: 50.3 },
-        { year: 2014, value: 50.5 }, { year: 2015, value: 50.7 }, { year: 2016, value: 50.9 },
-        { year: 2017, value: 51.1 }, { year: 2018, value: 51.3 }, { year: 2019, value: 51.5 },
-        { year: 2020, value: 50.8 }, { year: 2021, value: 51.0 }, { year: 2022, value: 51.4 },
-        { year: 2023, value: 51.2 }
-    ];
-
-    // Load historical chart
-    function loadHistoricalChart() {
-        const ctx = document.getElementById('historicalChart').getContext('2d');
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: historicalData.map(d => d.year),
-                datasets: [{
-                    label: 'Konsumsi Energi Fosil (%)',
-                    data: historicalData.map(d => d.value),
-                    borderColor: 'rgb(54, 162, 235)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true,
-                    pointRadius: 2,
-                    pointHoverRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return 'Konsumsi: ' + context.parsed.y.toFixed(2) + '%';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        title: {
-                            display: true,
-                            text: 'Konsumsi Energi Fosil (%)'
-                        },
-                        ticks: {
-                            callback: function (value) {
-                                return value.toFixed(1) + '%';
-                            }
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Tahun'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Generate prediction
-    let predictionChartInstance = null;
-
-    function generatePrediction() {
-        const scenario = document.querySelector('input[name="scenario"]:checked').value;
-        const startYear = parseInt(document.getElementById('startYear').value);
-        const forecastYears = parseInt(document.getElementById('forecastYears').value);
-
-        // Show loading
-        const btn = document.querySelector('#predictionForm button[type="submit"]');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
-        btn.disabled = true;
-
-        // Simulate API call
-        setTimeout(() => {
-            const predictions = generateDummyPrediction(scenario, startYear, forecastYears);
-            displayPrediction(predictions, startYear);
-
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-
-            // Scroll to result
-            document.getElementById('resultSection').style.display = 'block';
-            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 1500);
-    }
-
-    // Generate dummy prediction based on scenario
-    function generateDummyPrediction(scenario, startYear, years) {
-        const predictions = [];
-        let baseValue = 51.2; // Last historical value (2023)
-
-        // Growth rate based on scenario
-        const growthRates = {
-            'optimistic': 0.015,   // 1.5% annual increase
-            'moderate': 0.010,     // 1.0% annual increase
-            'pessimistic': 0.005   // 0.5% annual increase
-        };
-
-        const growthRate = growthRates[scenario];
-
-        for (let i = 1; i <= years; i++) {
-            const year = startYear + i - 1;
-            const value = baseValue + (baseValue * growthRate * i);
-            const margin = value * 0.05; // 5% confidence interval
-
-            predictions.push({
-                year: year,
-                value: value,
-                lower: value - margin,
-                upper: value + margin
-            });
-        }
-
-        return predictions;
-    }
-
-    // Display prediction
-    function displayPrediction(predictions, startYear) {
-        // Update summary cards
-        const lastPred = predictions[predictions.length - 1];
-        const firstPred = predictions[0];
-        const avgTrend = ((lastPred.value - firstPred.value) / predictions.length).toFixed(2);
-
-        document.getElementById('lastYear').textContent = lastPred.year;
-        document.getElementById('lastValue').textContent = lastPred.value.toFixed(2) + '%';
-        document.getElementById('avgTrend').innerHTML = `
-        <i class="fas fa-arrow-up text-danger"></i> ${avgTrend}%/tahun
-    `;
-
-        // Create chart
-        createPredictionChart(predictions, startYear);
-
-        // Populate table
-        populatePredictionTable(predictions);
-    }
-
-    // Create prediction chart
-    function createPredictionChart(predictions, startYear) {
-        const ctx = document.getElementById('predictionChart').getContext('2d');
-
-        // Destroy existing chart
-        if (predictionChartInstance) {
-            predictionChartInstance.destroy();
-        }
-
-        // Get last 5 years of historical data for context
-        const historicalContext = historicalData.slice(-5);
-        const allYears = [...historicalContext.map(d => d.year), ...predictions.map(d => d.year)];
-        const historicalValues = [...historicalContext.map(d => d.value), ...Array(predictions.length).fill(null)];
-        const predictionValues = [...Array(historicalContext.length).fill(null), ...predictions.map(d => d.value)];
-        const upperBound = [...Array(historicalContext.length).fill(null), ...predictions.map(d => d.upper)];
-        const lowerBound = [...Array(historicalContext.length).fill(null), ...predictions.map(d => d.lower)];
-
-        predictionChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: allYears,
-                datasets: [
-                    {
-                        label: 'Data Historis',
-                        data: historicalValues,
-                        borderColor: 'rgb(54, 162, 235)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: false
-                    },
-                    {
-                        label: 'Prediksi',
-                        data: predictionValues,
-                        borderColor: 'rgb(255, 99, 132)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        tension: 0.4,
-                        fill: false
-                    },
-                    {
-                        label: 'Upper Bound (95% CI)',
-                        data: upperBound,
-                        borderColor: 'rgba(201, 203, 207, 0.5)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                        borderWidth: 1,
-                        borderDash: [2, 2],
-                        tension: 0.4,
-                        fill: '+1',
-                        pointRadius: 0
-                    },
-                    {
-                        label: 'Lower Bound (95% CI)',
-                        data: lowerBound,
-                        borderColor: 'rgba(201, 203, 207, 0.5)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                        borderWidth: 1,
-                        borderDash: [2, 2],
-                        tension: 0.4,
-                        fill: false,
-                        pointRadius: 0
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            filter: function (item) {
-                                return !item.text.includes('Bound');
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                if (context.dataset.label.includes('Bound')) return null;
-                                return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + '%';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        title: {
-                            display: true,
-                            text: 'Konsumsi Energi Fosil (%)'
-                        },
-                        ticks: {
-                            callback: function (value) {
-                                return value.toFixed(1) + '%';
-                            }
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Tahun'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Populate prediction table
-    function populatePredictionTable(predictions) {
-        const tbody = document.getElementById('predictionTableBody');
-        tbody.innerHTML = '';
-
-        predictions.forEach((pred, index) => {
-            const change = index > 0 ?
-                ((pred.value - predictions[index - 1].value) / predictions[index - 1].value * 100).toFixed(2) :
-                '0.00';
-
-            const changeClass = parseFloat(change) > 0 ? 'text-danger' : 'text-success';
-            const changeIcon = parseFloat(change) > 0 ? 'fa-arrow-up' : 'fa-arrow-down';
-
-            const statusClass = pred.value > 55 ? 'danger' : pred.value > 50 ? 'warning' : 'success';
-            const statusText = pred.value > 55 ? 'Tinggi' : pred.value > 50 ? 'Sedang' : 'Normal';
-
-            const row = `
-            <tr>
-                <td><strong>${pred.year}</strong></td>
-                <td><strong>${pred.value.toFixed(2)}%</strong></td>
-                <td>${pred.lower.toFixed(2)}%</td>
-                <td>${pred.upper.toFixed(2)}%</td>
-                <td class="${changeClass}">
-                    <i class="fas ${changeIcon}"></i> ${Math.abs(change)}%
-                </td>
-                <td><span class="badge bg-${statusClass}">${statusText}</span></td>
-            </tr>
-        `;
-            tbody.innerHTML += row;
-        });
-    }
-</script>
 
 <style>
-    .section-title {
-        font-weight: 700;
-        color: #0f3f54;
-        margin-bottom: 1rem;
+    .overview-left,
+    .overview-right {
+        flex: 1;
     }
 
-    .scenario-card {
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 12px;
-        cursor: pointer;
+    .step-number-card {
+        background: #e8f5ee;
+        color: #2e7d32;
+        font-weight: 700;
+        font-size: 1.3rem;
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .step-divider {
+        display: none;
+        /* desktop ga perlu */
+    }
+
+    .step-content-card {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        flex: 1;
+    }
+
+    .overview-section {
+        padding: 80px 20px;
+        background: red;
+        margin-top: -80px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .overview-left .about-card {
+        transform: translateY(-80px);
+        position: relative;
+        z-index: 3;
+        background-color: #1e88e5;
+        overflow: hidden;
+    }
+
+    .overview-container {
+        max-width: 1200px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: 2fr 1.5fr;
+        gap: 20px;
+        align-items: start;
+    }
+
+    .workflow-clean {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    .workflow-desc {
+        color: #6b7280;
+        margin-bottom: 2rem;
+    }
+
+    .workflow-item {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 1.8rem;
+        position: relative;
+    }
+
+    .workflow-item:not(:last-child) .step-number-card::after {
+        content: "";
+        position: absolute;
+        top: 60px;
+        left: 30px;
+        width: 2px;
+        height: calc(100% + 10px);
+        background-image: linear-gradient(to bottom, #2e7d32 50%, transparent 50%);
+        background-size: 2px 8px;
+        background-repeat: repeat-y;
+    }
+
+    .workflow-step {
+        font-weight: 700;
+        color: #2e7d32;
+        min-width: 32px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .workflow-item h4 {
+        font-size: 1rem;
+        margin-bottom: 6px;
+        color: #1f2d3d;
+    }
+
+    .workflow-item p {
+        font-size: 0.9rem;
+        color: #4b5563;
+        line-height: 1.6;
+    }
+
+
+    @media (max-width: 768px) {
+        .overview-left .about-card {
+            transform: translateY(0);
+        }
+
+        .overview-section {
+            margin-top: 0;
+        }
+
+        .overview-left {
+            order: 2;
+        }
+
+        .overview-right {
+            order: 1;
+        }
+    }
+
+    .about-card {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 0px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    .about-card h3,
+    .section-header h3 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .about-card p {
+        line-height: 1.7;
+        color: #374151;
+    }
+
+    .chart-title {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .why-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .why-image img {
+        width: 100%;
+        max-width: 250px;
+        margin: auto;
+        justify-content: center;
+        align-items: center;
+        display: block;
+        opacity: 0.85;
+    }
+
+    .workflow-step {
+        position: relative;
+    }
+
+    .workflow-step::before {
+        content: "";
+        position: absolute;
+        left: 30px;
+        top: 70px;
+        width: 2px;
+        height: calc(100% - 70px);
+        background: #e5e7eb;
+    }
+
+    .why-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .why-icon {
+        border-radius: 20px;
+        color: #53B863;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #E8F5EE;
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+
+    .why-card {
+        display: flex;
+        gap: 14px;
+        background: #ffffff;
+        padding: 16px;
+        border-radius: 14px;
+        border: 1px solid #eef2f6;
+        box-shadow: none;
+        margin-bottom: 16px;
+    }
+
+    .why-card h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .why-card p {
+        font-size: 0.85rem !important;
+        color: #4b5563;
+        line-height: 1.5;
+    }
+
+    .why-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    .chart-wrapper {
+        position: relative;
+        width: 100%;
+        height: 350px;
+        overflow: hidden;
+    }
+
+    .chart-wrapper canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .features-section {
+        padding: 80px 20px;
+        background: #ffffff;
+    }
+
+    .features-section .container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .features-title {
+        text-align: center;
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: #1f2d3d;
+        margin-bottom: 50px;
+    }
+
+    /* Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
+    }
+
+    /* Item */
+    .feature-item {
+        text-align: center;
+    }
+
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        background: #f3f6fb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px auto;
         transition: all 0.3s ease;
     }
 
-    .scenario-card:hover {
-        border-color: #0d6efd;
-        background-color: #f8f9fa;
+    .feature-icon i {
+        font-size: 28px;
+        color: #2e7d32;
     }
 
-    .scenario-card input[type="radio"]:checked+label {
-        border-color: #0d6efd;
-        background-color: #e7f1ff;
+    .feature-item h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #1f2d3d;
     }
 
-    .scenario-card label {
-        cursor: pointer;
-        margin-bottom: 0;
-        padding: 8px;
+    .feature-item p {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    /* Hover */
+    .feature-item:hover .feature-icon {
+        background: #2e7d32;
+        transform: translateY(-5px);
+    }
+
+    .feature-item:hover .feature-icon i {
+        color: #ffffff;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .workflow-step {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .step-number-card {
+            margin-bottom: 6px;
+        }
+
+        .step-divider {
+            display: block;
+            width: 2px;
+            height: 30px;
+            background: #cbd5e1;
+            margin: 8px 0;
+        }
+
+        .step-content-card {
+            width: 100%;
+            text-align: left;
+        }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 992px) {
+        .overview-container {
+            grid-template-columns: 1fr;
+        }
+
+        .chart-wrapper {
+            height: 280px;
+        }
+    }
+
+
+    /* Header */
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: #0f3f54;
+        margin-bottom: 10px;
+    }
+
+    .section-header p {
+        font-size: 0.85rem;
+        color: #555;
+        max-width: 650px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .workflow-steps {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+
+    .workflow-step {
+        background: #ffffff;
+        border-radius: 14px;
+        font-size: 14px !important;
+        width: 150px;
+        min-height: auto;
+        padding: 24px 18px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+    }
+
+    .workflow-step p {
+        font-size: 0.5rem;
+    }
+
+    .workflow-step:hover {
+        transform: translateY(-6px);
+    }
+
+    .step-icon {
+        width: 45px;
+        height: 45px;
+        background: #e8f5ee;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px auto;
+    }
+
+    .step-icon i {
+        font-size: 20px;
+        color: #2e7d32;
+    }
+
+    /* Text */
+    .workflow-step h4 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1f2d3d;
+        margin-bottom: 8px;
+    }
+
+    .workflow-step p {
+        font-size: 0.75rem;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+
+    /* Line Between Steps */
+    .step-line {
+        width: 30px;
+        height: 2px;
+        background: #cbd5e1;
+        margin: 0 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .workflow-steps {
+            flex-direction: column;
+        }
+
+        .step-line {
+            width: 2px;
+            height: 40px;
+            margin: 15px 0;
+        }
+
+        .workflow-step {
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .about-card {
+            margin-bottom: 1.5rem;
+        }
+
+        .overview-left .about-card {
+            transform: none !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .why-grid {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .why-card {
+            align-items: center;
+            text-align: left;
+        }
     }
 </style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('energyChart');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['1970', '1980', '1990', '2000', '2010', '2020'],
+            datasets: [
+                {
+                    label: 'Data Historis',
+                    data: [50, 120, 260, 520, 780, 850],
+                    borderColor: '#1e88e5',
+                    backgroundColor: 'rgba(30,136,229,0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Prediksi ARIMAX',
+                    data: [null, null, null, null, 780, 920],
+                    borderColor: '#8bc34a',
+                    borderDash: [6, 6],
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Konsumsi Energi (Joule)'
+                    }
+                }
+            }
+        }
+    });
+</script>
 
 {% endblock %}

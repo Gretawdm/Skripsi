@@ -80,11 +80,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (targetPrediction) {
                         document.getElementById('sim-value').textContent = targetPrediction.value.toFixed(2);
                         
-                        // Hitung perubahan dari 2023
-                        const base2023 = 2722.95; // TWh
-                        const change = ((targetPrediction.value - base2023) / base2023 * 100).toFixed(1);
-                        document.getElementById('sim-change').textContent = (change > 0 ? '+' : '') + change + '%';
-                        
+                        // Hitung perubahan dari tahun data terakhir
+                      // Ambil tahun & nilai terakhir dari historical official
+const historical = officialPredictionData.historical;
+const lastHistorical = historical[historical.length - 1];
+
+const baseYear = lastHistorical.year;
+const baseValue = lastHistorical.value;
+
+const change = ((targetPrediction.value - baseValue) / baseValue * 100).toFixed(1);
+     
                         // Update info
                         const scenarioNames = {
                             'optimistic': 'optimis (pertumbuhan PDB tinggi)',
@@ -92,10 +97,11 @@ document.addEventListener("DOMContentLoaded", () => {
                             'pessimistic': 'pesimis (pertumbuhan PDB rendah)'
                         };
                         
-                        document.getElementById('sim-info').textContent = 
-                            `Dengan skenario ${scenarioNames[scenario]}, ` +
-                            `konsumsi energi fosil Indonesia diprediksi mencapai ${targetPrediction.value.toFixed(2)} TWh pada tahun ${year}. ` +
-                            `Ini menunjukkan ${change > 0 ? 'peningkatan' : 'penurunan'} ${Math.abs(change)}% dari tahun 2023.`;
+                        document.getElementById('sim-info').textContent =
+                        `Dengan skenario ${scenarioNames[scenario]}, ` +
+                        `konsumsi energi fosil Indonesia diprediksi mencapai ${targetPrediction.value.toFixed(2)} TWh pada tahun ${year}. ` +
+                        `Ini menunjukkan ${change > 0 ? 'peningkatan' : 'penurunan'} ${Math.abs(change)}% dari tahun ${baseYear}.`;
+
                     }
                     
                     // Show result & reset button
@@ -417,6 +423,10 @@ async function loadModelMetrics() {
     try {
         const response = await fetch('/api/model/metrics');
         const data = await response.json();
+
+        console.log("last_actual_year:", data.last_actual_year);
+console.log("last_actual_value:", data.last_actual_value);
+
         
         if (data.success && data.metrics) {
             const metrics = data.metrics;

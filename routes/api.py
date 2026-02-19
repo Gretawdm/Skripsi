@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from decimal import Decimal
 from datetime import datetime
+from sqlalchemy import text
 from services.predict_service import predict_energy_service
 from services.update_data_api import (
     fetch_data_from_api,
@@ -43,6 +44,7 @@ api_bp = Blueprint("api", __name__)
 def predict():
     data = request.json
     scenario = data.get("scenario")
+    
     years = int(data.get("years", data.get("forecast_years", 3)))  # Support both params
     save_to_db = data.get("save_to_database", True)  # Default True untuk backward compatibility
 
@@ -62,6 +64,7 @@ def predict():
         except Exception as e:
             print(f"Warning: Failed to save prediction history: {e}")
 
+
     return jsonify({
         "status": "success",
         "scenario": scenario,
@@ -69,9 +72,30 @@ def predict():
         "predictions": result['predictions'],  # Changed from 'prediction' to 'predictions'
         "lower_bounds": result['lower_bounds'],
         "upper_bounds": result['upper_bounds'],
+       "last_actual_year": result['last_actual_year'],
+       "last_actual_value": result['last_actual_value'],
         "saved_to_database": save_to_db
     })
 
+def get_avg_gdp_growth():
+    result = db.session.execute(text("""
+        SELECT tahun, nilai FROM gdp ORDER BY tahun
+    """)).fetchall()
+
+    if len(result) < 2:
+        return 0.05
+
+    growth_rates = []
+
+    for i in range(1, len(result)):
+        prev = result[i-1].nilai
+        curr = result[i].nilai
+
+        if prev and prev != 0:
+            growth = (curr - prev) / prev
+            growth_rates.append(growth)
+
+    return sum(growth_rates) / len(growth_rates)
 
 # ===== DATA MANAGEMENT API ENDPOINTS =====
 
@@ -204,6 +228,53 @@ def gdp_data():
         print(f"Error in gdp_data API: {str(e)}")
         import traceback
         traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+    
+
+@api_bp.route("/gdp/scenario", methods=["GET"])
+def get_gdp_scenario():
+    try:
+        data = get_gdp_from_db()  # ambil dari function yang sama
+
+        if not data or len(data) < 2:
+            return jsonify({
+                "success": False,
+                "message": "Data tidak cukup untuk menghitung pertumbuhan"
+            })
+
+        # Urutkan berdasarkan tahun
+        data_sorted = sorted(data, key=lambda x: x['year'])
+
+        growth_rates = []
+
+        for i in range(1, len(data_sorted)):
+            prev = float(data_sorted[i-1]['gdp'])
+            curr = float(data_sorted[i]['gdp'])
+
+            if prev != 0:
+                growth = ((curr - prev) / prev) * 100
+                growth_rates.append(growth)
+
+        if len(growth_rates) == 0:
+            return jsonify({
+                "success": False,
+                "message": "Tidak ada growth rate yang valid"
+            })
+
+        avg_growth = sum(growth_rates) / len(growth_rates)
+
+        return jsonify({
+            "success": True,
+            "baseline": round(avg_growth, 2),
+            "moderate": round(avg_growth, 2),
+            "optimistic": round(avg_growth + 2, 2),
+            "pessimistic": round(avg_growth - 2, 2)
+        })
+
+    except Exception as e:
         return jsonify({
             "success": False,
             "message": str(e)
@@ -641,10 +712,14 @@ def get_latest_prediction():
         
         # Get latest moderat prediction from database
         cursor.execute("""
-            SELECT * FROM prediction_history 
-            WHERE scenario = 'moderat'
-            ORDER BY prediction_date DESC 
-            LIMIT 1
+                       SELECT p.*
+                       FROM prediction_history p
+                       JOIN training_history t
+                       ON p.model_id = t.id
+                       WHERE t.model_status = 'active'
+                       ORDER BY p.prediction_date DESC
+                       LIMIT 1;
+
         """)
         
         record = cursor.fetchone()
@@ -732,6 +807,42 @@ def get_latest_prediction():
             'predictions': [],
             'years': 0,
             'scenario': 'moderat'
+        }), 500
+
+
+@api_bp.route("/data/range", methods=["GET"])
+def get_data_range():
+    try:
+        from services.database_service import get_db_connection
+        
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        query = """
+        SELECT 
+            MIN(year) AS min_year,
+            MAX(year) AS max_year,
+            COUNT(*) AS total_records
+        FROM energy_data
+        """
+
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "success": True,
+            "min_year": result["min_year"],
+            "max_year": result["max_year"],
+            "total_records": result["total_records"]
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": str(e)
         }), 500
 
 
@@ -896,8 +1007,7 @@ def delete_model_endpoint(model_id):
         }), 500
 
 
-# ============ DASHBOARD API ENDPOINTS ============
-
+# ============= DASHBOARD API ENDPOINTS ===============
 @api_bp.route("/dashboard/model-info", methods=["GET"])
 def dashboard_model_info():
     """Get active model info for dashboard"""
@@ -1205,7 +1315,10 @@ def dashboard_prediction():
             "prediction_2030": prediction_2030,
             "trend": float(trend) if trend else 0,
             "total_records": aligned_count,
-            "data_range": data_range
+            "data_range": data_range,
+            "last_actual_year": last_year,
+"last_actual_value": float(energy_df.loc[energy_df['Year'] == last_year, 'fossil_fuels__twh'].values[0]),
+
         })
     except Exception as e:
         import traceback

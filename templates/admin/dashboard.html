@@ -30,7 +30,9 @@
                         <div>
                             <p class="text-muted small mb-1">Total Data</p>
                             <h3 class="fw-bold mb-0" id="totalRecords">0</h3>
-                            <small class="text-muted">records (1964-2024)</small>
+                            <small class="text-muted" id="yearRange">
+                                records (...)
+                            </small>
                         </div>
                         <div class="bg-success bg-opacity-10 p-3 rounded">
                             <i class="fas fa-database text-success fs-2"></i>
@@ -81,7 +83,7 @@
     <!-- Main Charts Row -->
     <div class="row mb-4">
         <!-- Prediction Chart -->
-        <div class="col-lg-8 mb-4">
+        <div class="col-lg-7 mb-4">
             <!-- Title Card -->
             <div class="card shadow-sm mb-3">
                 <div class="card-body py-3">
@@ -91,9 +93,9 @@
                                 <i class="fas fa-chart-line text-primary me-2"></i>
                                 Grafik Prediksi Konsumsi Energi Fosil
                             </h5>
-                            <span class="badge bg-success">
+                            <span class="badge bg-success" id="scenarioText">
                                 <i class="fas fa-check-circle me-1"></i>
-                                Menggunakan Moderat ( GDP Growth +5% / tahun )
+                                Menggunakan Moderat ( GDP Growth +5.37% / tahun )
                             </span>
                         </div>
                     </div>
@@ -123,7 +125,7 @@
         </div>
 
         <!-- Model Performance & Quick Stats -->
-        <div class="col-lg-4">
+        <div class="col-lg-5">
             <!-- Model Performance -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-white">
@@ -143,10 +145,9 @@
                         </div>
                         <!-- Penjelasan singkat tentang MAPE -->
                         <div class="mt-2">
-                            <small class="text-muted">
-                                <strong>MAPE</strong> (Mean Absolute Percentage Error) menunjukkan rata-rata persentase
-                                kesalahan prediksi. Semakin kecil nilai MAPE, semakin tinggi akurasi model.
-                            </small>
+                            <div class="mt-1">
+                                <small id="mapeDescription" class="fw-bold"></small>
+                            </div>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -160,7 +161,7 @@
                     </div>
                     <!-- Grafik kecil: Actual vs Predicted (Test Set) -->
                     <div class="mt-3">
-                        <small class="text-muted">Perbandingan Data Asli & Prediksi (Test Set):</small>
+                        <small class="fw-bold">Perbandingan Data Asli & Prediksi (Test Set):</small>
                         <div style="height: 120px;">
                             <canvas id="miniComparisonChart"></canvas>
                         </div>
@@ -176,6 +177,25 @@
                             <strong id="maeValue">-</strong>
                         </div>
                     </div>
+
+                    <div class="mt-3">
+                        <small class="fw-bold">Penjelasan Evaluasi Model</small>
+                        <div class="d-inline-block px-4 py-3 mt-2"
+                            style="background: linear-gradient(135deg, #e3f2fd, #f3e5f5); border-radius: 12px; border-left: 4px solid #01384F; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-info-circle" style="font-size: 1.2rem; color: #01384F;"></i>
+                                <small class="text-muted">
+                                    Kinerja model dievaluasi menggunakan <strong>MAPE, R², RMSE, dan MAE</strong>.
+                                    Nilai <strong>MAPE</strong> menunjukkan rata-rata persentase kesalahan prediksi,
+                                    sedangkan <strong>R²</strong> mengukur kemampuan model dalam menjelaskan variasi
+                                    data historis. Semakin <strong>rendah MAPE</strong> dan <strong>tinggi R²</strong>,
+                                    <strong>semakin baik performa model dalam melakukan prediksi</strong>.
+                                </small>
+                            </div>
+                        </div>
+
+                    </div>
+
                 </div>
             </div>
 
@@ -230,7 +250,7 @@
                 <div class="card-header bg-white">
                     <h6 class="mb-0 fw-bold">
                         <i class="fas fa-table text-secondary me-2"></i>
-                        Preview Prediksi Mendatang (2025-2030)
+                        Preview Prediksi Mendatang
                     </h6>
                 </div>
                 <div class="card-body">
@@ -404,99 +424,11 @@
 <script>
     let charts = {};
 
-    // Dummy data untuk testing
-    const dummyData = {
-        modelInfo: {
-            version: "ARIMAX v1.2",
-            mape: 3.45,
-            r2: 0.9512,
-            rmse: 0.0234,
-            mae: 0.0189,
-            totalRecords: 34,
-            lastTrained: "21 Jan 2026, 10:30",
-            params: "ARIMAX(2,1,1)",
-            duration: "2m 34s",
-            testData: {
-                years: ['2020', '2021', '2022', '2023'],
-                actual: [48.2, 49.1, 50.3, 51.2],
-                predicted: [48.5, 49.3, 50.1, 51.5]
-            },
-            errorData: {
-                bins: ['-2 to -1', '-1 to 0', '0 to 1', '1 to 2', '2 to 3'],
-                frequencies: [2, 5, 12, 8, 3]
-            }
-        },
-        prediction: {
-            historical: [
-                { year: 2015, value: 44.2 },
-                { year: 2016, value: 45.1 },
-                { year: 2017, value: 46.3 },
-                { year: 2018, value: 47.5 },
-                { year: 2019, value: 47.8 },
-                { year: 2020, value: 48.2 },
-                { year: 2021, value: 49.1 },
-                { year: 2022, value: 50.3 },
-                { year: 2023, value: 51.2 }
-            ],
-            predictions: [
-                { year: 2024, value: 52.1, lowerBound: 50.2, upperBound: 54.0 },
-                { year: 2025, value: 53.5, lowerBound: 51.0, upperBound: 56.0 },
-                { year: 2026, value: 54.8, lowerBound: 51.8, upperBound: 57.8 },
-                { year: 2027, value: 56.2, lowerBound: 52.5, upperBound: 59.9 },
-                { year: 2028, value: 57.4, lowerBound: 53.0, upperBound: 61.8 },
-                { year: 2029, value: 58.7, lowerBound: 53.5, upperBound: 63.9 },
-                { year: 2030, value: 60.1, lowerBound: 54.0, upperBound: 66.2 }
-            ],
-            trend: 1.25
-        },
-        activities: [
-            {
-                type: 'training',
-                title: 'Model Retrained Successfully',
-                description: 'Model ARIMAX v1.2 berhasil dilatih dengan akurasi MAPE 3.45%',
-                timestamp: new Date(Date.now() - 3600000).toISOString()
-            },
-            {
-                type: 'data',
-                title: 'Data Updated via API',
-                description: 'Berhasil fetch 15 records data energi dari World Bank API',
-                timestamp: new Date(Date.now() - 7200000).toISOString()
-            },
-            {
-                type: 'prediction',
-                title: 'New Prediction Generated',
-                description: 'Prediksi periode 2024-2030 berhasil dibuat',
-                timestamp: new Date(Date.now() - 10800000).toISOString()
-            },
-            {
-                type: 'data',
-                title: 'Data Uploaded',
-                description: 'Upload file GDP data berhasil, 20 records ditambahkan',
-                timestamp: new Date(Date.now() - 86400000).toISOString()
-            },
-            {
-                type: 'training',
-                title: 'Model Parameters Optimized',
-                description: 'Auto-optimization menemukan parameter optimal (2,1,1)',
-                timestamp: new Date(Date.now() - 172800000).toISOString()
-            }
-        ],
-        systemStatus: {
-            uptime: '5d 12h 34m',
-            modelServerRunning: true
-        }
-    };
-
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function () {
         loadDashboardData();
         updateLastUpdateTime();
-
-        // Refresh data every 5 minutes (disabled untuk dummy data)
-        // setInterval(loadDashboardData, 300000);
-
-        // Update time every minute
-        setInterval(updateLastUpdateTime, 60000);
+        loadGDPScenario();
     });
 
     // Load all dashboard data
@@ -507,6 +439,32 @@
         loadSystemStatus();
         loadActualAndGDPData(); // <-- panggil API untuk grafik Data Asli vs GDP
     }
+
+     function loadGDPScenario() {
+            fetch('/api/gdp/scenario')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const select = document.getElementById("sim-scenario");
+
+                        select.options[0].text =
+                            `Moderat (${data.moderate}% per tahun)`;
+
+                        select.options[1].text =
+                            `Optimis (${data.optimistic}% per tahun)`;
+
+                        select.options[2].text =
+                            `Pesimis (${data.pessimistic}% per tahun)`;
+
+                        // Update scenarioText with moderate value on load
+                        const scenarioText = document.getElementById("scenarioText");
+                        if (scenarioText) {
+                            scenarioText.innerHTML = `Moderat (+${data.moderate}%/tahun)`;
+                        }
+                    }
+                })
+                .catch(err => console.error("Scenario error:", err));
+        }
 
     // Fungsi ambil data asli dan GDP dari database
     function loadActualAndGDPData() {
@@ -673,96 +631,18 @@
         });
     }
 
-
-
-    // Tambahkan dummy data GDP
-    dummyData.gdp = [
-        { year: 2015, value: 900 },
-        { year: 2016, value: 950 },
-        { year: 2017, value: 1000 },
-        { year: 2018, value: 1100 },
-        { year: 2019, value: 1200 },
-        { year: 2020, value: 1150 },
-        { year: 2021, value: 1250 },
-        { year: 2022, value: 1300 },
-        { year: 2023, value: 1400 }
-    ];
-
-    // Load model info dengan dummy data
-    function loadModelInfoDummy() {
-        const data = dummyData.modelInfo;
-
-        document.getElementById('modelVersion').textContent = data.version;
-        document.getElementById('modelAccuracy').textContent = `MAPE: ${data.mape.toFixed(2)}%`;
-        document.getElementById('totalRecords').textContent = data.totalRecords;
-
-        // Performance metrics
-        document.getElementById('mapeValue').textContent = data.mape.toFixed(2) + '%';
-        document.getElementById('r2Value').textContent = data.r2.toFixed(4);
-        document.getElementById('rmseValue').textContent = data.rmse.toFixed(4);
-        document.getElementById('maeValue').textContent = data.mae.toFixed(4);
-
-        // Progress bars (invert for MAPE - lower is better)
-        const mapeScore = Math.max(0, 100 - data.mape);
-        document.getElementById('mapeBar').style.width = mapeScore + '%';
-        document.getElementById('r2Bar').style.width = (data.r2 * 100) + '%';
-
-        // Last training info
-        document.getElementById('lastTrainingDate').textContent = data.lastTrained;
-        document.getElementById('modelParams').textContent = data.params;
-        document.getElementById('trainingDuration').textContent = data.duration;
-
-        // Load comparison chart
-        createComparisonChart(data.testData);
-
-        // Load error distribution chart
-        createErrorChart(data.errorData);
-    }
-
-    // Load prediction data dengan dummy data
-    function loadPredictionDataDummy() {
-        const data = dummyData.prediction;
-
-        // Update prediction 2030
-        const pred2030 = data.predictions.find(p => p.year === 2030);
-        if (pred2030) {
-            document.getElementById('prediction2030').textContent = pred2030.value.toFixed(2) + '%';
+    function interpretMAPE(mape) {
+        if (mape < 10) {
+            return { text: "Sangat Baik (Model sangat akurat)", color: "text-success", bar: "bg-success" };
+        } else if (mape < 20) {
+            return { text: "Baik (Akurasi model baik)", color: "text-primary", bar: "bg-primary" };
+        } else if (mape < 50) {
+            return { text: "Cukup (Model masih bisa ditingkatkan)", color: "text-warning", bar: "bg-warning" };
+        } else {
+            return { text: "Buruk (Model kurang akurat)", color: "text-danger", bar: "bg-danger" };
         }
-
-        // Update trend
-        const trendIcon = data.trend > 0 ?
-            '<i class="fas fa-arrow-up text-danger"></i>' :
-            '<i class="fas fa-arrow-down text-success"></i>';
-        document.getElementById('trendIndicator').innerHTML = trendIcon +
-            ' <span id="trendValue">' + Math.abs(data.trend).toFixed(2) + '%/tahun</span>';
-
-        // Create main prediction chart
-        createPredictionChart(data);
-
-        // Populate prediction table
-        populatePredictionTable(data.predictions);
     }
 
-    // Load recent activities dengan dummy data
-    function loadRecentActivitiesDummy() {
-        const activities = dummyData.activities;
-        renderActivities(activities);
-    }
-
-    // Load system status dengan dummy data
-    function loadSystemStatusDummy() {
-        const data = dummyData.systemStatus;
-
-        document.getElementById('serverUptime').textContent = data.uptime;
-
-        const statusBadge = data.modelServerRunning ?
-            '<i class="fas fa-check-circle"></i> Running' :
-            '<i class="fas fa-times-circle"></i> Stopped';
-        const statusClass = data.modelServerRunning ? 'bg-success' : 'bg-danger';
-
-        document.getElementById('modelServerStatus').className = 'badge ' + statusClass;
-        document.getElementById('modelServerStatus').innerHTML = statusBadge;
-    }
 
     // Load model info (API real - untuk nanti)
     function loadModelInfo() {
@@ -787,10 +667,31 @@
                     document.getElementById('maeValue').textContent = data.mae ? data.mae.toFixed(4) : '-';
 
                     // Progress bars (invert for MAPE - lower is better)
-                    if (data.mape) {
-                        const mapeScore = Math.max(0, 100 - data.mape);
-                        document.getElementById('mapeBar').style.width = mapeScore + '%';
+                    if (data.mape !== null && data.mape !== undefined) {
+
+                        const mape = data.mape;
+
+                        // Set nilai MAPE
+                        document.getElementById('mapeValue').textContent = mape.toFixed(2) + '%';
+
+                        // Interpretasi
+                        const interpretation = interpretMAPE(mape);
+
+                        const descEl = document.getElementById('mapeDescription');
+                        if (descEl) {
+                            descEl.textContent = interpretation.text;
+                            descEl.className = "fw-bold " + interpretation.color;
+                        }
+
+                        // Progress bar (dibalik karena makin kecil makin bagus)
+                        const mapeScore = Math.max(0, 100 - mape);
+                        const mapeBar = document.getElementById('mapeBar');
+                        mapeBar.style.width = mapeScore + '%';
+
+                        // Ganti warna progress bar sesuai kualitas
+                        mapeBar.className = "progress-bar " + interpretation.bar;
                     }
+
                     if (data.r2) {
                         document.getElementById('r2Bar').style.width = (data.r2 * 100) + '%';
                     }
@@ -850,6 +751,18 @@
                 console.error('Error loading model info:', error);
             });
     }
+
+    //range data
+    fetch("/api/data/range")
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("totalRecords").innerText = data.total_records;
+                document.getElementById("yearRange").innerText =
+                    `records (${data.min_year}-${data.max_year})`;
+            }
+        })
+        .catch(error => console.error("Error:", error));
 
     // Load prediction data
     function loadPredictionData() {
@@ -1523,19 +1436,6 @@
             `);
         }
     }
-
-    // Tambahkan dummy data GDP
-    dummyData.gdp = [
-        { year: 2015, value: 900 },
-        { year: 2016, value: 950 },
-        { year: 2017, value: 1000 },
-        { year: 2018, value: 1100 },
-        { year: 2019, value: 1200 },
-        { year: 2020, value: 1150 },
-        { year: 2021, value: 1250 },
-        { year: 2022, value: 1300 },
-        { year: 2023, value: 1400 }
-    ];
 
 </script>
 

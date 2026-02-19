@@ -44,7 +44,7 @@
     </div>
 
     {% include 'partials/footer.html' %}
-    
+
 
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
@@ -100,6 +100,37 @@
                 }, 100);
             }
         });
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const sections = document.querySelectorAll("section");
+            const navLinks = document.querySelectorAll("#navmenu a");
+
+            window.addEventListener("scroll", function () {
+
+                let current = "";
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 120;
+                    const sectionHeight = section.clientHeight;
+
+                    if (pageYOffset >= sectionTop) {
+                        current = section.getAttribute("id");
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove("active");
+                    if (link.getAttribute("href") === "#" + current) {
+                        link.classList.add("active");
+                    }
+                });
+
+            });
+        });
+
+
     </script>
 </body>
 

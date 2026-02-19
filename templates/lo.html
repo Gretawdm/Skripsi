@@ -7,13 +7,13 @@
 <section id="hero" class="hero section">
     <div class="container">
         <div class="row justify-content-center text-center">
-            <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-lg-8" data-aos="fade-in">
                 <div class="hero-content">
-                    <h1>Prediksi, Analisis, dan Aksi untuk Masa Depan Energi Indonesia</h1>
-                    <p>Menggunakan Metode ARIMA dengan Variabel Eksternal Pertumbuhan PDB/Produk Domestik Bruto</p>
+                    <h1>Prediksi Konsumsi Energi Fosil di Indonesia</h1>
+                    <p>Menggunakan Metode ARIMAX dengan Variabel Eksternal Pertumbuhan PDB/Produk Domestik Bruto</p>
                     <div class="hero-buttons">
-                        <a href="#" class="btn btn-outline-light">Lihat Data Historis</a>
-                        <a href="#" class="btn btn-success">Mulai Prediksi</a>
+                        <a href="#data" class="btn btn-outline-light">Lihat Data Historis</a>
+                        <a href="#simulasi" class="btn btn-success">Mulai Prediksi</a>
                     </div>
                 </div>
             </div>
@@ -44,171 +44,509 @@
 </section>
 <section class="overview-section">
     <div class="overview-container">
-        <div class="overview-left">
-            <div class="about-card">
-                <div class="about" style="margin-bottom: 2rem;">
-                    <h3>Tentang</h3>
-                    <p>
-                        Aplikasi ini dikembangkan untuk menganalisis dan memprediksi konsumsi
-                        energi fosil di Indonesia berdasarkan data tahunan menggunakan metode
-                        time series ARIMAX. Data diperoleh dari
-                        <strong>Our World in Data</strong> dan <strong>World Bank</strong>.
-                    </p>
+        <div class="about-card" sty>
+            <section class="text-center mb-4" id="grafik" data-aos="fade-up">
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: #01384F; margin-bottom: 1rem;">
+                    Grafik Prediksi Konsumsi Energi Fosil di Indonesia
+                </h2>
+                <p style="color: #6b7280; font-size: 1.1rem; margin-bottom: 0.5rem;" id="historicalText">
+                    <strong>Data Historis:</strong> Konsumsi energi fosil aktual dari tahun ...
+                </p>
+
+                <div class="d-inline-block px-4 py-3 mt-2"
+                    style="background: linear-gradient(135deg, #e3f2fd, #f3e5f5); border-radius: 12px; border-left: 4px solid #01384F; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div class="d-flex align-items-center gap-2">
+
+                        <div style="text-align: left;">
+                            <div>
+                                <small style="color: #53B863;">
+                                    <strong>Skenario Prediksi:</strong> GDP Growth
+                                    <strong id="scenarioText">
+                                        Moderat (+...%/tahun)
+                                    </strong>
+                                </small>
+                            </div>
+                            <div>
+                                <small style="color: #666;">
+                                    Grafik menampilkan seluruh data historis untuk
+                                    transparansi dan analisis tren jangka panjang
+                                </small>
+                            </div>
+                            <small style="color: #64748b;">
+                                <i class="bi bi-shield-check me-1"></i>
+                                <strong>Sumber Data:</strong> World Bank API & Our World in Data (ourworldindata.org)
+                            </small>
+
+                        </div>
+
+                    </div>
                 </div>
 
-                <div class="reason" style="margin-bottom: 2rem;">
-                    <h3>Mengapa Prediksi Ini Penting Dilakukan?</h3>
-                    <p class="text-muted" style="margin-bottom: 1.5rem;">
-                        Prediksi konsumsi energi fosil memberikan dasar pengambilan keputusan
-                        dalam perencanaan energi, kebijakan lingkungan, dan analisis ekonomi.
-                    </p>
-
-                    <div class="why-grid">
-                        <div class="why-image">
-                            <img src="{{ url_for('static', filename='assets/img/left.png') }}"
-                                alt="Tren Konsumsi Energi" class="img-fluid">
+                <div class="mb-5 mt-5" data-aos="fade-up">
+                    <canvas id="preview-chart" style="max-height: 450px;"></canvas>
+                </div>
+                <div class="row g-4" data-aos="fade-up">
+                    <div class="col-md-3">
+                        <div class="text-center p-4"
+                            style="background: linear-gradient(135deg, #53B863, #2e7d32); border-radius: 15px; color: white;">
+                            <h5 id="projection-year" style="font-size: 0.9rem; margin-bottom: 0.5rem; opacity: 0.9;">
+                                Model ARIMAX</h5>
+                            <h2 id="model-version" style="font-weight: 700; margin: 0;"><i
+                                    class="bi bi-hourglass-split"></i>
+                            </h2>
                         </div>
-                        <div class="why-list">
-                            <div class="why-card">
-                                <div class="why-icon">
-                                    <i class="fa-solid fa-file-circle-check"></i>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-4"
+                            style="background: #f8f9fa; border-radius: 15px; border: 2px solid #53B863;">
+                            <h5 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #6b7280;">MAPE</h5>
+                            <h2 id="modelAccuracy" style="font-weight: 700; margin: 0; color: #53B863;"><i
+                                    class="bi bi-bar-chart-line"></i>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-4"
+                            style="background: #f8f9fa; border-radius: 15px; border: 2px solid #ffc107;">
+                            <h5 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #6b7280;">MAE</h5>
+                            <h2 id="maeValue" style="font-weight: 700; margin: 0; color: #ffc107;"><i
+                                    class="bi bi-bar-chart"></i></h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-4"
+                            style="background: #f8f9fa; border-radius: 15px; border: 2px solid #17a2b8;">
+                            <h5 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #6b7280;">RMSE</h5>
+                            <h2 id="rmseValue" style="font-weight: 700; margin: 0; color: #17a2b8;"><i
+                                    class="bi bi-bar-chart-fill"></i>
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="simulasi">
+                <div class="container">
+                    <div class="text-center mb-2" data-aos="fade-up">
+                        <h3 style="font-size: 1.5rem; font-weight: 700; color: #01384F; margin-bottom: 0.5rem;">
+                            <i class="fas fa-flask me-2"></i>Simulasi Percobaan
+                        </h3>
+                        <p style="color: #6b7280; font-size: 1.1rem;">Ubah parameter skenario ekonomi dan tahun
+                            untuk melihat
+                            prediksi yang berbeda</p>
+                        <div class="d-inline-block px-4 py-2 mt-1"
+                            style="background: rgba(83, 184, 99, 0.1); border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);">
+                            <small style="color: #53B863;"><i class="bi bi-lightbulb me-1"></i>Hasil simulasi hanya
+                                untuk
+                                visualisasi, tidak disimpan ke database</small>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-center">
+
+                        <div class="card-body p-4 p-md-5">
+                            <form id="simulation-form">
+                                <div class="row g-4 justify-content-center">
+                                    <div class="col-md-6">
+                                        <label class="form-label" style="font-weight: 600; color: #01384F;">
+                                            <i class="fas fa-chart-bar me-2"></i>Skenario Pertumbuhan PDB
+                                        </label>
+                                        <select class="form-select form-select-xs" id="sim-scenario">
+                                            <option value="moderate">Moderat</option>
+                                            <option value="optimistic">Optimis</option>
+                                            <option value="pessimistic">Pesimis</option>
+                                        </select>
+
+                                        </select>
+                                        <small class="text-muted">Asumsi pertumbuhan PDB Indonesia</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" style="font-weight: 600; color: #01384F;">
+                                            <i class="fas fa-calendar me-2"></i>Tahun Target Prediksi
+                                        </label>
+                                        <select class="form-select form-select-xs" id="sim-year"
+                                            style="border-radius: 10px;">
+
+                                        </select>
+                                        <small class="text-muted">Tahun yang ingin diprediksi (sesuai
+                                            prediksi
+                                            admin)</small>
+                                    </div>
                                 </div>
-                                <div class="why-text">
-                                    <h4>Berbasis Data Resmi</h4>
-                                    <p>
-                                        Data historis berasal dari Our World in Data dan World Bank.
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-xs"
+                                        style="background: linear-gradient(135deg, #53B863, #2e7d32); color: white; padding: 15px 50px; border-radius: 30px; font-weight: 700; border: none;">
+                                        <i class="fas fa-magic me-2"></i>Jalankan Simulasi
+                                    </button>
+                                    <button type="button" id="resetToOfficial" class="btn btn-xs ms-3"
+                                        style="background: #6c757d; color: white; padding: 15px 40px; border-radius: 30px; font-weight: 700; border: none; display: none;">
+                                        <i class="fas fa-undo me-2"></i>Reset ke Prediksi Official
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Hasil -->
+                            <div id="sim-result" class="mt-5" style="display: none;">
+                                <hr style="margin: 2rem 0;">
+                                <h4 style="color: #01384F; font-weight: 700; margin-bottom: 1.5rem;">
+                                    <i class="fas fa-check-circle me-2" style="color: #53B863;"></i>Hasil
+                                    Simulasi
+                                </h4>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="p-4 text-center"
+                                            style="background: linear-gradient(135deg, #53B863, #2e7d32); border-radius: 15px; color: white;">
+                                            <h5 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Prediksi
+                                            </h5>
+                                            <h2 style="font-weight: 700; font-size: 2.5rem;" id="sim-value">
+                                                -</h2>
+                                            <p style="font-size: 0.85rem; margin: 0;">Terawatt-hour (TWh)
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="p-4 text-center" style="background: #f8f9fa; border-radius: 15px;">
+                                            <h5 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #6b7280;">
+                                                Perubahan
+                                            </h5>
+                                            <h2 style="font-weight: 700; font-size: 2.5rem; color: #01384F;"
+                                                id="sim-change">-</h2>
+                                            <p style="font-size: 0.85rem; margin: 0; color: #6b7280;">dari
+                                                2023</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 p-3"
+                                    style="background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 10px;">
+                                    <p id="sim-info" style="color: #856404; margin: 0; font-size: 0.9rem;">-
                                     </p>
                                 </div>
                             </div>
-
-                            <div class="why-card">
-                                <div class="why-icon">
-                                    <i class="fa-solid fa-solar-panel"></i>
-                                </div>
-                                <div class="why-text">
-                                    <h4>Kebijakan Energi Berkelanjutan</h4>
-                                    <p>
-                                        Mendukung perencanaan transisi energi dan target Net Zero Emission.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="why-card">
-                                <div class="why-icon">
-                                    <i class="fa-solid fa-chart-line"></i>
-                                </div>
-                                <div class="why-text">
-                                    <h4>Analisis Dampak Ekonomi</h4>
-                                    <p>
-                                        Membantu melihat hubungan pertumbuhan ekonomi dan konsumsi energi.
-                                    </p>
-                                </div>
-                            </div>
                         </div>
+
                     </div>
                 </div>
+            </section>
 
-                <div class="workflow-clean" style="margin-bottom: 2rem;">
-                    <h3>Bagaimana Cara Kerja Sistem?</h3>
-                    <p class="workflow-desc">
-                        Alur kerja sistem disusun secara bertahap untuk menjelaskan proses analisis
-                        dan prediksi konsumsi energi fosil menggunakan metode ARIMA dan ARIMAX.
-                    </p>
-
-                    <div class="workflow-item">
-                        <div class="step-number-card">01</div>
-
-                        <div class="step-divider"></div>
-                        <div class="step-content-card">
-                            <h4>Pilih Data & Periode</h4>
-                            <p>
-                                Pengguna memilih data konsumsi energi fosil serta rentang tahun
-                                yang akan dianalisis sebagai dasar pemodelan.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="workflow-item">
-                        <div class="step-number-card">02</div>
-
-                        <div class="step-divider"></div>
-                        <div class="step-content-card">
-                            <h4>Proses ARIMA / ARIMAX</h4>
-                            <p>
-                                Sistem melakukan pemodelan time series menggunakan ARIMA atau
-                                ARIMAX dengan variabel eksternal berupa PDB.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="workflow-item">
-                        <div class="step-number-card">03</div>
-                        <div class="step-divider"></div>
-                        <div class="step-content-card">
-                            <h4>Hasil Prediksi & Insight</h4>
-                            <p>
-                                Hasil prediksi disajikan dalam bentuk grafik dan analisis untuk
-                                mendukung evaluasi dan pengambilan keputusan.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section-features" style="margin-bottom: 2rem;">
-                    <h3>Komponen Sistem</h3>
-                    <div class=" features-grid">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="bi bi-database"></i>
-                            </div>
-                            <h4>Data Historis</h4>
-                            <p>Konsumsi Energi Fosil Indonesia</p>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="bi bi-search"></i>
-                            </div>
-                            <h4>Model Prediksi</h4>
-                            <p>ARIMA & ARIMAX</p>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="bi bi-graph-up-arrow"></i>
-                            </div>
-                            <h4>Simulasi PDB</h4>
-                            <p>Skenario Pertumbuhan Ekonomi</p>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="bi bi-lightbulb"></i>
-                            </div>
-                            <h4>Analisis & Insight</h4>
-                            <p>Hasil dan Rekomendasi</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
         </div>
 
-
-
-        <div class="overview-right">
-            <h3 class="why-title text-center">Grafik Tren Konsumsi Energi Fosil di Indonesia</h3>
-            <div class="section-grafik">
-                <div class="chart-wrapper">
-                    <canvas id="energyChart"></canvas>
-                </div>
-            </div>
-
-        </div>
     </div>
+
+    <section id="data" class="container">
+
+        <div class="text-center mb-4" id="data" data-aos="fade-up">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: #01384F; margin-bottom: 1rem;">
+                Grafik Preview Data
+            </h2>
+
+            <!-- Grafik Data Asli Energi & GDP -->
+            <div class="mb-5" data-aos="fade-up">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div
+                            style="background: #f8f9fa; border-radius: 20px; padding: 2rem; box-shadow: 0 6px 18px rgba(0,0,0,0.08);">
+                            <h5 class="mb-3" style="color: #01384F; font-weight: 700;">Grafik Data Asli Energi Fosil
+                            </h5>
+                            <canvas id="energy-actual-chart" style="max-height: 350px;"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div
+                            style="background: #f8f9fa; border-radius: 20px; padding: 2rem; box-shadow: 0 6px 18px rgba(0,0,0,0.08);">
+                            <h5 class="mb-3" style="color: #01384F; font-weight: 700;">Grafik Data Asli GDP Indonesia
+                            </h5>
+                            <canvas id="gdp-actual-chart" style="max-height: 350px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="overview-section-metode" id="metode">
+        <div class="text-center mb-2">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: #01384F;">
+                Metodelogi & Alur Sistem
+            </h2>
+        </div>
+
+        <div class="overview-container">
+            <div class="overview-left">
+                <div class="metode-card">
+                    <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Metode ARIMA</h4>
+                    <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;">
+                        <strong style="color: black;">ARIMA (Autoregressive Integrated Moving Average)</strong>
+                        merupakan
+                        metode peramalan deret waktu (time
+                        series) yang memodelkan
+                        data berdasarkan pola historisnya. Model ini digunakan untuk menganalisis data yang bersifat
+                        runtun
+                        waktu dan
+                        memprediksi nilai di masa mendatang dengan mempertimbangkan ketergantungan antar periode.
+                    </p>
+
+                    <div
+                        style="display: flex; gap: 15px; margin-bottom: 2rem; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                        <div class="arima-param" style="text-align: center; flex: 1;">
+                            <div
+                                style="background: #2e7d32; color: white; width: 50px; height: 50px; border-radius: 50%;
+                                        display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 700; font-size: 1.2rem;">
+                                P
+                            </div>
+                            <h6 style="font-size: 0.8rem; font-weight: 600;">Autoregressive</h6>
+                        </div>
+                        <div class="arima-param" style="text-align: center; flex: 1;">
+                            <div
+                                style="background: #1e88e5; color: white; width: 50px; height: 50px; border-radius: 50%;
+                                        display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 700; font-size: 1.2rem;">
+                                D
+                            </div>
+                            <h6 style="font-size: 0.8rem; font-weight: 600;">Differencing</h6>
+                        </div>
+                        <div class="arima-param" style="text-align: center; flex: 1;">
+                            <div
+                                style="background: #f57c00; color: white; width: 50px; height: 50px; border-radius: 50%;
+                                        display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 700; font-size: 1.2rem;">
+                                Q
+                            </div>
+                            <h6 style="font-size: 0.8rem; font-weight: 600;">Moving Average</h6>
+                        </div>
+                    </div>
+                    <p class="param-title">
+                        Model ARIMA terdiri dari tiga parameter utama:
+                    </p>
+
+                    <ul class="param-list">
+                        <li>
+                            <strong>p (Autoregressive)</strong> → Orde keterkaitan nilai saat ini terhadap nilai
+                            sebelumnya
+                        </li>
+                        <li>
+                            <strong>d (Differencing)</strong> → Tingkat differencing untuk membuat data menjadi
+                            stasioner
+                        </li>
+                        <li>
+                            <strong>q (Moving Average)</strong> → Orde rata-rata kesalahan (error) masa lalu
+                        </li>
+                    </ul>
+
+
+                    <!-- Metode ARIMAX -->
+                    <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Metode ARIMAX</h4>
+                    <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1.5rem;">
+                        ARIMAX (Autoregressive Integrated Moving Average with Exogenous Variable) merupakan pengembangan
+                        dari ARIMA dengan
+                        menambahkan variabel eksternal (exogenous variable) yang diduga memengaruhi variabel utama yang
+                        diprediksi.Dalam sistem ini, variabel eksternal yang digunakan adalah:
+                    </p>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                        <div
+                            style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                            <span style="font-weight: 700; color: #1e88e5;">Eksternal Sektoral Ekonomi</span>
+                            <i class="fas fa-arrow-right" style="color: #6b7280;"></i>
+                            <div
+                                style="background: white; padding: 10px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <strong style="color: #2e7d32; font-size: 1.1rem;">PDB</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1.5rem;">
+                        Penambahan variabel eksternal bertujuan untuk meningkatkan akurasi model dalam memprediksi
+                        konsumsi
+                        energi dengan
+                        mempertimbangkan faktor ekonomi yang relevan.
+                    </p>
+                </div>
+            </div>
+
+            <div class="overview-right">
+                <div class="about-card" style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 1.5rem;">Alur Sistem</h3>
+
+                    <div class="workflow-clean">
+                        <div class="workflow-item">
+                            <div class="step-number-card">01</div>
+                            <div class="step-content-card">
+                                <h4>Pilih Data & Periode</h4>
+                                <p>Menggunakan dataset konsumsi energi serta variabel ekonomi (PDB) berdasarkan periode
+                                    analisis yang telah ditentukan.</p>
+                            </div>
+                        </div>
+
+                        <div class="workflow-item">
+                            <div class="step-number-card">02</div>
+                            <div class="step-content-card">
+                                <h4>Pra-pemrosesan Data</h4>
+                                <p>Melakukan pembersihan data (data cleaning), transformasi, serta pengujian
+                                    stasioneritas
+                                    untuk memastikan data siap
+                                    digunakan dalam proses pelatihan model.</p>
+                            </div>
+                        </div>
+
+                        <div class="workflow-item">
+                            <div class="step-number-card">03</div>
+                            <div class="step-content-card">
+                                <h4>Pemodelan ARIMA / ARIMAX</h4>
+                                <p>Menentukan parameter optimal (p, d, q) serta membangun model ARIMA dan ARIMAX
+                                    berdasarkan
+                                    skenario analisis (optimis, pesimistis, dan moderat).
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="workflow-item">
+                            <div class="step-number-card">04</div>
+                            <div class="step-content-card">
+                                <h4>Prediksi Konsumsi Energi</h4>
+                                <p>Menghasilkan nilai prediksi konsumsi energi berdasarkan model terpilih dengan
+                                    mempertimbangkan proyeksi kondisi ekonomi.</p>
+                            </div>
+                        </div>
+
+                        <div class="workflow-item">
+                            <div class="step-number-card">05</div>
+                            <div class="step-content-card">
+                                <h4>Visualisasi Hasil</h4>
+                                <p>Menampilkan hasil prediksi dalam bentuk grafik dan tabel serta mengevaluasi performa
+                                    model menggunakan metrik akurasi
+                                    seperti MAPE.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 </section>
 
 
 <style>
+    /* ===============================
+   METODOLOGI SECTION (KHUSUS)
+================================= */
+    .overview-section-metode {
+        padding-left: 80px;
+        padding-right: 80px;
+        background: #f9fafb;
+    }
+
+    /* Title */
+    .overview-section-metode .section-title {
+        text-align: center;
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: 60px;
+        color: #1f2937;
+    }
+
+    /* Container 2 kolom */
+    .overview-section-metode .overview-container {
+        display: flex;
+        gap: 40px;
+        align-items: flex-start;
+    }
+
+    /* Bagi kiri kanan */
+    .overview-section-metode .overview-left,
+    .overview-section-metode .overview-right {
+        flex: 1;
+    }
+
+    /* Card styling */
+    .overview-section-metode .metode-card,
+    .overview-section-metode .about-card {
+        background: #ffffff;
+        padding: 35px;
+        border-radius: 16px;
+    }
+
+    .param-title {
+        font-size: 0.9rem;
+        color: #374151;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .param-list {
+        padding-left: 20px;
+        margin-bottom: 1.5rem;
+    }
+
+    .param-list li {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-bottom: 8px;
+        line-height: 1.6;
+    }
+
+    .param-list li strong {
+        color: #111827;
+    }
+
+    /* ===============================
+   ARIMA PARAMETER STYLE
+================================= */
+    .overview-section-metode .arima-param div:first-child {
+        transition: transform 0.3s ease;
+    }
+
+    .overview-section-metode .arima-param:hover div:first-child {
+        transform: scale(1.1);
+    }
+
+    /* ===============================
+   WORKFLOW STYLE
+================================= */
+    .workflow-clean {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .workflow-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .step-number-card {
+        min-width: 45px;
+        height: 45px;
+        background: #2563eb;
+        color: white;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 14px;
+    }
+
+    .step-content-card h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .step-content-card p {
+        margin: 5px 0 0;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    /* ===============================
+   RESPONSIVE (HP)
+================================= */
+    @media (max-width: 992px) {
+        .overview-section-metode .overview-container {
+            flex-direction: column;
+        }
+    }
+
     .overview-left,
     .overview-right {
         flex: 1;
@@ -248,10 +586,13 @@
         z-index: 3;
     }
 
-    .overview-left .about-card {
-        transform: translateY(-80px);
+    .overview-container .about-card {
+        background-color: transparent;
+        transform: translateY(-0px);
         position: relative;
-        z-index: 3;
+        z-index: 1000;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
         overflow: hidden;
     }
 
@@ -259,8 +600,9 @@
         max-width: 1200px;
         margin: auto;
         display: grid;
-        grid-template-columns: 2fr 1.5fr;
+        grid-template-columns: 1fr;
         gap: 20px;
+        margin-bottom: 0;
         align-items: start;
     }
 
@@ -278,6 +620,19 @@
         display: flex;
         gap: 20px;
         margin-bottom: 1.8rem;
+        position: relative;
+    }
+
+    .workflow-item:not(:last-child) .step-number-card::after {
+        content: "";
+        position: absolute;
+        top: 60px;
+        left: 30px;
+        width: 2px;
+        height: calc(100% + 10px);
+        background-image: linear-gradient(to bottom, #2e7d32 50%, transparent 50%);
+        background-size: 2px 8px;
+        background-repeat: repeat-y;
     }
 
     .workflow-step {
@@ -302,36 +657,18 @@
     }
 
 
-    @media (max-width: 768px) {
-        .overview-left .about-card {
-            transform: translateY(0);
-        }
-
-        .overview-section {
-            margin-top: 0;
-        }
-
-        .overview-left {
-            order: 2;
-        }
-
-        .overview-right {
-            order: 1;
-        }
-    }
-
     .about-card {
         background: #ffffff;
         padding: 30px;
         border-radius: 16px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+
     }
 
     .about-card h3,
     .section-header h3 {
         font-size: 1.4rem;
         font-weight: 700;
-        margin-bottom: 10px;
+
     }
 
     .about-card p {
@@ -659,7 +996,7 @@
         }
 
         .about-card {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .overview-left .about-card {
@@ -684,48 +1021,254 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const ctx = document.getElementById('energyChart');
+    document.addEventListener("DOMContentLoaded", function () {
+        loadActualCharts();
+        loadGDPScenario();
+        loadModelInfo();
+    });
+    // ==============================
+    // range api
+    // ==============================
+    fetch('/api/data/range')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['1970', '1980', '1990', '2000', '2010', '2020'],
-            datasets: [
-                {
-                    label: 'Data Historis',
-                    data: [50, 120, 260, 520, 780, 850],
-                    borderColor: '#1e88e5',
-                    backgroundColor: 'rgba(30,136,229,0.1)',
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: 'Prediksi ARIMAX',
-                    data: [null, null, null, null, 780, 920],
-                    borderColor: '#8bc34a',
-                    borderDash: [6, 6],
-                    tension: 0.4
+                const historicalEl = document.getElementById('historicalText');
+
+                if (historicalEl) {
+                    historicalEl.innerText =
+                        `Data Historis: Konsumsi energi fosil aktual dari tahun ${data.min_year} - ${data.max_year}`;
                 }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            },
-            scales: {
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Konsumsi Energi (Joule)'
+
+            }
+        })
+        .catch(err => console.error("Range error:", err));
+
+
+    // ==============================
+    // LOAD GDP SCENARIO
+    // ==============================
+    function loadGDPScenario() {
+        fetch('/api/gdp/scenario')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const select = document.getElementById("sim-scenario");
+
+                    select.options[0].text =
+                        `Moderat (${data.moderate}% per tahun)`;
+
+                    select.options[1].text =
+                        `Optimis (${data.optimistic}% per tahun)`;
+
+                    select.options[2].text =
+                        `Pesimis (${data.pessimistic}% per tahun)`;
+
+                    // Update scenarioText with moderate value on load
+                    const scenarioText = document.getElementById("scenarioText");
+                    if (scenarioText) {
+                        scenarioText.innerHTML = `Moderat (+${data.moderate}%/tahun)`;
                     }
                 }
-            }
-        }
-    });
+            })
+            .catch(err => console.error("Scenario error:", err));
+    }
+
+    fetch("/api/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            scenario: selectedScenario,
+            years: selectedYears
+        })
+    })
+        .then(res => res.json())
+        .then(data => {
+
+
+            // Update teks skenario
+            const scenarioLabel = selectedScenario.charAt(0).toUpperCase() + selectedScenario.slice(1);
+
+            document.getElementById("scenarioText").innerHTML =
+                `${scenarioLabel} (+${data.growth_used}%/tahun)`;
+
+            // lanjut render grafik pakai data.predictions
+        });
+
+
+
+    // ==============================
+    // LOAD DATA ASLI
+    // ==============================
+    function loadActualCharts() {
+        fetch('/api/dashboard/actual-gdp')
+            .then(res => res.json())
+            .then(data => {
+
+                if (!data.actual || !data.gdp) return;
+
+                // Energy Chart
+                const energyCtx = document.getElementById('energy-actual-chart');
+                new Chart(energyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.actual.map(d => d.year),
+                        datasets: [{
+                            label: 'Energi Fosil',
+                            data: data.actual.map(d => d.value),
+                            borderWidth: 2,
+                            tension: 0.3
+                        }]
+                    }
+                });
+
+                // GDP Chart
+                const gdpCtx = document.getElementById('gdp-actual-chart');
+                new Chart(gdpCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.gdp.map(d => d.year),
+                        datasets: [{
+                            label: 'GDP Indonesia',
+                            data: data.gdp.map(d => d.value),
+                            borderWidth: 2,
+                            tension: 0.3
+                        }]
+                    }
+                });
+
+            })
+            .catch(err => console.log("Actual error:", err));
+    }
+
+
+    function loadModelInfo() {
+        fetch('/api/dashboard/model-info')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update semua elemen yang menampilkan MAPE, MAE, RMSE
+                    if (data.mape !== null && data.mape !== undefined) {
+                        const modelAccuracy = document.getElementById('modelAccuracy');
+                        if (modelAccuracy) modelAccuracy.textContent = data.mape.toFixed(2) + '%';
+                        const modelMape = document.getElementById('model-mape');
+                        if (modelMape) modelMape.textContent = data.mape.toFixed(2) + '%';
+                        const mapeValue = document.getElementById('mapeValue');
+                        if (mapeValue) mapeValue.textContent = data.mape.toFixed(2) + '%';
+                    }
+                    if (data.mae !== null && data.mae !== undefined) {
+                        const maeValue = document.getElementById('maeValue');
+                        if (maeValue) maeValue.textContent = data.mae.toFixed(4);
+                        const modelMae = document.getElementById('model-mae');
+                        if (modelMae) modelMae.textContent = data.mae.toFixed(4);
+                    }
+                    if (data.rmse !== null && data.rmse !== undefined) {
+                        const rmseValue = document.getElementById('rmseValue');
+                        if (rmseValue) rmseValue.textContent = data.rmse.toFixed(4);
+                        const modelRmse = document.getElementById('model-rmse');
+                        if (modelRmse) modelRmse.textContent = data.rmse.toFixed(4);
+                    }
+                    // Update R² Score card
+                    if (data.r2 !== null && data.r2 !== undefined) {
+                        document.getElementById('r2Score').textContent = data.r2.toFixed(4);
+                        const r2Percent = (data.r2 * 100).toFixed(1);
+                        document.getElementById('r2Label').textContent = `${r2Percent}% variance explained`;
+                    }
+
+                    // Performance metrics
+                    document.getElementById('maeValue').textContent = data.mae ? data.mae.toFixed(4) : '-';
+                    document.getElementById('r2Value').textContent = data.r2 ? data.r2.toFixed(4) : '-';
+                    document.getElementById('rmseValue').textContent = data.rmse ? data.rmse.toFixed(4) : '-';
+                    document.getElementById('maeValue').textContent = data.mae ? data.mae.toFixed(4) : '-';
+
+                    // Progress bars (invert for MAPE - lower is better)
+                    if (data.mape !== null && data.mape !== undefined) {
+
+                        const mape = data.mape;
+
+                        // Set nilai MAPE
+                        document.getElementById('mapeValue').textContent = mape.toFixed(2) + '%';
+
+                        // Interpretasi
+                        const interpretation = interpretMAPE(mape);
+
+                        const descEl = document.getElementById('mapeDescription');
+                        if (descEl) {
+                            descEl.textContent = interpretation.text;
+                            descEl.className = "fw-bold " + interpretation.color;
+                        }
+
+                        // Progress bar (dibalik karena makin kecil makin bagus)
+                        const mapeScore = Math.max(0, 100 - mape);
+                        const mapeBar = document.getElementById('mapeBar');
+                        mapeBar.style.width = mapeScore + '%';
+
+                        // Ganti warna progress bar sesuai kualitas
+                        mapeBar.className = "progress-bar " + interpretation.bar;
+                    }
+
+                    if (data.r2) {
+                        document.getElementById('r2Bar').style.width = (data.r2 * 100) + '%';
+                    }
+
+                    // Last training info
+                    document.getElementById('lastTrainingDate').textContent = data.lastTrained || '-';
+                    document.getElementById('modelParams').textContent = data.params || '-';
+                    document.getElementById('trainingDuration').textContent = data.duration || '-';
+
+                    // Load comparison chart
+                    if (data.testData) {
+                        createComparisonChart(data.testData);
+                        createMiniComparisonChart(data.testData); // Tambahan: grafik mini
+                    } else {
+                        // Show placeholder for comparison chart
+                        const comparisonCanvas = document.getElementById('comparisonChart');
+                        if (comparisonCanvas) {
+                            const container = comparisonCanvas.parentElement;
+                            container.innerHTML = `
+                                <div class="text-center py-5">
+                                    <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Data perbandingan belum tersedia</p>
+                                    <small class="text-muted">Lakukan retrain model untuk melihat chart ini</small>
+                                    <br>
+                                    <a href="/admin/update-model" class="btn btn-sm btn-primary mt-3">
+                                        <i class="fas fa-brain me-1"></i> Retrain Model
+                                    </a>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    // Load error distribution chart
+                    if (data.errorData) {
+                        createErrorChart(data.errorData);
+                    } else {
+                        // Show placeholder for error chart
+                        const errorCanvas = document.getElementById('errorChart');
+                        if (errorCanvas) {
+                            const container = errorCanvas.parentElement;
+                            container.innerHTML = `
+                                <div class="text-center py-5">
+                                    <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Data distribusi error belum tersedia</p>
+                                    <small class="text-muted">Lakukan retrain model untuk melihat chart ini</small>
+                                    <br>
+                                    <a href="/admin/update-model" class="btn btn-sm btn-primary mt-3">
+                                        <i class="fas fa-brain me-1"></i> Retrain Model
+                                    </a>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading model info:', error);
+            });
+    }
+
+
 </script>
 
 {% endblock %}
