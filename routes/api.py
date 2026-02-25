@@ -10,12 +10,7 @@ from services.update_data_api import (
     get_energy_data,
     get_gdp_data
 )
-# SCHEDULER DISABLED - Not reliable for local development
-# from services.scheduler_service import (
-#     setup_schedule,
-#     save_schedule_config,
-#     get_schedule_status
-# )
+
 from services.data_validator import validate_data_compatibility, get_data_alignment_report
 from services.train_service import retrain_model
 from services.database_service import (
@@ -109,6 +104,14 @@ def fetch_data():
         end_year = data.get("endYear", 2023)
         
         result = fetch_data_from_api(data_type, start_year, end_year)
+
+        # --- PATCH: Rename 'entityname' to 'Entity' in energy data ---
+        if result and 'energy_data' in result and isinstance(result['energy_data'], list):
+            for row in result['energy_data']:
+                if 'entityname' in row and 'Entity' not in row:
+                    row['Entity'] = row.pop('entityname')
+        # --- END PATCH ---
+
         return jsonify(result)
         
     except Exception as e:

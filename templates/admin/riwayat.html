@@ -149,7 +149,7 @@
                                             <th style="width: 12%;">Akurasi (MAPE)</th>
                                             <th style="width: 10%;">Status</th>
                                             <th style="width: 20%;">Keterangan</th>
-                                            <th style="width: 11%;">Aksi</th>
+                                            <!-- <th style="width: 11%;">Aksi</th> -->
                                         </tr>
                                     </thead>
                                     <tbody id="trainingTableBody">
@@ -183,7 +183,6 @@
                                             <th style="width: 12%;">Records Ditambah</th>
                                             <th style="width: 10%;">Status</th>
                                             <th style="width: 20%;">Keterangan</th>
-                                            <th style="width: 11%;">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody id="dataTableBody">
@@ -216,8 +215,6 @@
                                             <th style="width: 15%;">Forecast Period</th>
                                             <th style="width: 12%;">Skenario</th>
                                             <th style="width: 10%;">Status</th>
-                                            <th style="width: 20%;">User/Admin</th>
-                                            <th style="width: 11%;">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody id="predictionTableBody">
@@ -484,11 +481,7 @@
                 <td><strong class="${item.mape < 10 ? 'text-success' : item.mape < 20 ? 'text-warning' : 'text-danger'}">${item.mape ? item.mape.toFixed(2) + '%' : '-'}</strong></td>
                 <td><span class="badge bg-success">Success</span></td>
                 <td><small>${item.year_range || '-'} (${item.total_data || 0} data)</small></td>
-                <td>
-                    <button class="btn btn-sm btn-info" onclick="viewTrainingDetail(${item.id})">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </td>
+               
             </tr>
         `).join('');
     }
@@ -535,11 +528,7 @@
                 <td><strong>${item.records_added || 0}</strong> records</td>
                 <td><span class="badge bg-${item.status === 'success' ? 'success' : 'danger'}">${item.status || 'success'}</span></td>
                 <td><small>${item.message || '-'}</small></td>
-                <td>
-                    <button class="btn btn-sm btn-info" onclick="viewDataDetail(${item.id})">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </td>
+               
             </tr>
         `).join('');
     }
@@ -584,12 +573,6 @@
                     </span>
                 </td>
                 <td><span class="badge bg-success">Success</span></td>
-                <td>User/Admin</td>
-                <td>
-                    <button class="btn btn-sm btn-info" onclick="viewPredictionDetail(${item.id})">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </td>
             </tr>
         `).join('');
     }
@@ -602,10 +585,10 @@
             .then(data => {
                 if (data) {
                     const modalBody = document.getElementById('detailModalBody');
-                    
+
                     // Build detail HTML with preprocessing visualizations
                     let visualizationHtml = '';
-                    
+
                     if (data.acf_plot || data.pacf_plot || data.preprocessing_plot || data.train_test_plot) {
                         visualizationHtml = `
                             <h6 class="mt-4 mb-3 fw-bold text-primary">
@@ -662,7 +645,7 @@
                             </div>
                         `;
                     }
-                    
+
                     modalBody.innerHTML = `
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -954,7 +937,7 @@
                         </div>
                         ` : ''}
                     `;
-                    
+
                     // Show modal
                     const modal = new bootstrap.Modal(document.getElementById('detailModal'));
                     modal.show();

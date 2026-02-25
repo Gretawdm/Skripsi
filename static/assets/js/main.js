@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Variable untuk simpan prediksi official
     let officialPredictionData = null;
     let currentChart = null;
+    let simChart = null;
 
     // Load chart prediksi official dan model metrics
     loadOfficialPrediction();
@@ -73,35 +74,38 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.log('Formatted predictions:', predictions);
                     
                     // Update chart dengan hasil simulasi
-                    updateChartWithSimulation(predictions, scenarioMap[scenario]);
-                    
+                    renderSimChart(officialPredictionData.historical, predictions, scenario, scenarioMap[scenario]);
+                      
                     // Update hasil simulasi
                     const targetPrediction = predictions.find(p => p.year === year);
                     if (targetPrediction) {
                         document.getElementById('sim-value').textContent = targetPrediction.value.toFixed(2);
-                        
-                        // Hitung perubahan dari tahun data terakhir
-                      // Ambil tahun & nilai terakhir dari historical official
-const historical = officialPredictionData.historical;
-const lastHistorical = historical[historical.length - 1];
-
-const baseYear = lastHistorical.year;
-const baseValue = lastHistorical.value;
-
-const change = ((targetPrediction.value - baseValue) / baseValue * 100).toFixed(1);
-     
+                        // Ambil tahun & nilai terakhir dari historical official
+                        const historical = officialPredictionData.historical;
+                        const lastHistorical = historical[historical.length - 1];
+                        const baseYear = lastHistorical.year;
+                        const baseValue = lastHistorical.value;
+                        const change = ((targetPrediction.value - baseValue) / baseValue * 100).toFixed(1);
+                        // Update sim-change card
+                        const simChangeEl = document.getElementById('sim-change');
+                        if (simChangeEl) {
+                            simChangeEl.textContent = `${change > 0 ? '+' : ''}${change}%`;
+                        }
+                        // Update baseline-year card
+                        const baselineYearEl = document.getElementById('baseline-year');
+                        if (baselineYearEl) {
+                            baselineYearEl.textContent = baseYear;
+                        }
                         // Update info
                         const scenarioNames = {
                             'optimistic': 'optimis (pertumbuhan PDB tinggi)',
                             'moderate': 'moderat (pertumbuhan PDB stabil)',
                             'pessimistic': 'pesimis (pertumbuhan PDB rendah)'
                         };
-                        
                         document.getElementById('sim-info').textContent =
-                        `Dengan skenario ${scenarioNames[scenario]}, ` +
-                        `konsumsi energi fosil Indonesia diprediksi mencapai ${targetPrediction.value.toFixed(2)} TWh pada tahun ${year}. ` +
-                        `Ini menunjukkan ${change > 0 ? 'peningkatan' : 'penurunan'} ${Math.abs(change)}% dari tahun ${baseYear}.`;
-
+                            `Dengan skenario ${scenarioNames[scenario]}, ` +
+                            `konsumsi energi fosil Indonesia diprediksi mencapai ${targetPrediction.value.toFixed(2)} TWh pada tahun ${year}. ` +
+                            `Ini menunjukkan ${change > 0 ? 'peningkatan' : 'penurunan'} ${Math.abs(change)}% dari tahun ${baseYear}.`;
                     }
                     
                     // Show result & reset button
@@ -129,8 +133,10 @@ const change = ((targetPrediction.value - baseValue) / baseValue * 100).toFixed(
             }
             
             // Hide result & reset button
-            document.getElementById('sim-result').style.display = 'none';
-            resetBtn.style.display = 'none';
+           document.getElementById('sim-result').style.display = 'none';
+           resetBtn.style.display = 'none';
+           //Destroy grafik simulasi
+           if (simChart) { simChart.destroy(); simChart = null; }
             
             // Reset form
             document.getElementById('sim-scenario').value = 'moderate';
@@ -371,6 +377,103 @@ const change = ((targetPrediction.value - baseValue) / baseValue * 100).toFixed(
         
         loadChart(officialPredictionData.historical, predictions, scenario);
     }
+
+    function renderSimChart(historical, predictions, scenarioEn, scenarioId) {
+    const ctx = document.getElementById('sim-chart');
+    if (!ctx) return;
+
+    // Destroy chart lama kalau ada
+    if (simChart) {
+        simChart.destroy();
+    }
+
+    const histYears = historical.map(d => d.year);
+    const histValues = historical.map(d => d.value);
+    const predYears = predictions.map(d => d.year);
+    const predValues = predictions.map(d => typeof d.value === 'number' ? d.value : d.prediction_value);
+
+    // Warna berdasarkan skenario
+    const colorMap = {
+        'optimistic': { border: '#2e7d32', bg: 'rgba(46,125,50,0.12)' },
+        'moderate':   { border: '#ffc107', bg: 'rgba(255,193,7,0.12)' },
+        'pessimistic':{ border: '#e53935', bg: 'rgba(229,57,53,0.12)' }
+    };
+    const color = colorMap[scenarioEn] || colorMap['moderate'];
+
+    const scenarioLabel = {
+        'optimistic': 'Simulasi Optimis',
+        'moderate': 'Simulasi Moderat',
+        'pessimistic': 'Simulasi Pesimis'
+    }[scenarioEn] || 'Simulasi';
+
+    // Gabungkan semua label tahun
+    const allYears = histYears.concat(predYears);
+
+    simChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: allYears,
+            datasets: [
+                {
+                    label: 'Data Historis',
+                    data: histValues,
+                    borderColor: '#2196F3',
+                    backgroundColor: 'rgba(33,150,243,0.08)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 2,
+                    fill: true
+                },
+                {
+                    label: scenarioLabel,
+                    data: new Array(histYears.length).fill(null).concat(predValues),
+                    borderColor: color.border,
+                    backgroundColor: color.bg,
+                    borderWidth: 3,
+                    borderDash: [6, 4],
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointBackgroundColor: color.border,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: true, position: 'top' },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleFont: { size: 13, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    padding: 10,
+                    callbacks: {
+                        title: ctx => 'Tahun ' + ctx[0].label,
+                        label: ctx => {
+                            if (ctx.parsed.y === null) return null;
+                            const year = parseInt(ctx.label);
+                            const suffix = year <= 2024 ? ' TWh (Aktual)' : ' TWh (Simulasi)';
+                            return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(2) + suffix;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: { display: true, text: 'Konsumsi Energi Fosil (TWh)' },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    title: { display: true, text: 'Tahun' },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                }
+            }
+        }
+    });
+}
+
     const btn = document.getElementById("refreshBtn");
     if (!btn) {
         console.error("refreshBtn tidak ditemukan");
@@ -430,46 +533,49 @@ console.log("last_actual_value:", data.last_actual_value);
         
         if (data.success && data.metrics) {
             const metrics = data.metrics;
-            
             // Update akurasi di stats card
             const accuracyEl = document.getElementById('model-accuracy');
             if (accuracyEl) {
                 accuracyEl.textContent = metrics.accuracy + '%';
             }
-            
             // Update MAPE di evaluasi model
             const mapeEl = document.getElementById('model-mape');
             if (mapeEl) {
                 mapeEl.textContent = metrics.mape.toFixed(2) + '%';
             }
-            
             // Update model version
             const versionEl = document.getElementById('model-version');
             if (versionEl) {
                 versionEl.textContent = metrics.order;
             }
-            
             // Update training date
             const dateEl = document.getElementById('model-date');
             if (dateEl) {
                 dateEl.textContent = metrics.training_date || 'N/A';
             }
-            
+            // Update model-accuracy-summary for layman
+            const summaryEl = document.getElementById('model-accuracy-summary');
+            if (summaryEl && metrics.mape !== undefined && metrics.mape !== null) {
+                const accuracy = 100 - metrics.mape;
+                summaryEl.textContent = accuracy >= 0 ? accuracy.toFixed(1) + '%' : 'N/A';
+            } else if (summaryEl) {
+                summaryEl.textContent = 'N/A';
+            }
             console.log('✅ Model metrics loaded:', metrics);
         } else {
             console.warn('⚠️ No active model metrics found');
             // Set fallback values
             const accuracyEl = document.getElementById('model-accuracy');
             if (accuracyEl) accuracyEl.textContent = 'N/A';
-            
             const mapeEl = document.getElementById('model-mape');
             if (mapeEl) mapeEl.textContent = 'N/A';
-            
             const versionEl = document.getElementById('model-version');
             if (versionEl) versionEl.textContent = 'N/A';
-            
             const dateEl = document.getElementById('model-date');
             if (dateEl) dateEl.textContent = 'N/A';
+            // Set fallback for summary
+            const summaryEl = document.getElementById('model-accuracy-summary');
+            if (summaryEl) summaryEl.textContent = 'N/A';
         }
     } catch (error) {
         console.error('❌ Error loading model metrics:', error);

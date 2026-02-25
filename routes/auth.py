@@ -173,20 +173,18 @@ def api_list_users():
 def login():
     """Login page and handler"""
     if request.method == 'POST':
-        username = request.form.get('username')
+        identifier = request.form.get('username')  # bisa username atau email
         password = request.form.get('password')
         
-        if not username or not password:
-            flash('Username dan password wajib diisi', 'danger')
+        if not identifier or not password:
+            flash('Username/email dan password wajib diisi', 'danger')
             return redirect(url_for('auth.login'))
         
-        # Check user in database
+        # Check user in database (username OR email)
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
-        
-        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+        cursor.execute("SELECT * FROM users WHERE username = %s OR email = %s", (identifier, identifier))
         user = cursor.fetchone()
-        
         cursor.close()
         connection.close()
         
@@ -194,22 +192,19 @@ def login():
             if not user['is_active']:
                 flash('Akun Anda tidak aktif. Hubungi administrator.', 'danger')
                 return redirect(url_for('auth.login'))
-            
             # Set session
             session['user_id'] = user['id']
             session['username'] = user['username']
             session['role'] = user['role']
             session['full_name'] = user['full_name']
-            
             # Redirect based on role
             if user['role'] == 'admin':
                 return redirect('/admin/dashboard')
             else:
                 return redirect('/')
         else:
-            flash('Username atau password salah', 'danger')
+            flash('Username/email atau password salah', 'danger')
             return redirect(url_for('auth.login'))
-    
     return render_template('auth/login.html')
 
 @auth_bp.route('/logout')

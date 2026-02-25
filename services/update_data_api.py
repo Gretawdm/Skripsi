@@ -97,15 +97,29 @@ def fetch_data_from_api(data_type='all', start_year=1990, end_year=2023):
             energy_url = "https://ourworldindata.org/grapher/fossil-fuel-primary-energy.csv?v=1&csvType=full&useColumnShortNames=true"
             energy_df = pd.read_csv(energy_url, storage_options=headers)
             
-            # Filter Indonesia - cek berbagai kemungkinan nama kolom
             entity_col = None
-            for col in ['Entity', 'entity', 'Country', 'country', 'location', 'Location']:
+            for col in ['Entity', 'entity', 'Country', 'country', 'location', 'Location', 'entityname']:
                 if col in energy_df.columns:
                     entity_col = col
                     break
             
             if entity_col:
-                energy_df = energy_df[energy_df[entity_col] == "Indonesia"]
+                # Try exact match first
+                filtered = energy_df[energy_df[entity_col].astype(str).str.lower().str.strip() == 'indonesia']
+                # If empty, try substring match
+                if filtered.empty:
+                    filtered = energy_df[energy_df[entity_col].astype(str).str.lower().str.contains('indonesia')]
+                energy_df = filtered
+                # If still empty, show available values for debugging
+                if energy_df.empty:
+                    available_entities = energy_df[entity_col].unique()
+                    return {
+                        "success": False,
+                        "message": f"Tidak ada data Indonesia di kolom '{entity_col}'. Nilai yang tersedia: {', '.join(map(str, available_entities))}"
+                    }
+                # Normalize column name to 'Entity'
+                if entity_col != 'Entity':
+                    energy_df = energy_df.rename(columns={entity_col: 'Entity'})
             else:
                 return {
                     "success": False,
@@ -194,10 +208,10 @@ def fetch_data_from_api(data_type='all', start_year=1990, end_year=2023):
                 warnings = []
                 if energy_dropped > 0:
                     result["message"] += f"⚠️ {energy_dropped} tahun energi tidak ada GDP-nya. "
-                    warnings.append(f"Data energi tersedia untuk {len(energy_years)} tahun, tapi {energy_dropped} tahun tidak memiliki data GDP")
+                    warnings.append(f"{energy_dropped} tahun energi tidak memiliki data GDP")
                 if gdp_dropped > 0:
                     result["message"] += f"⚠️ {gdp_dropped} tahun GDP tidak ada energi-nya. "
-                    warnings.append(f"Data GDP tersedia untuk {len(gdp_years)} tahun, tapi {gdp_dropped} tahun tidak memiliki data energi")
+                    warnings.append(f"{gdp_dropped} tahun GDP tidak memiliki data energi")
                 
                 result["warnings"] = warnings
                 result["alignment_info"] = {
@@ -436,7 +450,7 @@ def upload_data_from_files(energy_file=None, gdp_file=None):
                 elif filename.endswith(('.xlsx', '.xls')):
                     gdp_df = pd.read_excel(gdp_file)
                 else:
-                    raise ValueError("Format file GDP tidak didukung. Gunakan CSV atau Excel")
+                    raise ValueError("Format file GDP tidak didukung. Gunakan CSV atau Excel (.xlsx/.xls)")
             except Exception as e:
                 if isinstance(e, ValueError):
                     raise
@@ -483,7 +497,7 @@ def upload_data_from_files(energy_file=None, gdp_file=None):
                 
                 if entity_col:
                     indonesia_data = gdp_long[
-                        gdp_long[entity_col].astype(str).str.lower().str.contains('indonesia|idn', na=False, regex=True)
+                        gdp_long[entity_col].astype(str).str.lower().str.contains('indonesia|idn|id', na=False, regex=True)
                     ]
                     
                     if len(indonesia_data) > 0:
@@ -806,4 +820,3 @@ def preview_api_data():
         "energy_api_preview": energy_preview,
         "gdp_api_preview": gdp_preview
     })
-

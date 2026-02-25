@@ -440,31 +440,31 @@
         loadActualAndGDPData(); // <-- panggil API untuk grafik Data Asli vs GDP
     }
 
-     function loadGDPScenario() {
-            fetch('/api/gdp/scenario')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        const select = document.getElementById("sim-scenario");
+    function loadGDPScenario() {
+        fetch('/api/gdp/scenario')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const select = document.getElementById("sim-scenario");
 
-                        select.options[0].text =
-                            `Moderat (${data.moderate}% per tahun)`;
+                    select.options[0].text =
+                        `Moderat (${data.moderate}% per tahun)`;
 
-                        select.options[1].text =
-                            `Optimis (${data.optimistic}% per tahun)`;
+                    select.options[1].text =
+                        `Optimis (${data.optimistic}% per tahun)`;
 
-                        select.options[2].text =
-                            `Pesimis (${data.pessimistic}% per tahun)`;
+                    select.options[2].text =
+                        `Pesimis (${data.pessimistic}% per tahun)`;
 
-                        // Update scenarioText with moderate value on load
-                        const scenarioText = document.getElementById("scenarioText");
-                        if (scenarioText) {
-                            scenarioText.innerHTML = `Moderat (+${data.moderate}%/tahun)`;
-                        }
+                    // Update scenarioText with moderate value on load
+                    const scenarioText = document.getElementById("scenarioText");
+                    if (scenarioText) {
+                        scenarioText.innerHTML = `Moderat (+${data.moderate}%/tahun)`;
                     }
-                })
-                .catch(err => console.error("Scenario error:", err));
-        }
+                }
+            })
+            .catch(err => console.error("Scenario error:", err));
+    }
 
     // Fungsi ambil data asli dan GDP dari database
     function loadActualAndGDPData() {
@@ -875,27 +875,27 @@
         ];
 
         // Add confidence interval
-        if (data.predictions[0]?.lowerBound) {
-            datasets.push({
-                label: 'Lower Bound (95%)',
-                data: data.predictions.map(d => ({ x: d.year, y: d.lowerBound })),
-                borderColor: 'rgba(200, 200, 200, 0.5)',
-                backgroundColor: 'rgba(200, 200, 200, 0.1)',
-                borderWidth: 1,
-                borderDash: [2, 2],
-                pointRadius: 0,
-                fill: false
-            });
-
+        if (data.predictions[0]?.lowerBound !== undefined && data.predictions[0]?.lowerBound !== null) {
             datasets.push({
                 label: 'Upper Bound (95%)',
                 data: data.predictions.map(d => ({ x: d.year, y: d.upperBound })),
-                borderColor: 'rgba(200, 200, 200, 0.5)',
-                backgroundColor: 'rgba(200, 200, 200, 0.2)',
+                borderColor: 'rgba(150, 150, 255, 0.4)',
+                backgroundColor: 'rgba(150, 150, 255, 0.15)',
                 borderWidth: 1,
-                borderDash: [2, 2],
+                borderDash: [3, 3],
                 pointRadius: 0,
-                fill: '-1'
+                fill: '+1'   // ← fill ke bawah ke arah Lower Bound
+            });
+
+            datasets.push({
+                label: 'Lower Bound (95%)',
+                data: data.predictions.map(d => ({ x: d.year, y: d.lowerBound })),
+                borderColor: 'rgba(150, 150, 255, 0.4)',
+                backgroundColor: 'rgba(150, 150, 255, 0.15)',
+                borderWidth: 1,
+                borderDash: [3, 3],
+                pointRadius: 0,
+                fill: false
             });
         }
 
@@ -1091,17 +1091,13 @@
             historical[historical.length - 1].value : null;
 
         tbody.innerHTML = predictions.map((pred, index) => {
-            // For first prediction year (2025), compare with last historical year (2024)
-            // For subsequent years, compare with previous prediction
             let change = 0;
             let previousValue = null;
 
             if (index === 0 && lastHistorical !== null) {
-                // Compare 2025 with 2024 (last historical)
                 previousValue = lastHistorical;
                 change = pred.value - lastHistorical;
             } else if (index > 0) {
-                // Compare with previous prediction
                 previousValue = predictions[index - 1].value;
                 change = pred.value - previousValue;
             }
@@ -1109,23 +1105,24 @@
             const changePercent = previousValue ? ((change / previousValue) * 100) : 0;
             const changeClass = change > 0 ? 'text-danger' : change < 0 ? 'text-success' : 'text-secondary';
             const changeIcon = change > 0 ? 'fa-arrow-up' : change < 0 ? 'fa-arrow-down' : 'fa-minus';
-            // Status berdasarkan nilai TWh (threshold realistis untuk Indonesia)
-            const statusClass = pred.value > 4000 ? 'bg-danger' : pred.value > 3500 ? 'bg-warning' : 'bg-success';
-            const statusText = pred.value > 4000 ? 'Tinggi' : pred.value > 3500 ? 'Sedang' : 'Rendah';
+
+            // Status berdasarkan persentase perubahan
+            const statusClass = changePercent > 5 ? 'bg-danger' : changePercent > 3 ? 'bg-warning' : 'bg-success';
+            const statusText = changePercent > 5 ? 'Naik Tinggi' : changePercent > 3 ? 'Naik Sedang' : 'Naik Rendah';
 
             return `
-                <tr>
-                    <td><strong>${pred.year}</strong></td>
-                    <td><strong>${pred.value.toFixed(2)} TWh</strong></td>
-                    <td>${pred.lowerBound ? pred.lowerBound.toFixed(2) + ' TWh' : '-'}</td>
-                    <td>${pred.upperBound ? pred.upperBound.toFixed(2) + ' TWh' : '-'}</td>
-                    <td class="${changeClass}">
-                        <i class="fas ${changeIcon} me-1"></i>
-                        ${Math.abs(change).toFixed(2)} TWh (${Math.abs(changePercent).toFixed(2)}%)
-                    </td>
-                    <td><span class="badge ${statusClass}">${statusText}</span></td>
-                </tr>
-            `;
+        <tr>
+            <td><strong>${pred.year}</strong></td>
+            <td><strong>${pred.value.toFixed(2)} TWh</strong></td>
+            <td>${pred.lowerBound !== undefined ? pred.lowerBound.toFixed(2) + ' TWh' : '-'}</td>
+            <td>${pred.upperBound !== undefined ? pred.upperBound.toFixed(2) + ' TWh' : '-'}</td>
+            <td class="${changeClass}">
+                <i class="fas ${changeIcon} me-1"></i>
+                ${Math.abs(change).toFixed(2)} TWh (${Math.abs(changePercent).toFixed(2)}%)
+            </td>
+            <td><span class="badge ${statusClass}">${statusText}</span></td>
+        </tr>
+    `;
         }).join('');
     }
 
